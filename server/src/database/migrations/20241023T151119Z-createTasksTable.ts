@@ -25,6 +25,7 @@ export async function up(db: Kysely<any>) {
     .addColumn('completed', 'boolean', (c) => c.notNull().defaultTo(false))
     .addColumn('completed_at', 'timestamptz')
     .addColumn('points', 'integer')
+    .addColumn('repeat_id', 'integer', (c) => c.references('repeat.id').onDelete('set null'))
     .execute()
 
     await db.schema

@@ -7,20 +7,18 @@ import {
 } from '@server/entities/tasks'
 import type { Insertable, Selectable } from 'kysely'
 
-
 export interface GetTasksOptions {
-    assignedUserId?: number
-    categoryId?: number
-    limit?: number
-    comleted?: boolean
-    createdByUserId?: number
-    deadline?: Date
-    groupId?: number
-    id?: number
-    importance?: string
-    title?: string
-
-  }
+  assignedUserId?: number
+  categoryId?: number
+  limit?: number
+  completed?: boolean
+  createdByUserId?: number
+  deadline?: Date
+  groupId?: number
+  id?: number
+  importance?: string
+  title?: string
+}
 
 export function tasksRepository(db: Database) {
   return {
@@ -32,24 +30,56 @@ export function tasksRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async get (options: string): Promise<Selectable<Tasks> | undefined> {
-        let query = db.selectFrom('tasks').selectAll()
+    async getTasks(
+      options: GetTasksOptions
+    ): Promise<TasksPublic[] | undefined> {
+      let query = db.selectFrom('tasks').selectAll()
 
-        if (options.username !== undefined) {
-          query = query.where('username', '=', options.username)
+      const filters: Array<{
+        column: keyof Tasks
+        operator: string
+        value: any
+      }> = [
+        {
+          column: 'assignedUserId',
+          operator: '=',
+          value: options.assignedUserId,
+        },
+        { column: 'categoryId', operator: '=', value: options.categoryId },
+        { column: 'completed', operator: '=', value: options.completed },
+        {
+          column: 'createdByUserId',
+          operator: '=',
+          value: options.createdByUserId,
+        },
+        { column: 'deadline', operator: '=', value: options.deadline },
+        { column: 'groupId', operator: '=', value: options.groupId },
+        { column: 'id', operator: '=', value: options.id },
+        { column: 'importance', operator: '=', value: options.importance },
+        {
+          column: 'title',
+          operator: 'like',
+          value: options.title ? `%${options.title}%` : undefined,
+        },
+      ]
+
+      filters.forEach((filter) => {
+        if (filter.value !== undefined) {
+          query = query.where(
+            filter.column,
+            filter.operator as any,
+            filter.value
+          )
         }
-    
-        if (options.sprintCode !== undefined) {
-          query = query.where('sprintCode', '=', options.sprintCode)
-        }
-    
-        if (options.limit !== undefined && options.limit > 0) {
-          query = query.limit(options.limit)
-        }
-    
-        return query.execute()
+      })
+
+      if (options.limit !== undefined) {
+        query = query.limit(options.limit)
+      }
+
+      return query.execute()
     },
   }
 }
 
-export type UserRepository = ReturnType<typeof userRepository>
+export type UserRepository = ReturnType<typeof tasksRepository>
