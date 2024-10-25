@@ -10,6 +10,8 @@ export const groupsSchema = z.object({
     name: z.string().trim().min(3).max(50)
 })
 
+export const insertGroupSchema = groupsSchema.omit({createdByUserId: true, id: true, createdAt: true})
+
 // list keys that we will return to the client
 export const groupsKeysAll = Object.keys(groupsSchema.shape) as (keyof Groups)[]
 

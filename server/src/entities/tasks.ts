@@ -2,7 +2,6 @@ import { z } from 'zod'
 import type { Selectable, Insertable } from 'kysely'
 import type { Tasks } from '@server/database/types'
 import { idSchema } from './shared'
-import tasks from '@server/controllers/tasks'
 
 export const taskSchema = z.object({
   id: idSchema,

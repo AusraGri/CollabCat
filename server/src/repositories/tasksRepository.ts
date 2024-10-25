@@ -81,4 +81,4 @@ export function tasksRepository(db: Database) {
   }
 }
 
-export type UserRepository = ReturnType<typeof tasksRepository>
+export type TasksRepository = ReturnType<typeof tasksRepository>
