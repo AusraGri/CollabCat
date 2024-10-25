@@ -11,7 +11,7 @@ export async function up(db: Kysely<any>) {
         c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
       )
     .addColumn('name', 'text', (c)=> c.notNull())
-    .addColumn('created_by_user_id', 'text', (c)=> c.notNull().references('users.id').onDelete('cascade'))
+    .addColumn('created_by_user_id', 'integer', (c)=> c.notNull().references('user.id').onDelete('cascade'))
     .execute()
 }
 

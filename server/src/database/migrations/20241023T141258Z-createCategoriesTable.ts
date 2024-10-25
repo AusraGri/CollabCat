@@ -8,7 +8,7 @@ export async function up(db: Kysely<any>) {
       )
     .addColumn('title', 'varchar(50)', (c) => c.notNull().unique())
     .addColumn('created_by_user_id', 'integer', (c) => c.references('user.id').onDelete('cascade'))
-    .addColumn('is_default', 'boolean', (c) => c.defaultTo(false))
+    .addColumn('is_default', 'boolean', (c) => c.notNull().defaultTo(false))
     .execute()
 }
 

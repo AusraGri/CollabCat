@@ -5,10 +5,6 @@ import { idSchema } from './shared'
 
 export const userSchema = z.object({
   id: idSchema,
-
-  // Trim and lowercase all emails so there are no issues
-  // due to users mistyping their emails as "Email@example.com "
-  // either during signup or login.
   email: z.string().trim().toLowerCase().email(),
 
   password: z
@@ -20,13 +16,11 @@ export const userSchema = z.object({
   lastName: z.string().min(1).max(500),
 })
 
-// list keys that we will return to the client
 export const userKeysAll = Object.keys(userSchema.shape) as (keyof User)[]
 
 export const userKeysPublic = ['id', 'firstName', 'lastName'] as const
 
 export type UserPublic = Pick<Selectable<User>, (typeof userKeysPublic)[number]>
 
-// a specific schema for authenticated user that is used in JWT
 export const authUserSchema = userSchema.pick({ id: true })
 export type AuthUser = z.infer<typeof authUserSchema>

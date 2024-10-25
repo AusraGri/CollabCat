@@ -21,7 +21,6 @@ export async function up(db: Kysely<any>) {
       c
         .defaultTo(sql`CURRENT_TIMESTAMP`)
         .notNull()
-        .onUpdate('set default')
     )
     .execute()
 
