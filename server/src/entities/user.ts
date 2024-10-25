@@ -17,7 +17,6 @@ export const userSchema = z.object({
   auth0Id: z.string(),
   createdAt: z.date(),
   provider: z.string(),
-  role: z.string(),
   updatedAt: z.date()
 })
 

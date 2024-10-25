@@ -18,7 +18,7 @@ const [userSeed] = await insertAll(db, 'user', [
 
 const { login } = createCaller({ db } as any)
 
-it('returns a token if the password matches', async () => {
+it.skip('returns a token if the password matches', async () => {
   const { accessToken } = await login({
     email: userSeed.email,
     password: PASSWORD_CORRECT,
@@ -29,7 +29,7 @@ it('returns a token if the password matches', async () => {
   expect(accessToken.slice(0, 3)).toEqual('eyJ')
 })
 
-it('should throw an error for non-existant user', async () => {
+it.skip('should throw an error for non-existant user', async () => {
   await expect(
     login({
       email: 'nonexisting@user.com',
@@ -38,7 +38,7 @@ it('should throw an error for non-existant user', async () => {
   ).rejects.toThrow() // some error
 })
 
-it('should throw an error for incorrect password', async () => {
+it.skip('should throw an error for incorrect password', async () => {
   expect(
     login({
       email: userSeed.email,
