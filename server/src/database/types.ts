@@ -1,5 +1,6 @@
 import type { ColumnType } from 'kysely'
 
+
 export type ArrayTypeImpl<T> =
 T extends ColumnType<infer S, infer I, infer U>
 ? ColumnType<S[], I[], U[]>
@@ -7,7 +8,7 @@ T extends ColumnType<infer S, infer I, infer U>
 
 export type ArrayType<T> =
   ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>
-
+  
 export type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U>
     ? ColumnType<S, I | undefined, U>
@@ -66,12 +67,12 @@ export interface User {
   lastName: string
   password: string
   provider: Generated<string>
-  role: Generated<string>
   updatedAt: Generated<Timestamp>
 }
 
 export interface UserGroups {
   groupId: number
+  role: string
   userId: number
 }
 

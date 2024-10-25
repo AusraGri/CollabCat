@@ -13,7 +13,6 @@ export async function up(db: Kysely<any>) {
     .addColumn('password', 'text', (c) => c.notNull())
     .addColumn('auth0_id', 'text', (c) => c.unique())
     .addColumn('provider', 'text', (c) => c.notNull().defaultTo('email'))
-    .addColumn('role', 'text', (c) => c.notNull().defaultTo('user'))
     .addColumn('created_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )

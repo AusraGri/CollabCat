@@ -5,7 +5,8 @@ export async function up(db: Kysely<any>) {
     .createTable('user_groups')
     .addColumn('user_id', 'integer', (c) => c.notNull().references('user.id').onDelete('cascade'))
     .addColumn('group_id', 'integer', (c) => c.notNull().references('groups.id').onDelete('cascade'))
-    .addPrimaryKeyConstraint('user_group_pk', ['user_id', 'group_id']) // composite primary key
+    .addColumn('role', 'varchar(50)', (c)=> c.notNull())
+    .addPrimaryKeyConstraint('user_group_pk', ['user_id', 'group_id'])
     .execute()
 }
 

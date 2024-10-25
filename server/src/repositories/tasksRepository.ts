@@ -2,10 +2,9 @@ import type { Database } from '@server/database'
 import type { Tasks } from '@server/database/types'
 import {
   type TasksPublic,
-  tasksKeysAll,
   tasksKeysPublic,
 } from '@server/entities/tasks'
-import type { Insertable, Selectable } from 'kysely'
+import type { Insertable} from 'kysely'
 
 export interface GetTasksOptions {
   assignedUserId?: number

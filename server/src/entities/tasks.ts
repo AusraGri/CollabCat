@@ -18,6 +18,16 @@ export const taskSchema = z.object({
   title: z.string().trim().min(3).max(100),
 })
 
+export const inputTaskSchema = z.object({
+  title: taskSchema.shape.title, 
+  importance: taskSchema.shape.importance.optional(),
+  categoryId: taskSchema.shape.categoryId.optional(),
+  deadline: taskSchema.shape.deadline.optional(),
+  description: taskSchema.shape.description.optional(),
+  points: taskSchema.shape.points.optional(),
+  groupId: taskSchema.shape.groupId.optional()
+});
+
 export const tasksKeysAll = Object.keys(taskSchema.shape) as (keyof Tasks)[]
 
 export const tasksKeysPublic = [

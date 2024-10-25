@@ -5,7 +5,7 @@ import { articleRepository } from '@server/repositories/articleRepository'
 import { idSchema } from '@server/entities/shared'
 import provideRepos from '../provideRepos'
 
-export const articleAuthorProcedure = authenticatedProcedure
+export const taskAuthorProcedure = authenticatedProcedure
   .use(
     provideRepos({
       articleRepository,

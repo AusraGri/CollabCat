@@ -14,6 +14,11 @@ export const userSchema = z.object({
 
   firstName: z.string().min(1).max(500),
   lastName: z.string().min(1).max(500),
+  auth0Id: z.string(),
+  createdAt: z.date(),
+  provider: z.string(),
+  role: z.string(),
+  updatedAt: z.date()
 })
 
 export const userKeysAll = Object.keys(userSchema.shape) as (keyof User)[]
