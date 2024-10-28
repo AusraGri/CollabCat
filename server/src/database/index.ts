@@ -9,6 +9,22 @@ import type { DB } from './types'
 
 export function createDatabase(options: pg.PoolConfig): Kysely<DB> {
   return new Kysely<DB>({
+    // log(event) {
+    //   if (event.level === "error") {
+    //       console.error("Query failed : ", {
+    //         durationMs: event.queryDurationMillis,
+    //         error: event.error,
+    //         sql: event.query.sql,
+    //         params: event.query.parameters,
+    //       });
+    //   } else { // `'query'`
+    //     console.log("Query executed : ", {
+    //       durationMs: event.queryDurationMillis,
+    //       sql: event.query.sql,
+    //       params: event.query.parameters,
+    //     });
+    //   }
+    // },
     dialect: new PostgresDialect({
       pool: new pg.Pool(options),
     }),

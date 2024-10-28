@@ -6,7 +6,7 @@ import {
   fakeCategory
 } from '@server/entities/tests/fakes'
 import { wrapInRollbacks } from '@tests/utils/transactions'
-import { insertAll, selectAll } from '@tests/utils/records'
+import { insertAll} from '@tests/utils/records'
 import { pick } from 'lodash-es'
 import { tasksKeysPublic } from '@server/entities/tasks'
 import { tasksRepository } from '../tasksRepository'
