@@ -59,4 +59,6 @@ export type TasksPublic = Pick<
   (typeof tasksKeysPublic)[number]
 >
 
+export type TasksUpdateables =  Omit<Tasks, 'createdByUserId' | 'id'>
+
 export type InsertableTasks = Insertable<Tasks>

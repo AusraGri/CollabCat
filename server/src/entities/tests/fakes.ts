@@ -1,4 +1,4 @@
-import type { Tasks, Groups, User } from '@server/database/types'
+import type { Tasks, Groups, User, Categories } from '@server/database/types'
 import type { Insertable } from 'kysely'
 import { random } from '@tests/utils/random'
 import type { AuthUser } from '../user'
@@ -47,8 +47,8 @@ export const fakeTask = <T extends Partial<Insertable<Tasks>>>(
   }) satisfies Insertable<Tasks>
 
 /**
- * Generates a fake comment with some default test data.
- * @param overrides articleId and any properties that should be different from default fake data.
+ * Generates a fake group with some default test data.
+ * @param overrides createdByUserId and any properties that should be different from default fake data.
  */
 export const fakeGroup = <T extends Partial<Insertable<Groups>>>(
   overrides: T
@@ -59,3 +59,16 @@ export const fakeGroup = <T extends Partial<Insertable<Groups>>>(
     ...overrides,
     createdAt: new Date(),
   }) satisfies Insertable<Groups>
+
+  /**
+ * Generates a fake category with some default test data.
+ * @param overrides createdByUserId and any properties that should be different from default fake data.
+ */
+export const fakeCategory = <T extends Partial<Insertable<Groups>>>(
+  overrides: T
+) =>
+  ({
+    title: random.string(),
+    createdByUserId: randomId(),
+    ...overrides,
+  }) satisfies Insertable<Categories>
