@@ -8,7 +8,6 @@ export async function up(db: Kysely<any>) {
     )
     .addColumn('title', 'varchar(225)', (c) => c.notNull())
     .addColumn('description', 'text')
-    .addColumn('deadline', 'timestamptz')
     .addColumn('created_by_user_id', 'integer', (c) =>
       c.notNull().references('user.id').onDelete('cascade')
     )
@@ -22,10 +21,15 @@ export async function up(db: Kysely<any>) {
     .addColumn('category_id', 'integer', (c) =>
       c.references('categories.id').onDelete('set null')
     )
-    .addColumn('completed', 'boolean', (c) => c.notNull().defaultTo(false))
+    .addColumn('is_completed', 'boolean', (c) => c.notNull().defaultTo(false))
     .addColumn('completed_at', 'timestamptz')
     .addColumn('points', 'integer')
-    .addColumn('repeat_id', 'integer', (c) => c.references('repeat.id').onDelete('set null'))
+    .addColumn('parent_task_id', 'integer', (c) => c.references('tasks.id').onDelete('cascade'))
+    .addColumn('start_date', 'timestamptz', (c)=> c.notNull())
+    .addColumn('end_date', 'timestamptz')
+    .addColumn('start_time', 'timetz')
+    .addColumn('end_time', 'timetz')
+    .addColumn('is_full_day_event', 'boolean', (c) => c.defaultTo(false))
     .execute()
 
     await db.schema
@@ -44,12 +48,6 @@ export async function up(db: Kysely<any>) {
     .createIndex('idx_tasks_group')
     .on('tasks')
     .columns(['group_id'])
-    .execute()
-
-  await db.schema
-    .createIndex('idx_tasks_deadline')
-    .on('tasks')
-    .columns(['deadline'])
     .execute()
 
   await db.schema

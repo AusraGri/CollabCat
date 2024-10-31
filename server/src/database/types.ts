@@ -1,14 +1,13 @@
 import type { ColumnType } from 'kysely'
 
-
 export type ArrayTypeImpl<T> =
-T extends ColumnType<infer S, infer I, infer U>
-? ColumnType<S[], I[], U[]>
-: T[]
+  T extends ColumnType<infer S, infer I, infer U>
+    ? ColumnType<S[], I[], U[]>
+    : T[]
 
 export type ArrayType<T> =
   ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>
-  
+
 export type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U>
     ? ColumnType<S, I | undefined, U>
@@ -48,7 +47,6 @@ export interface Tasks {
   completed: Generated<boolean>
   completedAt: Timestamp | null
   createdByUserId: number
-  deadline: Timestamp | null
   description: string | null
   groupId: number | null
   id: Generated<number>

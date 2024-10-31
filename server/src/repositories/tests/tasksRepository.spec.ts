@@ -112,30 +112,6 @@ describe('get', () => {
     })
   })
 
-  it('should get tasks by deadline, with the most current task first', async () => {
-
-    // When
-    const tasks = await repository.getTasks({deadline: new Date()})
-
-    // Then
-    expect(tasks).toHaveLength(2)
-    expect (tasks[0]).toMatchObject({
-      ...taskOne
-    })
-    expect (tasks[1]).toMatchObject({
-      ...taskTwo
-    })
-  })
-
-  it('should get zero tasks id deadline is set behind any deadline', async () => {
-
-    // When
-    const tasks = await repository.getTasks({deadline: new Date(2010, 0, 1)})
-
-    // Then
-    expect(tasks).toHaveLength(0)
-
-  })
 
   it('should get tasks by title', async () => {
 

@@ -46,7 +46,6 @@ export const tasksKeysPublic = [
   'categoryId',
   'completed',
   'createdByUserId',
-  'deadline',
   'description',
   'groupId',
   'importance',

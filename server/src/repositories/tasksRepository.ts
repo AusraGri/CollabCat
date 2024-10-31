@@ -57,7 +57,6 @@ export function tasksRepository(db: Database) {
           operator: '=',
           value: options.createdByUserId,
         },
-        { column: 'deadline', operator: '<=', value: options.deadline },
         { column: 'groupId', operator: '=', value: options.groupId },
         { column: 'id', operator: '=', value: options.id },
         { column: 'importance', operator: '=', value: options.importance },
@@ -83,10 +82,6 @@ export function tasksRepository(db: Database) {
 
       if (options.limit !== undefined) {
         query = query.limit(options.limit)
-      }
-
-      if (options.deadline !== undefined) {
-        query = query.orderBy('deadline', 'desc')
       }
 
       return query.execute()

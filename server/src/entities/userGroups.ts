@@ -8,7 +8,6 @@ export const userGroupsSchema = z.object({
     userId: idSchema,
 })
 
-// list keys that we will return to the client
 export const userGroupsKeysAll = Object.keys(userGroupsSchema.shape) as (keyof UserGroups)[]
 
 export const userGroupsKeysPublic = ['groupId', 'userId'] as const
