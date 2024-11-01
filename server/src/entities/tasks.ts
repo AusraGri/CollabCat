@@ -7,31 +7,37 @@ export const taskSchema = z.object({
   id: idSchema,
   assignedUserId: idSchema,
   categoryId: idSchema,
-  completed: z.boolean(),
+  isCompleted: z.boolean(),
   completedAt: z.date(),
   createdByUserId: idSchema,
-  deadline: z.date(),
   description: z.string().trim().max(300),
   groupId: idSchema,
   importance: z.string(),
   points: z.number().positive(),
   title: z.string().trim().min(3).max(100),
+  startDate: z.date(),
+  endDate: z.date(),
+  isFullDayEvent: z.boolean(),
+  parentTaskId: idSchema,
+  startTime: z.date(),
+  endTime: z.date()
+
 })
 
 export const inputTaskSchema = z.object({
   title: taskSchema.shape.title,
   importance: taskSchema.shape.importance.optional(),
   categoryId: taskSchema.shape.categoryId.optional(),
-  deadline: taskSchema.shape.deadline.optional(),
   description: taskSchema.shape.description.optional(),
   points: taskSchema.shape.points.optional(),
   groupId: taskSchema.shape.groupId.optional(),
+  assignedUserId: taskSchema.shape.assignedUserId.optional()
 })
+
 export const getTasksSchema = z.object({
   title: taskSchema.shape.title.optional(),
   importance: taskSchema.shape.importance.optional(),
   categoryId: taskSchema.shape.categoryId.optional(),
-  deadline: taskSchema.shape.deadline.optional(),
   groupId: taskSchema.shape.groupId.optional(),
   assignedUserId: taskSchema.shape.assignedUserId.optional(),
   createdByUserId: taskSchema.shape.createdByUserId.optional(),
@@ -40,18 +46,10 @@ export const getTasksSchema = z.object({
 
 export const tasksKeysAll = Object.keys(taskSchema.shape) as (keyof Tasks)[]
 
-export const tasksKeysPublic = [
-  'id',
-  'assignedUserId',
-  'categoryId',
-  'completed',
-  'createdByUserId',
-  'description',
-  'groupId',
-  'importance',
-  'points',
-  'title',
-] as const
+const excludedKeys = ['parentTaskId'] as const;
+export const tasksKeysPublic = tasksKeysAll.filter(
+  (key) => !excludedKeys.includes(key as (typeof excludedKeys)[number])
+) as (typeof tasksKeysAll)[number][];
 
 export type TasksPublic = Pick<
   Selectable<Tasks>,

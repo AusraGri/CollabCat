@@ -12,7 +12,7 @@ export interface GetTasksOptions {
   assignedUserId?: number
   categoryId?: number
   limit?: number
-  completed?: boolean
+  isCompleted?: boolean
   createdByUserId?: number
   deadline?: Date
   groupId?: number
@@ -51,7 +51,7 @@ export function tasksRepository(db: Database) {
           value: options.assignedUserId,
         },
         { column: 'categoryId', operator: '=', value: options.categoryId },
-        { column: 'completed', operator: '=', value: options.completed },
+        { column: 'isCompleted', operator: '=', value: options.completed },
         {
           column: 'createdByUserId',
           operator: '=',
@@ -102,6 +102,29 @@ export function tasksRepository(db: Database) {
         .where('id', '=', taskId)
         .executeTakeFirstOrThrow()
     },
+
+    async getTasksDue(date: Date): Promise<TasksPublic[]> {
+      // not working
+      return db
+      .selectFrom('tasks as t')
+      .selectAll()
+      .innerJoin('recurringPattern as rp', 'rp.taskId', 't.id')
+      .where((eb) =>
+        eb.or([
+          eb('t.startDate', '<=', date).and(
+            eb.or([
+              eb('t.endDate', '>=', date),
+              eb('t.endDate', 'is', null),
+            ])
+          ),
+        ])
+      )
+      .where((eb)=>eb.or([
+          eb('rp.recurringTypeId', '=', 1)
+      ]))
+      .execute()
+  }
+
   }
 }
 

@@ -1,13 +1,5 @@
 import type { ColumnType } from 'kysely'
 
-export type ArrayTypeImpl<T> =
-  T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S[], I[], U[]>
-    : T[]
-
-export type ArrayType<T> =
-  ArrayTypeImpl<T> extends (infer U)[] ? U[] : ArrayTypeImpl<T>
-
 export type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U>
     ? ColumnType<S, I | undefined, U>
@@ -22,6 +14,13 @@ export interface Categories {
   title: string
 }
 
+export interface CompletedTasks {
+  completedAt: Timestamp
+  id: Generated<number>
+  instanceDate: Timestamp
+  taskId: number | null
+}
+
 export interface Groups {
   createdAt: Generated<Timestamp>
   createdByUserId: number
@@ -29,30 +28,68 @@ export interface Groups {
   name: string
 }
 
-export interface Repeat {
-  daysOfWeek: Generated<string | null>
-  endDate: Timestamp | null
-  endTime: Timestamp | null
+export interface Points {
+  createdAt: Generated<Timestamp>
+  groupId: number | null
+  points: Generated<number>
+  userId: number | null
+}
+
+export interface RecurringPattern {
+  dayOfMonth: number[] | null
+  dayOfWeek: number[] | null
+  maxNumOfOccurrences: number | null
+  monthOfYear: number[] | null
+  recurringTypeId: number | null
+  separationCount: number | null
+  taskId: number
+  weekOfMonth: number[] | null
+}
+
+export interface RecurringTypes {
   id: Generated<number>
-  interval: number | null
-  specificDates: ArrayType<Timestamp> | null
+  recurringType: string | null
+}
+
+export interface Rewards {
+  amount: number | null
+  cost: number
+  createdByUserId: number | null
+  groupId: number | null
+  id: Generated<number>
+  targetUserIds: number[] | null
+  title: string
+}
+
+export interface TaskInstanceException {
+  createdAt: Timestamp
+  createdBy: number
+  endDate: Timestamp
+  id: Generated<number>
+  isCanceled: boolean | null
+  isFullDayEvent: Generated<boolean | null>
+  isRescheduled: boolean | null
   startDate: Timestamp
-  startTime: Timestamp | null
-  type: string
+  taskId: number
 }
 
 export interface Tasks {
   assignedUserId: number | null
   categoryId: number | null
-  completed: Generated<boolean>
   completedAt: Timestamp | null
   createdByUserId: number
   description: string | null
+  endDate: Timestamp | null
+  endTime: Timestamp | null
   groupId: number | null
   id: Generated<number>
   importance: string | null
+  isCompleted: Generated<boolean>
+  isFullDayEvent: Generated<boolean | null>
+  parentTaskId: number | null
   points: number | null
-  repeatId: number | null
+  startDate: Timestamp
+  startTime: Timestamp | null
   title: string
 }
 
@@ -76,8 +113,13 @@ export interface UserGroups {
 
 export interface DB {
   categories: Categories
+  completedTasks: CompletedTasks
   groups: Groups
-  repeat: Repeat
+  points: Points
+  recurringPattern: RecurringPattern
+  recurringTypes: RecurringTypes
+  rewards: Rewards
+  taskInstanceException: TaskInstanceException
   tasks: Tasks
   user: User
   userGroups: UserGroups

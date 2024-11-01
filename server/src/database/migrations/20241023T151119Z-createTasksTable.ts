@@ -27,8 +27,8 @@ export async function up(db: Kysely<any>) {
     .addColumn('parent_task_id', 'integer', (c) => c.references('tasks.id').onDelete('cascade'))
     .addColumn('start_date', 'timestamptz', (c)=> c.notNull())
     .addColumn('end_date', 'timestamptz')
-    .addColumn('start_time', 'timetz')
-    .addColumn('end_time', 'timetz')
+    .addColumn('start_time', 'timestamptz')
+    .addColumn('end_time', 'timestamptz')
     .addColumn('is_full_day_event', 'boolean', (c) => c.defaultTo(false))
     .execute()
 

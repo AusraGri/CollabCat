@@ -35,3 +35,42 @@ CREATE TABLE tasks (
     is_recurring BOOLEAN DEFAULT FALSE, -- Indicate if the task is recurring
     scheduled_at TIMESTAMP -- for task that appear only once at a certain date and time
 );
+
+SELECT t.*
+FROM tasks AS t
+INNER JOIN recurringPattern AS rp ON rp.taskId = t.id
+WHERE (
+    -- Filter tasks where the given date is within the task's active date range
+    t.startDate = :date OR
+    t.endDate = :date OR
+    (
+        t.startDate <= :date AND (
+            t.endDate >= :date OR
+            t.endDate IS NULL -- Task has no end date, so it's open-ended
+        )
+    )
+) AND (
+    -- Daily Recurrence
+    (rp.recurringTypeId = 1 AND 
+     :date >= t.startDate AND 
+     (:date - t.startDate) % (rp.separationCount * INTERVAL '1 day') = INTERVAL '0 day') OR
+    
+    -- Weekly Recurrence
+    (rp.dayOfWeek IS NOT NULL AND
+     EXTRACT(DOW FROM :date) = ANY(rp.dayOfWeek) AND 
+     :date >= t.startDate AND
+     (:date - t.startDate) % (rp.separationCount * INTERVAL '1 week') = INTERVAL '0 day') OR
+    
+    -- Monthly Recurrence
+    (rp.dayOfMonth IS NOT NULL AND
+     EXTRACT(DAY FROM :date) = ANY(rp.dayOfMonth) AND 
+     :date >= t.startDate AND
+     (:date - t.startDate) % (rp.separationCount * INTERVAL '1 month') = INTERVAL '0 day') OR
+    
+    -- Yearly Recurrence
+    (rp.monthOfYear IS NOT NULL AND
+     EXTRACT(MONTH FROM :date) = ANY(rp.monthOfYear) AND
+     EXTRACT(DAY FROM :date) = ANY(rp.dayOfMonth) AND
+     :date >= t.startDate AND
+     (:date - t.startDate) % (rp.separationCount * INTERVAL '1 year') = INTERVAL '0 day')
+);

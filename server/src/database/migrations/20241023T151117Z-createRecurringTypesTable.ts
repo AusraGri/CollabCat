@@ -2,7 +2,7 @@ import type { Kysely } from 'kysely'
 
 export async function up(db: Kysely<any>) {
   await db.schema
-    .createTable('recurring_type')
+    .createTable('recurring_types')
     .addColumn('id', 'integer', (c) =>
       c.primaryKey().generatedAlwaysAsIdentity()
     )

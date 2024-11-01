@@ -2,11 +2,17 @@ import type { Database } from '@server/database'
 import { userRepository } from './userRepository'
 import { tasksRepository } from './tasksRepository'
 import { groupsRepository } from './groupRepository'
+import { recurringRepository } from './recurrenceRepository'
 
 export type RepositoryFactory = <T>(db: Database) => T
 
 // index of all repositories for provideRepos
-const repositories = { userRepository, tasksRepository, groupsRepository}
+const repositories = {
+  userRepository,
+  tasksRepository,
+  groupsRepository,
+  recurringRepository,
+}
 
 export type RepositoriesFactories = typeof repositories
 export type Repositories = {
