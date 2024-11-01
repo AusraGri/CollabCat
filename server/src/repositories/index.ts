@@ -3,6 +3,8 @@ import { userRepository } from './userRepository'
 import { tasksRepository } from './tasksRepository'
 import { groupsRepository } from './groupRepository'
 import { recurringRepository } from './recurrenceRepository'
+import { rewardsRepository } from './rewardsRepository'
+import { pointsRepository } from './pointsRepository'
 
 export type RepositoryFactory = <T>(db: Database) => T
 
@@ -12,6 +14,8 @@ const repositories = {
   tasksRepository,
   groupsRepository,
   recurringRepository,
+  pointsRepository,
+  rewardsRepository,
 }
 
 export type RepositoriesFactories = typeof repositories

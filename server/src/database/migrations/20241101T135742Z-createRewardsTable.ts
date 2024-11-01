@@ -9,7 +9,7 @@ export async function up(db: Kysely<any>) {
       )
     .addColumn('title', 'varchar(100)', (c)=> c.notNull())
     .addColumn('cost', 'integer', (c)=> c.notNull())
-    .addColumn('created_by_user_id', 'integer', (c) => c.references('user.id').onDelete('cascade'))
+    .addColumn('created_by_user_id', 'integer', (c) => c.references('user.id').notNull().onDelete('cascade'))
     .addColumn('amount', 'integer')
     .addColumn('group_id', 'integer', (c)=> c.references('groups.id').onDelete('cascade'))
     .addColumn('target_user_ids', sql`integer[]`)

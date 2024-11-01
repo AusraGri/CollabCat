@@ -32,7 +32,7 @@ export interface Points {
   createdAt: Generated<Timestamp>
   groupId: number | null
   points: Generated<number>
-  userId: number | null
+  userId: number
 }
 
 export interface RecurringPattern {
@@ -54,7 +54,7 @@ export interface RecurringTypes {
 export interface Rewards {
   amount: number | null
   cost: number
-  createdByUserId: number | null
+  createdByUserId: number
   groupId: number | null
   id: Generated<number>
   targetUserIds: number[] | null
