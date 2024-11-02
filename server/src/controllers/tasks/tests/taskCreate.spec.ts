@@ -34,16 +34,20 @@ it('should create a persisted task', async () => {
   // ASSERT
   expect(taskReturned).toMatchObject({
     id: expect.any(Number),
+    completedAt: null,
     assignedUserId: null,
     categoryId: null,
-    completed: false,
+    isCompleted: false,
     createdByUserId: user.id,
-    deadline: null,
     description: null,
     groupId: null,
     importance: null,
     points: null,
-    title: 'New Task'
+    startDate: expect.any(Date),
+    isFullDayEvent: null,
+    startTime: null,
+    parentTaskId: null,
+    title: 'New Task',
   })
 
   const [taskCreated] = await selectAll(db, 'tasks', (eb) =>

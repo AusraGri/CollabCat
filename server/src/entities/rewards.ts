@@ -12,6 +12,7 @@ export const rewardsSchema = z.object({
     title: z.string().min(3).max(100)
 })
 
+export const createRewardSchema = rewardsSchema.omit({createdByUserId: true, id: true})
 export const rewardsKeysAll = Object.keys(rewardsSchema.shape) as (keyof Rewards)[]
 
 export type RewardUpdateables =  Omit<Rewards, 'createdByUserId' | 'id'>

@@ -45,7 +45,9 @@ export function tasksRepositoryTest(db: Database) {
             ),
           ])
         )
-        .where((eb) => eb.or([eb('rp.recurringTypeId', '=', 1)]))
+        .where((eb) => eb.or([
+          eb('rp.recurringTypeId', '=', 1)
+        ]))
         .execute()
     },
   }

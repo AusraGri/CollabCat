@@ -18,7 +18,7 @@ export type Context = {
 
   // We can also add our own custom context properties.
   authUser?: AuthUser
-
+  userGroupRole?: String
   // For providing repos in a slightly easier to test way
   repos?: Partial<Repositories>
 }

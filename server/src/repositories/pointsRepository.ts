@@ -3,12 +3,14 @@ import type { Points } from '@server/database/types'
 import type { DeleteResult, Insertable } from 'kysely'
 import { pointsKeysPublic, type PointsPublic } from '@server/entities/points'
 
-
 export interface PointAlterObject {
-    userId: number
-    points: number
-    action: '+' | '-'
+  groupId?: number
+  userId: number
+  points: number
+  action: '+' | '-'
 }
+
+export type DeletePoints = Omit<PointAlterObject, 'points' | 'action'>
 
 export function pointsRepository(db: Database) {
   return {
@@ -28,23 +30,30 @@ export function pointsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async deletePoints(userId: number): Promise<DeleteResult> {
-      return db
-        .deleteFrom('points')
-        .where('userId', '=', userId)
-        .executeTakeFirstOrThrow()
+    async deletePoints(options: DeletePoints): Promise<DeleteResult> {
+      let query = db.deleteFrom('points').where('userId', '=', options.userId)
+
+      if (options.groupId !== undefined) {
+        query = query.where('groupId', '=', options.groupId)
+      }
+
+      return query.executeTakeFirstOrThrow()
     },
 
     async alterPoints(object: PointAlterObject): Promise<PointsPublic> {
-        return db
-          .updateTable('points')
-          .set((eb)=>({
-            points: eb('points', object.action, object.points)
-          }))
-          .where('userId', '=', object.userId)
-          .returning(pointsKeysPublic)
-          .executeTakeFirstOrThrow()
-      },
+      let query = db
+        .updateTable('points')
+        .set((eb) => ({
+          points: eb('points', object.action, object.points),
+        }))
+        .where('userId', '=', object.userId)
+
+      if (object.groupId !== undefined) {
+        query = query.where('groupId', '=', object.groupId)
+      }
+
+      return query.returning(pointsKeysPublic).executeTakeFirstOrThrow()
+    },
   }
 }
 

@@ -51,7 +51,7 @@ export function tasksRepository(db: Database) {
           value: options.assignedUserId,
         },
         { column: 'categoryId', operator: '=', value: options.categoryId },
-        { column: 'isCompleted', operator: '=', value: options.completed },
+        { column: 'isCompleted', operator: '=', value: options.isCompleted },
         {
           column: 'createdByUserId',
           operator: '=',

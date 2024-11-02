@@ -23,9 +23,8 @@ const [taskOne, taskTwo] = await insertAll(db, 'tasks', [
     createdByUserId: userOne.id,
     groupId: groupOne.id,
     categoryId: categoryOne.id,
-    completed: true,
+    isCompleted: true,
     importance: 'High',
-    deadline: new Date(2024, 0, 1),
     title: 'Task One'
 
   }),
@@ -34,7 +33,6 @@ const [taskOne, taskTwo] = await insertAll(db, 'tasks', [
     assignedUserId: userThree.id,
     groupId: groupTwo.id,
     categoryId: categoryTwo.id,
-    deadline: new Date(2023, 0, 1),
   }),
 ])
 
@@ -104,7 +102,7 @@ describe('get', () => {
   it('should get task by completed status', async () => {
 
     // When
-    const [task] = await repository.getTasks({completed: true})
+    const [task] = await repository.getTasks({isCompleted: true})
 
     // Then
     expect(task).toMatchObject({
@@ -137,7 +135,7 @@ describe('update', () => {
     const task = await repository.update({id: taskOne.id, task: updatedTask})
 
     // Then
-    expect(task.completed).toBe(taskOne.completed)
+    expect(task.isCompleted).toBe(taskOne.isCompleted)
     expect(task.title).toBe(updatedTask.title)
     expect(task.assignedUserId).toBe(updatedTask.assignedUserId)
     expect(task.categoryId).toBe(updatedTask.categoryId)

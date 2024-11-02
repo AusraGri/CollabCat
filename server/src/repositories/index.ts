@@ -1,7 +1,7 @@
 import type { Database } from '@server/database'
 import { userRepository } from './userRepository'
 import { tasksRepository } from './tasksRepository'
-import { groupsRepository } from './groupRepository'
+import { groupsRepository } from './groupsRepository'
 import { recurringRepository } from './recurrenceRepository'
 import { rewardsRepository } from './rewardsRepository'
 import { pointsRepository } from './pointsRepository'

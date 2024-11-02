@@ -26,6 +26,16 @@ export function userRepository(db: Database) {
 
       return user
     },
+
+    async findById(id: number[]): Promise<Selectable<User>[]>{
+      const user = await db
+        .selectFrom('user')
+        .select(userKeysAll)
+        .where('id', 'in', id)
+        .execute()
+
+      return user
+    },
   }
 }
 

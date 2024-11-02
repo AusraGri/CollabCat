@@ -48,7 +48,6 @@ describe('get', () => {
     it.skip('should get daily task', async () => {
       // Given
       const date = new Date(2025, 2, 23)
-  
       // When
       const task = await repository.getTasksDue(date)
 
