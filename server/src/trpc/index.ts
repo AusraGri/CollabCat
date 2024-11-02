@@ -6,6 +6,7 @@ import SuperJSON from 'superjson'
 import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import type { Repositories } from '@server/repositories'
+import type { AuthGroup } from '@server/entities/groups'
 
 export type Context = {
   db: Database
@@ -18,7 +19,7 @@ export type Context = {
 
   // We can also add our own custom context properties.
   authUser?: AuthUser
-  userGroupRole?: String
+  userGroup?: AuthGroup
   // For providing repos in a slightly easier to test way
   repos?: Partial<Repositories>
 }

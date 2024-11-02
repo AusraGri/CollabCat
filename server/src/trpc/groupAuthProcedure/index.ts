@@ -31,12 +31,14 @@ export const groupAuthProcedure = authenticatedProcedure
     }
 
     // Add the role to the context
-    ctx.userGroupRole = userGroupRole.role;
+    ctx.userGroup = {
+      role: userGroupRole.role,
+      groupId
+    }
 
     return next({
       ctx: {
         ...ctx,
-        userGroupRole: userGroupRole.role,
       },
     });
   });

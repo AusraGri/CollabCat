@@ -10,6 +10,12 @@ export const groupsSchema = z.object({
     name: z.string().trim().min(3).max(50)
 })
 
+export const userGroupsSchema = z.object({
+    groupId: idSchema,
+    userId: idSchema,
+    role: z.string().trim().min(3).max(50)
+})
+
 export const insertGroupSchema = groupsSchema.omit({createdByUserId: true, id: true, createdAt: true})
 
 // list keys that we will return to the client
@@ -20,4 +26,8 @@ export const groupsKeysPublic = ['id', 'name', 'createdByUserId'] as const
 export type GroupsPublic = Pick<Selectable<Groups>, (typeof groupsKeysPublic)[number]>
 
 export type InsertableGroups = Insertable<Groups>
+
+export const authGroup = userGroupsSchema.omit({userId: true})
+
+export type AuthGroup = z.infer<typeof authGroup>
 

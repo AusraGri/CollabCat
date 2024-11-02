@@ -9,7 +9,9 @@ import z from 'zod'
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
 
-  .input(idSchema)
+  .input(z.object({
+    id: idSchema,
+  })
   .mutation(async ({ input: groupId, ctx: { authUser, userGroupRole, repos } }) => {
     if(userGroupRole !== 'Admin'){
       throw new TRPCError({
