@@ -28,6 +28,14 @@ export interface Groups {
   name: string
 }
 
+export interface Invitations {
+  createdAt: Generated<Timestamp>
+  email: string
+  groupId: number
+  id: Generated<number>
+  invitationToken: string
+}
+
 export interface Points {
   createdAt: Generated<Timestamp>
   groupId: number | null
@@ -115,6 +123,7 @@ export interface DB {
   categories: Categories
   completedTasks: CompletedTasks
   groups: Groups
+  invitations: Invitations
   points: Points
   recurringPattern: RecurringPattern
   recurringTypes: RecurringTypes
