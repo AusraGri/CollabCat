@@ -14,7 +14,7 @@ export interface GroupData {
   id: number
 }
 
-export interface GetRoleData {
+export interface GroupUserData {
   userId: number
   groupId: number
 }
@@ -85,10 +85,17 @@ export function groupsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async getRole(data: GetRoleData): Promise<{ role: UserGroups['role'] }>{
+    async getRole(data: GroupUserData): Promise<{ role: UserGroups['role'] }>{
       return db
       .selectFrom('userGroups')
       .select('role')
+      .where((eb)=> eb('userGroups.userId', '=', data.userId).and('userGroups.groupId', '=', data.groupId))
+      .executeTakeFirstOrThrow()
+    },
+
+    async removeUser(data: GroupUserData): Promise<DeleteResult>{
+      return db
+      .deleteFrom('userGroups')
       .where((eb)=> eb('userGroups.userId', '=', data.userId).and('userGroups.groupId', '=', data.groupId))
       .executeTakeFirstOrThrow()
     }
