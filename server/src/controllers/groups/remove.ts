@@ -1,4 +1,3 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 import { groupAuthProcedure } from '@server/trpc/groupAuthProcedure'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
@@ -10,17 +9,18 @@ export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
 
   .input(z.object({
-    id: idSchema,
-  })
-  .mutation(async ({ input: groupId, ctx: { authUser, userGroupRole, repos } }) => {
-    if(userGroupRole !== 'Admin'){
+    id: idSchema
+  }))
+  .mutation(async ({ input: group, ctx: { authUser, userGroup, repos } }) => {
+    if(!userGroup || userGroup.role !== 'Admin'){
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message: 'User does not have permission to delete this group',
       })
     }
+
     const isGroupDeleted = await repos.groupsRepository.delete({
-      groupId,
+      id: group.id,
       createdByUserId: authUser.id,
     })
 

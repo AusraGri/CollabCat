@@ -1,13 +1,13 @@
 import { authContext } from '@tests/utils/context'
 import { createTestDatabase } from '@tests/utils/database'
-import { fakeArticle, fakeUser } from '@server/entities/tests/fakes'
+import { fakeTask, fakeUser } from '@server/entities/tests/fakes'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
 import { createCallerFactory, router } from '..'
-import { articleAuthorProcedure } from '.'
+import { groupAuthProcedure } from '.'
 
 const routes = router({
-  testCall: articleAuthorProcedure.query(() => 'passed'),
+  testCall: groupAuthProcedure.query(() => 'passed'),
 })
 
 const db = await wrapInRollbacks(createTestDatabase())
