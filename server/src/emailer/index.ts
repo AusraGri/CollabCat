@@ -29,7 +29,7 @@ export async function sentInvitationMail(emailData: EmailData) {
         // eslint-disable-next-line no-console
         console.log("Message sent: %s", email.messageId)
 
-        return email.messageId
+        return email
 
     } catch (error) {
         throw new Error('Failed to send the invitation message')

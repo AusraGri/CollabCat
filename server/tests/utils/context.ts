@@ -1,4 +1,5 @@
-import { fakeAuthUser } from '@server/entities/tests/fakes'
+import { authGroup, type AuthGroup } from '@server/entities/groups'
+import { fakeAuthUser, fakeAuthGroup } from '@server/entities/tests/fakes'
 import { authUserSchema, type AuthUser } from '@server/entities/user'
 import type { Context, ContextMinimal } from '@server/trpc'
 
@@ -17,9 +18,11 @@ export const requestContext = (
 
 export const authContext = (
   context: Partial<Context> & ContextMinimal,
-  user: AuthUser = fakeAuthUser()
+  user: AuthUser = fakeAuthUser(),
+  group: AuthGroup = fakeAuthGroup()
 ): Context => ({
   authUser: authUserSchema.parse(user),
+  userGroup: authGroup.parse(group),
   ...context,
 })
 

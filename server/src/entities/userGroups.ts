@@ -10,7 +10,7 @@ export const userGroupsSchema = z.object({
 
 export const userGroupsKeysAll = Object.keys(userGroupsSchema.shape) as (keyof UserGroups)[]
 
-export const userGroupsKeysPublic = ['groupId', 'userId'] as const
+export const userGroupsKeysPublic = ['groupId', 'userId', 'role'] as const
 
 export type UserGroupsPublic = Pick<Selectable<UserGroups>, (typeof userGroupsKeysPublic)[number]>
 

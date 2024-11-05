@@ -1,6 +1,6 @@
 import { authContext } from '@tests/utils/context'
 import { createTestDatabase } from '@tests/utils/database'
-import { fakeTask, fakeUser } from '@server/entities/tests/fakes'
+import { fakeGroup, fakeUser, fakeUserGroup } from '@server/entities/tests/fakes'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
 import { createCallerFactory, router } from '..'
@@ -13,40 +13,43 @@ const routes = router({
 const db = await wrapInRollbacks(createTestDatabase())
 const [userOne, userTwo] = await insertAll(db, 'user', [fakeUser(), fakeUser()])
 
-const [articleOne, articleTwo] = await insertAll(db, 'article', [
-  fakeArticle({ userId: userOne.id }),
-  fakeArticle({ userId: userTwo.id }),
+const [groupOne, groupTwo] = await insertAll(db, 'groups', [
+  fakeGroup({ createdByUserId: userOne.id }),
+  fakeGroup({ createdByUserId: userTwo.id }),
+])
+
+ await insertAll(db, 'userGroups', [
+  fakeUserGroup({ userId: userOne.id, groupId: groupOne.id }),
+  fakeUserGroup({ userId: userTwo.id, groupId: groupTwo.id }),
 ])
 
 const createCaller = createCallerFactory(routes)
 const authenticated = createCaller(authContext({ db }, userOne))
 
-it('should pass if article belongs to the user', async () => {
-  const response = await authenticated.testCall({ articleId: articleOne.id })
+it('should pass if user belongs to the group', async () => {
+  const response = await authenticated.testCall({ groupId: groupOne.id })
 
   expect(response).toEqual('passed')
 })
 
-it('should throw an error if articleId is not provided', async () => {
-  // casting to any to allow calling without type safe input
-  await expect((authenticated.testCall as any)({})).rejects.toThrow(/article/i)
+it('should throw an error if groupId is not provided', async () => {
+  await expect((authenticated.testCall as any)({})).rejects.toThrow(/group/i)
 })
 
-it('should throw an error if user provides a non-existing articleId', async () => {
-  // casting to any to allow calling without type safe input
+it('should throw an error if user provides a non-existing groupId', async () => {
   await expect(
-    (authenticated.testCall as any)({ articleId: 999 })
-  ).rejects.toThrow(/article/i)
+    (authenticated.testCall as any)({ groupId: 999 })
+  ).rejects.toThrow(/group/i)
 })
 
-it('should throw an error if user provides null articleId', async () => {
+it('should throw an error if user provides null groupId', async () => {
   await expect(
-    authenticated.testCall({ articleId: null as any })
-  ).rejects.toThrow(/article/i)
+    authenticated.testCall({ groupId: null as any })
+  ).rejects.toThrow(/group/i)
 })
 
-it('should throw an error if article does not belong to the user', async () => {
+it('should throw an error if user does not belong to the group', async () => {
   await expect(
-    authenticated.testCall({ articleId: articleTwo.id })
-  ).rejects.toThrow(/article/i)
+    authenticated.testCall({ groupId: groupTwo.id })
+  ).rejects.toThrow(/group/i)
 })

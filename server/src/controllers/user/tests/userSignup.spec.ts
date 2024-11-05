@@ -10,7 +10,7 @@ const db = await wrapInRollbacks(createTestDatabase())
 const createCaller = createCallerFactory(userRouter)
 const { signup } = createCaller({ db })
 
-it.skip('should save a user', async () => {
+it('should save a user', async () => {
   const user = fakeUser()
   const response = await signup(user)
 
@@ -31,7 +31,7 @@ it.skip('should save a user', async () => {
   })
 })
 
-it.skip('should require a valid email', async () => {
+it('should require a valid email', async () => {
   await expect(
     signup(
       fakeUser({
@@ -41,7 +41,7 @@ it.skip('should require a valid email', async () => {
   ).rejects.toThrow(/email/i) // throws out some error complaining about "email"
 })
 
-it.skip('should require a password with at least 8 characters', async () => {
+it('should require a password with at least 8 characters', async () => {
   await expect(
     signup(
       fakeUser({
@@ -51,7 +51,7 @@ it.skip('should require a password with at least 8 characters', async () => {
   ).rejects.toThrow(/password/i) // throws out some error complaining about "password"
 })
 
-it.skip('throws an error for invalid email', async () => {
+it('throws an error for invalid email', async () => {
   await expect(
     signup(
       fakeUser({

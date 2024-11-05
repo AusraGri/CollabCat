@@ -17,17 +17,27 @@ export const groupAuthProcedure = authenticatedProcedure
     })
   )
   .use(async ({ input: { groupId }, ctx, next }) => {
-    const { authUser, repos } = ctx;
+    const { authUser, repos } = ctx
+
+    const [isGroup] = await repos.groupsRepository.get({ id: groupId })
+
+    if (!isGroup) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Group does not exist`,
+      })
+    }
+
     const userGroupRole = await repos.groupsRepository.getRole({
       userId: authUser.id,
-      groupId,
-    });
+      groupId
+    })
 
-    if (userGroupRole.role === undefined) {
+    if (!userGroupRole || userGroupRole.role === undefined) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: `User is not in this group`,
-      });
+        message: `Unauthorized: user is not in this group`,
+      })
     }
 
     // Add the role to the context
@@ -40,5 +50,5 @@ export const groupAuthProcedure = authenticatedProcedure
       ctx: {
         ...ctx,
       },
-    });
-  });
+    })
+  })

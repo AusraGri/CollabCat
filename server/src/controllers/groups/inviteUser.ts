@@ -25,6 +25,17 @@ export default groupAuthProcedure
         message: 'User does not have permission to invite users to this group',
       })
     }
+    // check if user is not already in the group
+    const usersInGroup = await repos.groupsRepository.getGroupMembers(userGroup.groupId)
+
+    const isUserIngroup = usersInGroup.some((user) => user.email === email)
+
+    if (isUserIngroup) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'User is already in the group',
+        })
+      }
     // check if this user is not already invited
     const isUserInvited =
       await repos.invitationsRepository.getInvitationByEmail(email)

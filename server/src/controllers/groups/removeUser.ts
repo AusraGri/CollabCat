@@ -15,7 +15,7 @@ export default groupAuthProcedure
     if(!userGroup || userGroup.role !== 'Admin'){
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'User does not have permission to delete this group',
+        message: 'User does not have permission to remove user from this group',
       })
     }
 

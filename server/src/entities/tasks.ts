@@ -23,16 +23,19 @@ export const taskSchema = z.object({
   endTime: z.date()
 
 })
+const taskOptional = taskSchema.omit({title: true, startDate: true}).partial()
+export const inputTaskSchema = taskSchema.pick({title: true, startDate: true}).merge(taskOptional)
 
-export const inputTaskSchema = z.object({
-  title: taskSchema.shape.title,
-  importance: taskSchema.shape.importance.optional(),
-  categoryId: taskSchema.shape.categoryId.optional(),
-  description: taskSchema.shape.description.optional(),
-  points: taskSchema.shape.points.optional(),
-  groupId: taskSchema.shape.groupId.optional(),
-  assignedUserId: taskSchema.shape.assignedUserId.optional()
-})
+// export const inputTaskSchema = z.object({
+//   title: taskSchema.shape.title,
+//   startDate: z.date(),
+//   importance: taskSchema.shape.importance.optional(),
+//   categoryId: taskSchema.shape.categoryId.optional(),
+//   description: taskSchema.shape.description.optional(),
+//   points: taskSchema.shape.points.optional(),
+//   groupId: taskSchema.shape.groupId.optional(),
+//   assignedUserId: taskSchema.shape.assignedUserId.optional()
+// })
 
 export const getTasksSchema = z.object({
   title: taskSchema.shape.title.optional(),

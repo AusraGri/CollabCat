@@ -1,12 +1,14 @@
 import type { Database } from '@server/database'
 import type { Groups, UserGroups } from '@server/database/types'
 import { groupsKeysPublic, type GroupsPublic } from '@server/entities/groups'
-import type { DeleteResult, Insertable } from 'kysely'
+import { userKeysPublic, type UserPublic } from '@server/entities/user'
+import { userGroupsKeysPublic, type UserGroupsPublic } from '@server/entities/userGroups'
+import {type DeleteResult, type Insertable } from 'kysely'
 
 export interface GetGroupsOptions {
   createdByUserId?: number
   id?: number
-  name?: string
+  userId?: number
 }
 
 export interface GroupData {
@@ -19,6 +21,8 @@ export interface GroupUserData {
   groupId: number
 }
 
+type GroupsUpdate = Omit<GroupsPublic, 'createdByUserId'>;
+
 export function groupsRepository(db: Database) {
   return {
     async create(group: Insertable<Groups>): Promise<GroupsPublic> {
@@ -28,10 +32,14 @@ export function groupsRepository(db: Database) {
         .returning(groupsKeysPublic)
         .executeTakeFirstOrThrow()
 
-       await db
-      .insertInto('userGroups')
-      .values({groupId: newGroup.id, role: 'Admin', userId: group.createdByUserId })
-      .executeTakeFirstOrThrow()
+      await db
+        .insertInto('userGroups')
+        .values({
+          groupId: newGroup.id,
+          role: 'Admin',
+          userId: group.createdByUserId,
+        })
+        .executeTakeFirstOrThrow()
 
       return newGroup
     },
@@ -40,7 +48,7 @@ export function groupsRepository(db: Database) {
       if (
         options.createdByUserId === undefined &&
         options.id === undefined &&
-        options.name === undefined
+        options.userId === undefined
       )
         return []
 
@@ -57,11 +65,6 @@ export function groupsRepository(db: Database) {
           value: options.createdByUserId,
         },
         { column: 'id', operator: '=', value: options.id },
-        {
-          column: 'name',
-          operator: 'like',
-          value: options.name ? `%${options.name}%` : undefined,
-        },
       ]
 
       filters.forEach((filter) => {
@@ -74,6 +77,12 @@ export function groupsRepository(db: Database) {
         }
       })
 
+      if (options.userId !== undefined) {
+        query = query
+          .innerJoin('userGroups', 'userGroups.groupId', 'groups.id')
+          .where('userGroups.userId', '=', options.userId)
+      }
+
       return query.execute()
     },
 
@@ -85,20 +94,72 @@ export function groupsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async getRole(data: GroupUserData): Promise<{ role: UserGroups['role'] }>{
+    async updateName(groupData: GroupsUpdate): Promise<GroupsPublic> {
       return db
-      .selectFrom('userGroups')
-      .select('role')
-      .where((eb)=> eb('userGroups.userId', '=', data.userId).and('userGroups.groupId', '=', data.groupId))
-      .executeTakeFirstOrThrow()
+        .updateTable('groups')
+        .set({name: groupData.name})
+        .where('id', '=', groupData.id)
+        .returning(groupsKeysPublic)
+        .executeTakeFirstOrThrow()
     },
 
-    async removeUser(data: GroupUserData): Promise<DeleteResult>{
+    async addGroupMember(groupData: Insertable<UserGroups>): Promise<UserGroupsPublic> {
       return db
-      .deleteFrom('userGroups')
-      .where((eb)=> eb('userGroups.userId', '=', data.userId).and('userGroups.groupId', '=', data.groupId))
-      .executeTakeFirstOrThrow()
-    }
+        .insertInto('userGroups')
+        .values(groupData)
+        .returning(userGroupsKeysPublic)
+        .executeTakeFirstOrThrow()
+    },
+
+    async removeGroupMember(groupData: GroupUserData): Promise<DeleteResult> {
+      return db
+        .deleteFrom('userGroups')
+        .where((eb)=> eb.and(
+         { groupId: groupData.groupId,
+          userId: groupData.userId
+         }
+        ))
+        .executeTakeFirstOrThrow()
+    },
+
+    async getGroupMembers(groupId: number): Promise<UserPublic[]> {
+      return db
+        .selectFrom('user')
+        .select(userKeysPublic)
+        .innerJoin('userGroups', 'user.id', 'userGroups.userId')
+        .where('userGroups.groupId', '=', groupId
+        )
+        .execute()
+    },
+
+    async getRole(
+      data: GroupUserData
+    ): Promise<{ role: UserGroups['role'] } | undefined> {
+      return db
+        .selectFrom('userGroups')
+        .select('role')
+        .where((eb) =>
+          eb('userGroups.userId', '=', data.userId).and(
+            'userGroups.groupId',
+            '=',
+            data.groupId
+          )
+        )
+        .executeTakeFirst()
+    },
+
+    async removeUser(data: GroupUserData): Promise<DeleteResult> {
+      return db
+        .deleteFrom('userGroups')
+        .where((eb) =>
+          eb('userGroups.userId', '=', data.userId).and(
+            'userGroups.groupId',
+            '=',
+            data.groupId
+          )
+        )
+        .executeTakeFirstOrThrow()
+    },
   }
 }
 

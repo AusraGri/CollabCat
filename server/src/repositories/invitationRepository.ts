@@ -21,7 +21,7 @@ export function invitationsRepository(db: Database) {
 
     async getInvitationByEmail(
       email: Invitations['email']
-    ): Promise<Selectable<Invitations>> {
+    ): Promise<Selectable<Invitations> | undefined> {
       return db
         .selectFrom('invitations')
         .select(invitationsKeysAll)
