@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import type { Selectable, Insertable } from 'kysely'
-import type { Tasks } from '@server/database/types'
+import type {
+  Tasks,
+  CompletedTasks,
+  RecurringPattern,
+} from '@server/database/types'
 import { idSchema } from './shared'
 
 export const taskSchema = z.object({
@@ -20,22 +24,12 @@ export const taskSchema = z.object({
   isFullDayEvent: z.boolean(),
   parentTaskId: idSchema,
   startTime: z.date(),
-  endTime: z.date()
-
+  endTime: z.date(),
 })
-const taskOptional = taskSchema.omit({title: true, startDate: true}).partial()
-export const inputTaskSchema = taskSchema.pick({title: true, startDate: true}).merge(taskOptional)
-
-// export const inputTaskSchema = z.object({
-//   title: taskSchema.shape.title,
-//   startDate: z.date(),
-//   importance: taskSchema.shape.importance.optional(),
-//   categoryId: taskSchema.shape.categoryId.optional(),
-//   description: taskSchema.shape.description.optional(),
-//   points: taskSchema.shape.points.optional(),
-//   groupId: taskSchema.shape.groupId.optional(),
-//   assignedUserId: taskSchema.shape.assignedUserId.optional()
-// })
+const taskOptional = taskSchema.omit({ title: true, startDate: true }).partial()
+export const inputTaskSchema = taskSchema
+  .pick({ title: true, startDate: true })
+  .merge(taskOptional)
 
 export const getTasksSchema = z.object({
   title: taskSchema.shape.title.optional(),
@@ -49,16 +43,21 @@ export const getTasksSchema = z.object({
 
 export const tasksKeysAll = Object.keys(taskSchema.shape) as (keyof Tasks)[]
 
-const excludedKeys = ['parentTaskId'] as const;
+const excludedKeys = ['parentTaskId'] as const
 export const tasksKeysPublic = tasksKeysAll.filter(
   (key) => !excludedKeys.includes(key as (typeof excludedKeys)[number])
-) as (typeof tasksKeysAll)[number][];
+) as (typeof tasksKeysAll)[number][]
 
 export type TasksPublic = Pick<
   Selectable<Tasks>,
   (typeof tasksKeysPublic)[number]
 >
 
-export type TasksUpdateables =  Omit<Tasks, 'createdByUserId' | 'id'>
+export type TasksUpdateables = Omit<Tasks, 'createdByUserId' | 'id'>
 
 export type InsertableTasks = Insertable<Tasks>
+
+export interface TasksDue extends Selectable<Tasks> {
+  completed: Selectable<CompletedTasks> | null
+  recurrence: Selectable<RecurringPattern> | null
+}

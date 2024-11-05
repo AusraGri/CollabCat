@@ -18,3 +18,5 @@ data/database*
 
 coverage
 .env
+test.ts
+test.spec.ts

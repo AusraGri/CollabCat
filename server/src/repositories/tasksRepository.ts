@@ -3,9 +3,11 @@ import type { Tasks } from '@server/database/types'
 import {
   type TasksPublic,
   type TasksUpdateables,
+  type TasksDue,
   tasksKeysPublic,
 } from '@server/entities/tasks'
 import type { DeleteResult, Insertable, Updateable } from 'kysely'
+import { jsonObjectFrom } from 'kysely/helpers/postgres'
 import { sql } from 'kysely'
 
 export interface GetTasksOptions {
@@ -103,27 +105,64 @@ export function tasksRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async getTasksDue(date: Date): Promise<TasksPublic[]> {
-      // not working
-      return db
-      .selectFrom('tasks as t')
-      .selectAll()
-      .innerJoin('recurringPattern as rp', 'rp.taskId', 't.id')
-      .where((eb) =>
-        eb.or([
-          eb('t.startDate', '<=', date).and(
-            eb.or([
-              eb('t.endDate', '>=', date),
-              eb('t.endDate', 'is', null),
-            ])
-          ),
+    async getTasksDue(date: Date, userId: number): Promise<TasksDue[]> {
+
+      const tasksToDate = await db
+        .selectFrom('tasks as t')
+        .select((eb) => [
+          't.id',
+          't.title',
+          't.description',
+          't.createdByUserId',
+          't.assignedUserId',
+          't.categoryId',
+          't.startDate',
+          't.endDate',
+          't.completedAt',
+          't.groupId',
+          't.parentTaskId',
+          't.importance',
+          't.isCompleted',
+          't.points',
+          't.startTime',
+          't.endTime',
+          't.isFullDayEvent',
+
+          // Use jsonObjectFrom to structure the recurrence pattern as a nested object
+          jsonObjectFrom(
+            eb
+              .selectFrom('recurringPattern as rp')
+              .selectAll()
+              .whereRef('rp.taskId', '=', 't.id')
+          ).as('recurrence'),
+          jsonObjectFrom(
+            eb
+              .selectFrom('completedTasks as ct')
+              .selectAll()
+              .whereRef('ct.taskId', '=', 't.id')
+              .where('ct.instanceDate', '=', date)
+          ).as('completed'),
         ])
-      )
-      .where((eb)=>eb.or([
-          eb('rp.recurringTypeId', '=', 1)
-      ]))
-      .execute()
-  }
+        .where((eb) =>
+          eb.or([
+            eb('t.createdByUserId', '=', userId),
+            eb('t.assignedUserId', '=', userId),
+          ])
+        )
+        .where((eb) =>
+          eb.or([
+            eb('t.startDate', '<=', date).and(
+              eb.or([eb('t.endDate', '>=', date), eb('t.endDate', 'is', null)])
+            ),
+          ])
+        )
+        .execute()
+
+        // const dueTasks = tasksToDate.filter(task => isTaskDue(task, date));
+
+        if (tasksToDate.length === 0) return []
+      return tasksToDate as TasksDue[]
+    },
 
   }
 }

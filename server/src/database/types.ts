@@ -48,8 +48,8 @@ export interface RecurringPattern {
   dayOfWeek: number[] | null
   maxNumOfOccurrences: number | null
   monthOfYear: number[] | null
-  recurringTypeId: number | null
-  separationCount: number | null
+  recurringType: string
+  separationCount: Generated<number>
   taskId: number
   weekOfMonth: number[] | null
 }

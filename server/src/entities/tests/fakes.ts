@@ -1,4 +1,4 @@
-import type { Tasks, Groups, User, Categories, RecurringPattern, RecurringTypes, UserGroups } from '@server/database/types'
+import type { Tasks, Groups, User, Categories, RecurringPattern, RecurringTypes, UserGroups, CompletedTasks } from '@server/database/types'
 import type { Insertable } from 'kysely'
 import { random } from '@tests/utils/random'
 import type { AuthUser } from '../user'
@@ -55,6 +55,21 @@ export const fakeTask = <T extends Partial<Insertable<Tasks>>>(
     ...overrides,
   }) satisfies Insertable<Tasks>
 
+
+/**
+ * Generates a fake completed task with some default test data.
+ * @param overrides userId and any properties that should be different from default fake data.
+ */
+export const fakeCompletedTask = <T extends Partial<Insertable<CompletedTasks>>>(
+  overrides: T
+) =>
+  ({
+    taskId: randomId(),
+    completedAt: random.date(),
+    instanceDate: random.date(),
+    ...overrides,
+  }) satisfies Insertable<CompletedTasks>
+
 /**
  * Generates a fake group with some default test data.
  * @param overrides createdByUserId and any properties that should be different from default fake data.
@@ -105,6 +120,8 @@ export const fakePattern = <T extends Partial<Insertable<RecurringPattern>>>(
 ) =>
   ({
     taskId: randomId(),
+    separationCount: 0,
+    recurringType: 'Daily',
     ...overrides,
   }) satisfies Insertable<RecurringPattern>
 
