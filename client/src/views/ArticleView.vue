@@ -18,8 +18,7 @@ const articleId = Number(route.params.id)
 onBeforeMount(async () => {
   // Promise.all allows to run multiple promises in parallel.
   const [articleFound, commentsFound] = await Promise.all([
-    trpc.article.get.query(articleId),
-    trpc.comment.find.query({ articleId }),
+    trpc.tasks.getDueTasks(new Date()),
   ])
 
   article.value = articleFound

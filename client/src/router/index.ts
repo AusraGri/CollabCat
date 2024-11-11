@@ -14,7 +14,7 @@ const router = createRouter({
         {
           path: 'write-article',
           name: 'WriteArticle',
-          component: () => import('../views/WriteArticle.vue'),
+          component: () => import('../views/CreateTask.vue'),
         },
       ],
     },

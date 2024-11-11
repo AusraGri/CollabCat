@@ -158,8 +158,6 @@ export function tasksRepository(db: Database) {
         )
         .execute()
 
-        // const dueTasks = tasksToDate.filter(task => isTaskDue(task, date));
-
         if (tasksToDate.length === 0) return []
       return tasksToDate as TasksDue[]
     },

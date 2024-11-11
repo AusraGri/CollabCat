@@ -10,7 +10,7 @@ function verify(token: string) {
   return jsonwebtoken.verify(token, tokenKey)
 }
 
-function getUserFromToken(token: string) {
+export function getUserFromToken(token: string) {
   try {
     const tokenVerified = verify(token)
     const tokenParsed = parseTokenPayload(tokenVerified)

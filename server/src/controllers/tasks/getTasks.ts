@@ -9,7 +9,7 @@ export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
 
   .input(getTasksSchema)
-  .mutation(async ({ input: requiredTaskData, ctx: { authUser, repos } }) => {
+  .query(async ({ input: requiredTaskData, ctx: { authUser, repos } }) => {
     const taskSearchOptions = {
       ...requiredTaskData,
       createdByUserId: authUser.id,

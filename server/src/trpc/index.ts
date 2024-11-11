@@ -1,8 +1,10 @@
 import { initTRPC } from '@trpc/server'
+import { type CreateExpressContextOptions } from '@trpc/server/adapters/express';
 import type { Request, Response } from 'express'
 import type { AuthUser } from '@server/entities/user'
 import type { Database } from '@server/database'
 import SuperJSON from 'superjson'
+import { type OpenApiMeta } from 'trpc-openapi';
 import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import type { Repositories } from '@server/repositories'
@@ -26,7 +28,10 @@ export type Context = {
 
 export type ContextMinimal = Pick<Context, 'db'>
 
-const t = initTRPC.context<Context>().create({
+const t = initTRPC
+.context<Context>()
+.meta<OpenApiMeta>()
+.create({
   transformer: SuperJSON,
   errorFormatter(opts) {
     const { shape, error } = opts
@@ -45,6 +50,12 @@ const t = initTRPC.context<Context>().create({
     return shape
   },
 })
+
+export const createContextFactory = (db: Database) => ({ req, res }: CreateExpressContextOptions): Context => ({
+      db,
+      req,
+      res,
+    });
 
 export const {
   createCallerFactory,

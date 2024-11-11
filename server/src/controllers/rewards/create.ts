@@ -8,7 +8,6 @@ import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure
   .use(provideRepos({ rewardsRepository, userRepository, groupsRepository }))
-
   .input(createRewardSchema)
   .mutation(async ({ input: rewardData, ctx: { authUser, repos } }) => {
     if (
@@ -29,6 +28,12 @@ export default authenticatedProcedure
       const users = await repos.userRepository.findById(
         rewardData.targetUserIds
       )
+
+      if (users.length === 0)
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid reward targets',
+        })
     }
 
     const reward = {
@@ -36,7 +41,7 @@ export default authenticatedProcedure
       createdByUserId: authUser.id,
     }
 
-    const pointsCreated = await repos.rewardsRepository.createReward(reward)
+    const rewardCreated = await repos.rewardsRepository.createReward(reward)
 
-    return pointsCreated
+    return rewardCreated
   })

@@ -9,8 +9,8 @@ import useErrorMessage from '@/composables/useErrorMessage'
 const router = useRouter()
 
 const userForm = ref({
-  email: '',
-  password: '',
+  email: 'test@email.com',
+  password: 'SomePassword',
 })
 
 const [submitLogin, errorMessage] = useErrorMessage(async () => {

@@ -9,7 +9,6 @@ import tasksRouter from '..'
 const createCaller = createCallerFactory(tasksRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
-// a pair of users and articles we will use in our test cases
 const [user, userOther] = await insertAll(db, 'user', [fakeUser(), fakeUser()])
 
 const [task, taskOther] = await insertAll(db, 'tasks', [
@@ -19,7 +18,8 @@ const [task, taskOther] = await insertAll(db, 'tasks', [
 
 const { get } = createCaller(authContext({ db }, user))
 
-it('should return a task', async () => {
+
+it('should return a task by id', async () => {
   // When (ACT)
   const taskResponse = await get({id: task.id})
 
@@ -27,7 +27,7 @@ it('should return a task', async () => {
   expect(taskResponse[0]).toMatchObject(task)
 })
 
-it('should throw an error if the article does not exist', async () => {
+it('should throw an error if the task does not exist', async () => {
   const nonExistantId = task.id + taskOther.id
 
   // When (ACT)

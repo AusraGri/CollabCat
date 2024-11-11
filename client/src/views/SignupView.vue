@@ -8,10 +8,10 @@ import AlertError from '@/components/AlertError.vue'
 // import useErrorMessage from '@/composables/useErrorMessage'
 
 const userForm = ref({
-  email: '',
-  password: '',
-  firstName: '',
-  lastName: '',
+  email: 'test@email.com',
+  password: 'SomePassword',
+  firstName: 'TestName',
+  lastName: 'TestLastName',
 })
 
 const hasSucceeded = ref(false)
