@@ -5,7 +5,7 @@ import type {
   CompletedTasks,
   RecurringPattern,
 } from '@server/database/types'
-import { idSchema } from './shared'
+import { idSchema, dateSchema } from './shared'
 
 export const taskSchema = z.object({
   id: idSchema,
@@ -19,17 +19,44 @@ export const taskSchema = z.object({
   importance: z.string(),
   points: z.number().positive(),
   title: z.string().trim().min(3).max(100),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: dateSchema,
+  endDate: dateSchema,
   isFullDayEvent: z.boolean(),
   parentTaskId: idSchema,
-  startTime: z.date(),
-  endTime: z.date(),
+  startTime: dateSchema,
+  endTime: dateSchema,
 })
-const taskOptional = taskSchema.omit({ title: true, startDate: true }).partial()
-export const inputTaskSchema = taskSchema
-  .pick({ title: true, startDate: true })
-  .merge(taskOptional)
+const taskOptional = taskSchema
+  .omit({
+    title: true,
+    startDate: true,
+    id: true,
+    createdByUserId: true,
+    parentTaskId: true,
+    isCompleted: true,
+    completedAt: true,
+  })
+  .partial()
+export const inputTaskSchemaAlter = taskSchema.pick({
+  title: true,
+  startDate: true,
+})
+export const inputTaskSchema = inputTaskSchemaAlter.merge(taskOptional)
+
+export const createTaskSchema = z.object({
+  startDate: z.date(),
+  title: z.string().trim().min(3).max(100),
+  assignedUserId: idSchema.optional(),
+  categoryId: idSchema.optional(),
+  description: z.string().trim().max(300).optional(),
+  groupId: idSchema.optional(),
+  importance: z.string().optional(),
+  points: z.number().positive().optional(),
+  endDate: z.date().optional(),
+  isFullDayEvent: z.boolean().optional(),
+  startTime: z.date().optional(),
+  endTime: z.date().optional(),
+})
 
 export const taskUpdateOptional = taskSchema
   .omit({ id: true, createdByUserId: true })
@@ -42,7 +69,7 @@ export const taskUpdateSchema = z.object({
 
 export const taskCompletionSchema = z.object({
   id: idSchema,
-  instanceDate: z.date(),
+  instanceDate: dateSchema,
   isCompleted: z.boolean(),
 })
 export const getTasksSchema = z.object({

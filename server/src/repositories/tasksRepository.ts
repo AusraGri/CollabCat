@@ -1,14 +1,16 @@
 import type { Database } from '@server/database'
-import type { Tasks } from '@server/database/types'
+import type { Tasks, CompletedTasks } from '@server/database/types'
 import {
   type TasksPublic,
   type TasksUpdateables,
   type TasksDue,
   tasksKeysPublic,
 } from '@server/entities/tasks'
-import type { DeleteResult, Insertable, Updateable } from 'kysely'
+import type { DeleteResult, Insertable, Updateable, Selectable } from 'kysely'
 import { jsonObjectFrom } from 'kysely/helpers/postgres'
 import { sql } from 'kysely'
+
+export type SelectableCompletedTask = Selectable<CompletedTasks>
 
 export interface GetTasksOptions {
   assignedUserId?: number
@@ -104,7 +106,7 @@ export function tasksRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async addToCompletedTasks(taskData: TaskCompletion): Promise<TaskCompletion> {
+    async addToCompletedTasks(taskData: TaskCompletion): Promise<SelectableCompletedTask> {
       return db
         .insertInto('completedTasks')
         .values(taskData)

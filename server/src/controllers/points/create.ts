@@ -8,10 +8,9 @@ export default authenticatedProcedure
   .use(provideRepos({ pointsRepository }))
 
   .input(createPointsSchema)
-  .mutation(async ({ input: pointsData, ctx: { authUser, repos } }) => {
+  .mutation(async ({ input: pointsData, ctx: { repos } }) => {
     const points = {
       ...pointsData,
-      userId: authUser.id,
     }
 
     const pointsCreated = await repos.pointsRepository.createPoints(points)
