@@ -15,7 +15,7 @@ it('should trow an error if task id is invalid', async () => {
   const task = {
     id: 1,
     isCompleted: true,
-    instanceDate: new Date(),
+    instanceDate: new Date().toISOString(),
   }
   const repos = {
     tasksRepository: {
@@ -37,7 +37,7 @@ it('should add task to completed', async () => {
   const task = {
     id: 1,
     isCompleted: true,
-    instanceDate: new Date(2024, 0, 1),
+    instanceDate: new Date(2024, 0, 1).toISOString(),
   }
 
   const repos = {
@@ -65,7 +65,7 @@ it('should remove task from completed', async () => {
   const task = {
     id: 1,
     isCompleted: false,
-    instanceDate: new Date(2024, 0, 1),
+    instanceDate: new Date(2024, 0, 1).toISOString(),
   }
 
   const repos = {

@@ -8,7 +8,8 @@ import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import type { Repositories } from '@server/repositories'
 import type { AuthGroup } from '@server/entities/groups'
-import { type TRPCPanelMeta } from "trpc-panel";
+// import { type TRPCPanelMeta } from "trpc-panel";
+import {type  OpenApiMeta } from 'trpc-openapi'; // test
 
 export type Context = {
   db: Database
@@ -30,7 +31,7 @@ export type ContextMinimal = Pick<Context, 'db'>
 
 const t = initTRPC
 .context<Context>()
-.meta<TRPCPanelMeta>()
+.meta<OpenApiMeta>()
 .create({
   transformer: SuperJSON,
   errorFormatter(opts) {

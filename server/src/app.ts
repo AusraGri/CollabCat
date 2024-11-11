@@ -5,10 +5,13 @@ import {
 } from '@trpc/server/adapters/express'
 import cors from 'cors'
 import { renderTrpcPanel } from 'trpc-panel'
+import swaggerUi from 'swagger-ui-express'
+import { createOpenApiExpressMiddleware } from 'trpc-openapi' // tets
 import type { Database } from './database'
 import { appRouter } from './controllers'
 import type { Context } from './trpc'
 import config from './config'
+import { openApiDocument } from './trpc/openApi'
 
 export default function createApp(db: Database) {
   const app = express()
@@ -40,6 +43,22 @@ export default function createApp(db: Database) {
       router: appRouter,
     })
   )
+
+  app.use(
+    '/api',
+    createOpenApiExpressMiddleware({
+      router: appRouter,
+      createContext: ({ req, res }: CreateExpressContextOptions): Context => ({
+        // What we provide to our procedures under `ctx` key.
+        db,
+        req,
+        res,
+      }),
+    })
+  )
+
+  app.use('/', swaggerUi.serve)
+  app.get('/', swaggerUi.setup(openApiDocument))
 
   if (config.env === 'development') {
     app.use('/api/v1/trpc-panel', (_, res) =>

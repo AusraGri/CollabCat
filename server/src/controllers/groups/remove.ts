@@ -7,10 +7,20 @@ import z from 'zod'
 
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
-
+.meta({
+  openapi: {
+    method: 'POST',
+    path: '/group/remove',
+    tags: ['group'],
+    summary: 'Delete group',
+  },
+})
   .input(z.object({
     id: idSchema
   }))
+  .output(
+    z.boolean()
+   )
   .mutation(async ({ input: group, ctx: { authUser, userGroup, repos } }) => {
     if(!userGroup || userGroup.role !== 'Admin'){
       throw new TRPCError({

@@ -54,10 +54,10 @@ const [patternOne, patternTwo, patterThree] = await insertAll(
 const { getDueTasks } = createCaller(authContext({ db }, user))
 
 it('should return a task for the given date', async () => {
-  const date = new Date(2024, 10, 11)
+  const date = '2024-11-11'
 
   // When (ACT)
-  const taskResponse = await getDueTasks(date)
+  const taskResponse = await getDueTasks({date})
 
   // Then (ASSERT)
   expect(taskResponse).toHaveLength(2)
@@ -67,10 +67,10 @@ it('should return a task for the given date', async () => {
 })
 
 it('should return empty array id no tasks for the day', async () => {
-  const date = new Date(2023, 10, 11)
+  const date = '2024-11-11'
 
   // When (ACT)
-  const taskResponse = await getDueTasks(date)
+  const taskResponse = await getDueTasks({date})
 
   // Then (ASSERT)
   expect(taskResponse).toHaveLength(0)
