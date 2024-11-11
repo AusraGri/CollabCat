@@ -15,10 +15,10 @@ export interface Categories {
 }
 
 export interface CompletedTasks {
-  completedAt: Timestamp
+  completedAt: Generated<Timestamp>
   id: Generated<number>
   instanceDate: Timestamp
-  taskId: number | null
+  taskId: number
 }
 
 export interface Groups {

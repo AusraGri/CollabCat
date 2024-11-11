@@ -3,6 +3,13 @@ import type { TasksDue } from "@server/entities/tasks"
 export default function isTaskDue(task: TasksDue, date: Date): boolean {
   const { recurrence } = task
   const startDate = new Date(task.startDate)
+  const today = new Date()
+
+  // Check for completed tasks for that date. Task can't be completed in the future
+  if(today < date && task.completed?.instanceDate){
+    const instanceDate = new Date(task.completed.instanceDate)
+    return instanceDate.toDateString() === date.toDateString()
+  }
 
   // Check for one-time tasks without recurrence
   if (!recurrence) {

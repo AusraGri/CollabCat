@@ -28,6 +28,12 @@ export interface TaskUpdate {
   task: Updateable<TasksUpdateables>
 }
 
+export interface TaskCompletion {
+  taskId: number
+  instanceDate: Date
+}
+
+
 export function tasksRepository(db: Database) {
   return {
     async create(task: Insertable<Tasks>): Promise<TasksPublic> {
@@ -95,6 +101,22 @@ export function tasksRepository(db: Database) {
         .set(taskData.task)
         .where('id', '=', taskData.id)
         .returning(tasksKeysPublic)
+        .executeTakeFirstOrThrow()
+    },
+
+    async addToCompletedTasks(taskData: TaskCompletion): Promise<TaskCompletion> {
+      return db
+        .insertInto('completedTasks')
+        .values(taskData)
+        .returningAll()
+        .executeTakeFirstOrThrow()
+    },
+
+    async removeCompletedTasks(taskData:TaskCompletion): Promise<DeleteResult> {
+      return db
+        .deleteFrom('completedTasks')
+        .where('completedTasks.taskId', '=', taskData.taskId)
+        .where('completedTasks.instanceDate', '=', taskData.instanceDate)
         .executeTakeFirstOrThrow()
     },
 

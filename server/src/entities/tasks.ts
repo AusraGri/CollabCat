@@ -30,10 +30,20 @@ const taskOptional = taskSchema.omit({ title: true, startDate: true }).partial()
 export const inputTaskSchema = taskSchema
   .pick({ title: true, startDate: true })
   .merge(taskOptional)
- export const taskUpdateOptional = taskSchema.omit({ id: true, createdByUserId: true}).partial()
+
+export const taskUpdateOptional = taskSchema
+  .omit({ id: true, createdByUserId: true })
+  .partial()
+
 export const taskUpdateSchema = z.object({
   id: idSchema,
-  task: taskUpdateOptional
+  task: taskUpdateOptional,
+})
+
+export const taskCompletionSchema = z.object({
+  id: idSchema,
+  instanceDate: z.date(),
+  isCompleted: z.boolean(),
 })
 export const getTasksSchema = z.object({
   title: taskSchema.shape.title.optional(),
