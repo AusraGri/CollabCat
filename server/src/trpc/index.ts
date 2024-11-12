@@ -1,5 +1,5 @@
 import { initTRPC } from '@trpc/server'
-import { type CreateExpressContextOptions } from '@trpc/server/adapters/express';
+import { type CreateExpressContextOptions } from '@trpc/server/adapters/express'
 import type { Request, Response } from 'express'
 import type { AuthUser } from '@server/entities/user'
 import type { Database } from '@server/database'
@@ -9,7 +9,7 @@ import { fromZodError } from 'zod-validation-error'
 import type { Repositories } from '@server/repositories'
 import type { AuthGroup } from '@server/entities/groups'
 // import { type TRPCPanelMeta } from "trpc-panel";
-import {type  OpenApiMeta } from 'trpc-openapi'; // test
+import { type OpenApiMeta } from 'trpc-openapi' // test
 
 export type Context = {
   db: Database
@@ -30,33 +30,35 @@ export type Context = {
 export type ContextMinimal = Pick<Context, 'db'>
 
 const t = initTRPC
-.context<Context>()
-.meta<OpenApiMeta>()
-.create({
-  transformer: SuperJSON,
-  errorFormatter(opts) {
-    const { shape, error } = opts
+  .context<Context>()
+  .meta<OpenApiMeta>()
+  .create({
+    transformer: SuperJSON,
+    errorFormatter(opts) {
+      const { shape, error } = opts
 
-    if (error.cause instanceof ZodError) {
-      const validationError = fromZodError(error.cause)
+      if (error.cause instanceof ZodError) {
+        const validationError = fromZodError(error.cause)
 
-      return {
-        ...shape,
-        data: {
-          message: validationError.message,
-        },
+        return {
+          ...shape,
+          data: {
+            message: validationError.message,
+          },
+        }
       }
-    }
 
-    return shape
-  },
-})
+      return shape
+    },
+  })
 
-export const createContextFactory = (db: Database) => ({ req, res }: CreateExpressContextOptions): Context => ({
-      db,
-      req,
-      res,
-    });
+export const createContextFactory =
+  (db: Database) =>
+  ({ req, res }: CreateExpressContextOptions): Context => ({
+    db,
+    req,
+    res,
+  })
 
 export const {
   createCallerFactory,

@@ -7,17 +7,27 @@ import { sentInvitationMail } from '@server/emailer'
 import jsonwebtoken from 'jsonwebtoken'
 import config from '@server/config'
 import { prepareInvitationTokenPayload } from '@server/trpc/tokenPayload'
+import { invitationSchema } from '@server/entities/invitations'
 import { invitationsRepository } from '../../repositories/invitationRepository'
 
 const { expiresIn, tokenKey } = config.auth
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository, invitationsRepository }))
-
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/group/invite-user',
+      tags: ['group'],
+      protect: true,
+      summary: 'Invite user to the group',
+    },
+  })
   .input(
     z.object({
       email: z.string().email(),
     })
   )
+  .output(invitationSchema)
   .mutation(async ({ input: { email }, ctx: { userGroup, repos } }) => {
     if (!userGroup || userGroup.role !== 'Admin') {
       throw new TRPCError({
@@ -26,16 +36,18 @@ export default groupAuthProcedure
       })
     }
     // check if user is not already in the group
-    const usersInGroup = await repos.groupsRepository.getGroupMembers(userGroup.groupId)
+    const usersInGroup = await repos.groupsRepository.getGroupMembers(
+      userGroup.groupId
+    )
 
     const isUserIngroup = usersInGroup.some((user) => user.email === email)
 
     if (isUserIngroup) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'User is already in the group',
-        })
-      }
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: 'User is already in the group',
+      })
+    }
     // check if this user is not already invited
     const isUserInvited =
       await repos.invitationsRepository.getInvitationByEmail(email)
@@ -55,7 +67,11 @@ export default groupAuthProcedure
     })
 
     // sent invitation
-    await sentInvitationMail({ email, inviteToken })
+    try {
+      await sentInvitationMail({ email, inviteToken })
+    } catch (error) {
+      throw new Error('error sending')
+    }
 
     // if sending invitation was successful only then save invitation to the database
     const invitation = await repos.invitationsRepository.createInvitation({

@@ -6,10 +6,10 @@ import taskCompletion from './taskCompletion'
 import update from './updateTask'
 
 export default router({
-// routes for tasks
-create,
-get,
-getDueTasks,
-taskCompletion,
-update
+  // routes for tasks
+  create,
+  get,
+  getDueTasks,
+  taskCompletion,
+  update,
 })

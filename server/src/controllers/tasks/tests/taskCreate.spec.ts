@@ -17,7 +17,7 @@ it('should throw an error if user is not authenticated', async () => {
   await expect(
     create({
       title: 'My New Task',
-      startDate: new Date()
+      startDate: '2024-11-11',
     })
   ).rejects.toThrow(/unauthenticated/i)
 })
@@ -30,7 +30,7 @@ it('should create a persisted task', async () => {
   // ACT
   const taskReturned = await create({
     title: 'New Task',
-    startDate: new Date()
+    startDate: '2024-11-11',
   })
 
   // ASSERT

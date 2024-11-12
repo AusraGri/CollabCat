@@ -7,6 +7,7 @@ import { userSchema } from '@server/entities/user'
 import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import { prepareTokenPayload } from '@server/trpc/tokenPayload'
+import z from 'zod'
 
 const { expiresIn, tokenKey } = config.auth
 
@@ -16,10 +17,30 @@ export default publicProcedure
       userRepository,
     })
   )
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/user/login',
+      tags: ['user'],
+      summary: 'Login user',
+      description: 'You can use provided example for login',
+      example: {
+        request: {
+          email: 'some@email.com',
+          password: 'password',
+        },
+      },
+    },
+  })
   .input(
     userSchema.pick({
       email: true,
       password: true,
+    })
+  )
+  .output(
+    z.object({
+      accessToken: z.string(),
     })
   )
   .mutation(async ({ input: { email, password }, ctx: { repos } }) => {

@@ -35,7 +35,6 @@ export interface TaskCompletion {
   instanceDate: Date
 }
 
-
 export function tasksRepository(db: Database) {
   return {
     async create(task: Insertable<Tasks>): Promise<TasksPublic> {
@@ -106,7 +105,9 @@ export function tasksRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async addToCompletedTasks(taskData: TaskCompletion): Promise<SelectableCompletedTask> {
+    async addToCompletedTasks(
+      taskData: TaskCompletion
+    ): Promise<SelectableCompletedTask> {
       return db
         .insertInto('completedTasks')
         .values(taskData)
@@ -114,7 +115,9 @@ export function tasksRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async removeCompletedTasks(taskData:TaskCompletion): Promise<DeleteResult> {
+    async removeCompletedTasks(
+      taskData: TaskCompletion
+    ): Promise<DeleteResult> {
       return db
         .deleteFrom('completedTasks')
         .where('completedTasks.taskId', '=', taskData.taskId)
@@ -130,7 +133,6 @@ export function tasksRepository(db: Database) {
     },
 
     async getTasksDue(date: Date, userId: number): Promise<TasksDue[]> {
-
       const tasksToDate = await db
         .selectFrom('tasks as t')
         .select((eb) => [
@@ -182,10 +184,9 @@ export function tasksRepository(db: Database) {
         )
         .execute()
 
-        if (tasksToDate.length === 0) return []
+      if (tasksToDate.length === 0) return []
       return tasksToDate as TasksDue[]
     },
-
   }
 }
 

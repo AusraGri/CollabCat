@@ -17,12 +17,9 @@ export async function up(db: Kysely<any>) {
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .addColumn('updated_at', 'timestamptz', (c) =>
-      c
-        .defaultTo(sql`CURRENT_TIMESTAMP`)
-        .notNull()
+      c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()
     )
     .execute()
-
 }
 
 export async function down(db: Kysely<any>) {

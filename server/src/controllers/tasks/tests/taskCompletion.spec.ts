@@ -57,7 +57,7 @@ it('should add task to completed', async () => {
   // Then (ASSERT)
   const completedTask = await taskCompletion(task)
 
-  expect(completedTask).toHaveProperty('taskId', 1)
+  expect(completedTask).toBe(true)
 })
 
 it('should remove task from completed', async () => {
@@ -85,5 +85,5 @@ it('should remove task from completed', async () => {
   // Then (ASSERT)
   const completedTask = await taskCompletion(task)
 
-  expect(completedTask).toHaveProperty('numDeletedRows')
+  expect(completedTask).toBe(true)
 })

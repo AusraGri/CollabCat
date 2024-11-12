@@ -17,7 +17,7 @@ export const userSchema = z.object({
   auth0Id: z.string(),
   createdAt: z.date(),
   provider: z.string(),
-  updatedAt: z.date()
+  updatedAt: z.date(),
 })
 
 export const userKeysAll = Object.keys(userSchema.shape) as (keyof User)[]

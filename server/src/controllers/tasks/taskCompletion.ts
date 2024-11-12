@@ -3,10 +3,21 @@ import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { taskCompletionSchema } from '@server/entities/tasks'
 import { TRPCError } from '@trpc/server'
+import z from 'zod'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/tasks/complete',
+      tags: ['tasks'],
+      summary: 'Alter task completion: done/undone',
+      protect: true,
+    },
+  })
   .input(taskCompletionSchema)
+  .output(z.boolean())
   .mutation(async ({ input: taskData, ctx: { repos } }) => {
     const [isTask] = await repos.tasksRepository.getTasks({ id: taskData.id })
 
@@ -40,5 +51,5 @@ export default authenticatedProcedure
       })
     }
 
-    return taskCompletion
+    return !!taskCompletion
   })

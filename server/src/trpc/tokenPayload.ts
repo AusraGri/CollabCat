@@ -1,4 +1,9 @@
-import { authUserEmail, authUserSchema, type AuthUser, type AuthUserEmail } from '@server/entities/user'
+import {
+  authUserEmail,
+  authUserSchema,
+  type AuthUser,
+  type AuthUserEmail,
+} from '@server/entities/user'
 import { z } from 'zod'
 
 // We have move out the token payload logic into a separate file.
@@ -16,7 +21,6 @@ type TokenPayload = z.infer<typeof tokenPayloadSchema>
 
 type TokenInvitationPayload = z.infer<typeof tokenInvitationPayloadSchema>
 
-
 /**
  * Prepares the token payload for the given user.
  * @param user The authenticated user.
@@ -32,7 +36,9 @@ export function prepareTokenPayload(user: AuthUser): TokenPayload {
  * @returns The token payload containing the user information.
  */
 
-export function prepareInvitationTokenPayload(user: AuthUserEmail): TokenInvitationPayload {
+export function prepareInvitationTokenPayload(
+  user: AuthUserEmail
+): TokenInvitationPayload {
   return tokenInvitationPayloadSchema.parse({ user })
 }
 

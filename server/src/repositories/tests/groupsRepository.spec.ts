@@ -3,7 +3,7 @@ import { DeleteResult } from 'kysely'
 import {
   fakeUser,
   fakeGroup,
-  fakeUserGroup
+  fakeUserGroup,
 } from '@server/entities/tests/fakes'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
@@ -21,7 +21,9 @@ const [groupOne, groupTwo] = await insertAll(db, 'groups', [
   fakeGroup({ createdByUserId: userTwo.id }),
 ])
 
-await insertAll(db, 'userGroups', [fakeUserGroup({userId: userOne.id, groupId: groupOne.id})])
+await insertAll(db, 'userGroups', [
+  fakeUserGroup({ userId: userOne.id, groupId: groupOne.id }),
+])
 
 describe('create', () => {
   it('should create a group', async () => {
@@ -75,10 +77,13 @@ describe('get', () => {
 
   it('should get user role in the group by the userId and groupId', async () => {
     // When
-    const role = await repository.getRole({ userId: userOne.id, groupId: groupOne.id })
+    const role = await repository.getRole({
+      userId: userOne.id,
+      groupId: groupOne.id,
+    })
 
     // Then
-    expect(role).toEqual({role: 'Admin'})
+    expect(role).toEqual({ role: 'Admin' })
   })
 })
 
@@ -129,16 +134,15 @@ describe('users in groups', () => {
   })
 
   it('should get all users that belongs to the group (by groupId)', async () => {
-
     // When
     const members = await repository.getGroupMembers(groupOne.id)
 
     // Then
     expect(members).toHaveLength(1)
     expect(members[0]).toMatchObject({
-        id: userOne.id,
-        firstName: userOne.firstName,
-        lastName: userOne.lastName
+      id: userOne.id,
+      firstName: userOne.firstName,
+      lastName: userOne.lastName,
     })
   })
 

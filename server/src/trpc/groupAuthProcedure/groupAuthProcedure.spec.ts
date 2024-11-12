@@ -1,6 +1,10 @@
 import { authContext } from '@tests/utils/context'
 import { createTestDatabase } from '@tests/utils/database'
-import { fakeGroup, fakeUser, fakeUserGroup } from '@server/entities/tests/fakes'
+import {
+  fakeGroup,
+  fakeUser,
+  fakeUserGroup,
+} from '@server/entities/tests/fakes'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
 import { createCallerFactory, router } from '..'
@@ -18,7 +22,7 @@ const [groupOne, groupTwo] = await insertAll(db, 'groups', [
   fakeGroup({ createdByUserId: userTwo.id }),
 ])
 
- await insertAll(db, 'userGroups', [
+await insertAll(db, 'userGroups', [
   fakeUserGroup({ userId: userOne.id, groupId: groupOne.id }),
   fakeUserGroup({ userId: userTwo.id, groupId: groupTwo.id }),
 ])

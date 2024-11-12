@@ -27,7 +27,7 @@ export function userRepository(db: Database) {
       return user
     },
 
-    async findById(id: number[]): Promise<Selectable<User>[]>{
+    async findById(id: number[]): Promise<Selectable<User>[]> {
       const user = await db
         .selectFrom('user')
         .select(userKeysAll)

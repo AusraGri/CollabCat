@@ -6,12 +6,12 @@ import points from './points'
 import rewards from './rewards'
 
 export const appRouter = router({
-// provide controllers
-user,
-tasks,
-groups,
-points,
-rewards
+  // provide controllers
+  user,
+  tasks,
+  groups,
+  points,
+  rewards,
 })
 
 export type AppRouter = typeof appRouter

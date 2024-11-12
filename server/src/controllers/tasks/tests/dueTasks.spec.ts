@@ -57,7 +57,7 @@ it('should return a task for the given date', async () => {
   const date = '2024-11-11'
 
   // When (ACT)
-  const taskResponse = await getDueTasks({date})
+  const taskResponse = await getDueTasks({ date })
 
   // Then (ASSERT)
   expect(taskResponse).toHaveLength(2)
@@ -67,10 +67,10 @@ it('should return a task for the given date', async () => {
 })
 
 it('should return empty array id no tasks for the day', async () => {
-  const date = '2024-11-11'
+  const date = '2023-11-11'
 
   // When (ACT)
-  const taskResponse = await getDueTasks({date})
+  const taskResponse = await getDueTasks({ date })
 
   // Then (ASSERT)
   expect(taskResponse).toHaveLength(0)

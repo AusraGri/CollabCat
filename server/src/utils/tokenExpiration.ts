@@ -4,7 +4,7 @@ import config from '@server/config'
 const { tokenKey } = config.auth
 
 export function verifyToken(token: string) {
-    let tokenExpiresAt
+  let tokenExpiresAt
   try {
     jsonwebtoken.verify(token, tokenKey)
     const tokenData = jsonwebtoken.decode(token) as JwtPayload

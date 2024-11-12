@@ -7,12 +7,23 @@ import z from 'zod'
 
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
-
-  .input(z.object({
-    id: idSchema
-  }))
+  .meta({
+    openapi: {
+      method: 'DELETE',
+      path: '/group/remove-user',
+      tags: ['group'],
+      protect: true,
+      summary: 'Remove user from group',
+    },
+  })
+  .input(
+    z.object({
+      userId: idSchema,
+    })
+  )
+  .output(z.boolean())
   .mutation(async ({ input: user, ctx: { userGroup, repos } }) => {
-    if(!userGroup || userGroup.role !== 'Admin'){
+    if (!userGroup || userGroup.role !== 'Admin') {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message: 'User does not have permission to remove user from this group',
@@ -21,7 +32,7 @@ export default groupAuthProcedure
 
     const isUserRemoved = await repos.groupsRepository.removeUser({
       groupId: userGroup.groupId,
-      userId: user.id,
+      userId: user.userId,
     })
 
     if (!isUserRemoved) {

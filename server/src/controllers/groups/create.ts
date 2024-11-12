@@ -10,13 +10,12 @@ export default authenticatedProcedure
       method: 'POST',
       path: '/group/create',
       tags: ['group'],
+      protect: true,
       summary: 'Create new Group',
     },
   })
   .input(insertGroupSchema)
-  .output(
-   groupsSchema.omit({createdAt: true})
-  )
+  .output(groupsSchema.omit({ createdAt: true }))
   .mutation(async ({ input: groupData, ctx: { authUser, repos } }) => {
     const group = {
       ...groupData,

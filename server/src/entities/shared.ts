@@ -1,4 +1,4 @@
-import {z} from 'zod'
+import { z } from 'zod'
 
 export const idSchema = z.number().int().positive()
 
@@ -7,4 +7,4 @@ export const dateSchema = z
   .refine((dateStr) => !Number.isNaN(Date.parse(dateStr)), {
     message: 'Invalid date format',
   })
-  .transform((dateStr) => new Date(dateStr));
+  .transform((dateStr) => new Date(dateStr))

@@ -1,9 +1,6 @@
 import type { Database } from '@server/database'
 import type { Invitations } from '@server/database/types'
-import {
-  DeleteResult,
-  type Selectable,
-} from 'kysely'
+import { DeleteResult, type Selectable } from 'kysely'
 import type { InsertableInvitation } from '@server/entities/invitations'
 import { invitationsKeysAll } from '../entities/invitations'
 
@@ -26,7 +23,7 @@ export function invitationsRepository(db: Database) {
         .selectFrom('invitations')
         .select(invitationsKeysAll)
         .where('email', '=', email)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
 
     async deleteInvitation(

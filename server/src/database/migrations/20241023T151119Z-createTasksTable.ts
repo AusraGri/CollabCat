@@ -24,15 +24,17 @@ export async function up(db: Kysely<any>) {
     .addColumn('is_completed', 'boolean', (c) => c.notNull().defaultTo(false))
     .addColumn('completed_at', 'timestamptz')
     .addColumn('points', 'integer')
-    .addColumn('parent_task_id', 'integer', (c) => c.references('tasks.id').onDelete('cascade'))
-    .addColumn('start_date', 'timestamptz', (c)=> c.notNull())
+    .addColumn('parent_task_id', 'integer', (c) =>
+      c.references('tasks.id').onDelete('cascade')
+    )
+    .addColumn('start_date', 'timestamptz', (c) => c.notNull())
     .addColumn('end_date', 'timestamptz')
     .addColumn('start_time', 'timestamptz')
     .addColumn('end_time', 'timestamptz')
     .addColumn('is_full_day_event', 'boolean', (c) => c.defaultTo(false))
     .execute()
 
-    await db.schema
+  await db.schema
     .createIndex('idx_tasks_created_by_user')
     .on('tasks')
     .columns(['created_by_user_id'])

@@ -60,6 +60,7 @@ export default function createApp(db: Database) {
   app.use('/', swaggerUi.serve)
   app.get('/', swaggerUi.setup(openApiDocument))
 
+  // not working, need to fix !!!
   if (config.env === 'development') {
     app.use('/api/v1/trpc-panel', (_, res) =>
       res.send(

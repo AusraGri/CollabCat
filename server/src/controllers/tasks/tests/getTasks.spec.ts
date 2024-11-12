@@ -18,18 +18,17 @@ const [task, taskOther] = await insertAll(db, 'tasks', [
 
 const { get } = createCaller(authContext({ db }, user))
 
-
 it('should return a task by id', async () => {
+  const { parentTaskId, ...taskWithoutParentTaskId } = task
   // When (ACT)
-  const taskResponse = await get({id: task.id})
-
+  const taskResponse = await get({ id: task.id })
   // Then (ASSERT)
-  expect(taskResponse[0]).toMatchObject(task)
+  expect(taskResponse[0]).toMatchObject(taskWithoutParentTaskId)
 })
 
 it('should throw an error if the task does not exist', async () => {
   const nonExistantId = task.id + taskOther.id
 
   // When (ACT)
-  await expect(get({id: nonExistantId})).rejects.toThrowError(/not found/i)
+  await expect(get({ id: nonExistantId })).rejects.toThrowError(/not found/i)
 })

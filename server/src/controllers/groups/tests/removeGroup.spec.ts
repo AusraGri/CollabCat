@@ -4,14 +4,16 @@ import {
   fakeGroup,
   fakeUserGroup,
 } from '@server/entities/tests/fakes'
-import { createTestDatabase } from '@tests/utils/database'
+import { createTestDatabase, cleanDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll, selectAll } from '@tests/utils/records'
 import groupsRouter from '..'
 
 const createCaller = createCallerFactory(groupsRouter)
-const db = await wrapInRollbacks(createTestDatabase())
+const testDb = createTestDatabase()
+await cleanDatabase(testDb)
+const db = await wrapInRollbacks(testDb)
 
 it('should throw an error if user is not authenticated', async () => {
   // ARRANGE
@@ -38,9 +40,9 @@ it('should throw an error if user is authenticated, but is not in the group', as
   const { remove } = createCaller(authContext({ db }, user))
 
   // ACT & ASSERTs
-  await expect(remove({ id: group.id, groupId: userGroup.groupId})).rejects.toThrow(
-    /unauthorized/i
-  )
+  await expect(
+    remove({ id: group.id, groupId: userGroup.groupId })
+  ).rejects.toThrow(/unauthorized/i)
 })
 
 it('should throw an error if user is authenticated, belongs to the group, but does not have permission', async () => {

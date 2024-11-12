@@ -13,7 +13,7 @@ export const groupAuthProcedure = authenticatedProcedure
   )
   .input(
     z.object({
-      groupId: idSchema,
+      groupId: idSchema.describe('Group id on witch user acts'),
     })
   )
   .use(async ({ input: { groupId }, ctx, next }) => {
@@ -30,7 +30,7 @@ export const groupAuthProcedure = authenticatedProcedure
 
     const userGroupRole = await repos.groupsRepository.getRole({
       userId: authUser.id,
-      groupId
+      groupId,
     })
 
     if (!userGroupRole || userGroupRole.role === undefined) {
@@ -43,7 +43,7 @@ export const groupAuthProcedure = authenticatedProcedure
     // Add the role to the context
     ctx.userGroup = {
       role: userGroupRole.role,
-      groupId
+      groupId,
     }
 
     return next({

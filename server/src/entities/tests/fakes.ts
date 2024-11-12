@@ -1,4 +1,13 @@
-import type { Tasks, Groups, User, Categories, RecurringPattern, RecurringTypes, UserGroups, CompletedTasks } from '@server/database/types'
+import type {
+  Tasks,
+  Groups,
+  User,
+  Categories,
+  RecurringPattern,
+  RecurringTypes,
+  UserGroups,
+  CompletedTasks,
+} from '@server/database/types'
 import type { Insertable } from 'kysely'
 import { random } from '@tests/utils/random'
 import type { AuthUser } from '../user'
@@ -36,7 +45,7 @@ export const fakeAuthGroup = <T extends Partial<AuthGroup>>(
   overrides: T = {} as T
 ): AuthGroup => ({
   groupId: randomId(),
- role: 'Admin',
+  role: 'Admin',
   ...overrides,
 })
 
@@ -44,23 +53,22 @@ export const fakeAuthGroup = <T extends Partial<AuthGroup>>(
  * Generates a fake article with some default test data.
  * @param overrides userId and any properties that should be different from default fake data.
  */
-export const fakeTask = <T extends Partial<Insertable<Tasks>>>(
-  overrides: T
-) =>
+export const fakeTask = <T extends Partial<Insertable<Tasks>>>(overrides: T) =>
   ({
-    title: random.string(),
-    description: random.paragraph(),
+    title: random.string().slice(1, 20),
+    description: random.paragraph().slice(1, 100),
     createdByUserId: randomId(),
     startDate: random.date(),
     ...overrides,
   }) satisfies Insertable<Tasks>
 
-
 /**
  * Generates a fake completed task with some default test data.
  * @param overrides userId and any properties that should be different from default fake data.
  */
-export const fakeCompletedTask = <T extends Partial<Insertable<CompletedTasks>>>(
+export const fakeCompletedTask = <
+  T extends Partial<Insertable<CompletedTasks>>,
+>(
   overrides: T
 ) =>
   ({
@@ -97,7 +105,7 @@ export const fakeUserGroup = <T extends Partial<Insertable<UserGroups>>>(
     ...overrides,
   }) satisfies Insertable<UserGroups>
 
-  /**
+/**
  * Generates a fake category with some default test data.
  * @param overrides createdByUserId and any properties that should be different from default fake data.
  */
@@ -110,8 +118,7 @@ export const fakeCategory = <T extends Partial<Insertable<Groups>>>(
     ...overrides,
   }) satisfies Insertable<Categories>
 
-
-  /**
+/**
  * Generates a fake recurring pattern with some default test data.
  * @param overrides createdByUserId and any properties that should be different from default fake data.
  */
@@ -125,12 +132,13 @@ export const fakePattern = <T extends Partial<Insertable<RecurringPattern>>>(
     ...overrides,
   }) satisfies Insertable<RecurringPattern>
 
-
-  /**
+/**
  * Generates a fake recurring type with some default test data.
  * @param overrides createdByUserId and any properties that should be different from default fake data.
  */
-export const fakeRecurringType = <T extends Partial<Insertable<RecurringTypes>>>(
+export const fakeRecurringType = <
+  T extends Partial<Insertable<RecurringTypes>>,
+>(
   overrides: T
 ) =>
   ({

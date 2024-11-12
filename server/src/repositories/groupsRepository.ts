@@ -2,8 +2,11 @@ import type { Database } from '@server/database'
 import type { Groups, UserGroups } from '@server/database/types'
 import { groupsKeysPublic, type GroupsPublic } from '@server/entities/groups'
 import { userKeysPublic, type UserPublic } from '@server/entities/user'
-import { userGroupsKeysPublic, type UserGroupsPublic } from '@server/entities/userGroups'
-import {type DeleteResult, type Insertable } from 'kysely'
+import {
+  userGroupsKeysPublic,
+  type UserGroupsPublic,
+} from '@server/entities/userGroups'
+import { type DeleteResult, type Insertable } from 'kysely'
 
 export interface GetGroupsOptions {
   createdByUserId?: number
@@ -21,7 +24,7 @@ export interface GroupUserData {
   groupId: number
 }
 
-type GroupsUpdate = Omit<GroupsPublic, 'createdByUserId'>;
+type GroupsUpdate = Omit<GroupsPublic, 'createdByUserId'>
 
 export function groupsRepository(db: Database) {
   return {
@@ -97,13 +100,15 @@ export function groupsRepository(db: Database) {
     async updateName(groupData: GroupsUpdate): Promise<GroupsPublic> {
       return db
         .updateTable('groups')
-        .set({name: groupData.name})
+        .set({ name: groupData.name })
         .where('id', '=', groupData.id)
         .returning(groupsKeysPublic)
         .executeTakeFirstOrThrow()
     },
 
-    async addGroupMember(groupData: Insertable<UserGroups>): Promise<UserGroupsPublic> {
+    async addGroupMember(
+      groupData: Insertable<UserGroups>
+    ): Promise<UserGroupsPublic> {
       return db
         .insertInto('userGroups')
         .values(groupData)
@@ -114,11 +119,9 @@ export function groupsRepository(db: Database) {
     async removeGroupMember(groupData: GroupUserData): Promise<DeleteResult> {
       return db
         .deleteFrom('userGroups')
-        .where((eb)=> eb.and(
-         { groupId: groupData.groupId,
-          userId: groupData.userId
-         }
-        ))
+        .where((eb) =>
+          eb.and({ groupId: groupData.groupId, userId: groupData.userId })
+        )
         .executeTakeFirstOrThrow()
     },
 
@@ -127,8 +130,7 @@ export function groupsRepository(db: Database) {
         .selectFrom('user')
         .select(userKeysPublic)
         .innerJoin('userGroups', 'user.id', 'userGroups.userId')
-        .where('userGroups.groupId', '=', groupId
-        )
+        .where('userGroups.groupId', '=', groupId)
         .execute()
     },
 

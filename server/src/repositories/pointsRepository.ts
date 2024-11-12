@@ -7,7 +7,7 @@ export interface PointAlterObject {
   groupId?: number
   userId: number
   points: number
-  action: '+' | '-'
+  action: '+' | '-' | '='
 }
 
 export type DeletePoints = Omit<PointAlterObject, 'points' | 'action'>
@@ -43,9 +43,17 @@ export function pointsRepository(db: Database) {
     async alterPoints(object: PointAlterObject): Promise<PointsPublic> {
       let query = db
         .updateTable('points')
-        .set((eb) => ({
-          points: eb('points', object.action, object.points),
-        }))
+        .set((eb) => {
+          if (object.action === '+') {
+            return { points: eb('points', '+', object.points) }
+          }
+
+          if (object.action === '-') {
+            return { points: eb('points', '-', object.points) }
+          }
+
+          return { points: object.points }
+        })
         .where('userId', '=', object.userId)
 
       if (object.groupId !== undefined) {

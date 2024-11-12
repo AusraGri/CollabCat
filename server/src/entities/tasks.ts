@@ -6,6 +6,7 @@ import type {
   RecurringPattern,
 } from '@server/database/types'
 import { idSchema, dateSchema } from './shared'
+import { recurringPatternSchema } from './recurrence'
 
 export const taskSchema = z.object({
   id: idSchema,
@@ -16,7 +17,7 @@ export const taskSchema = z.object({
   createdByUserId: idSchema,
   description: z.string().trim().max(300),
   groupId: idSchema,
-  importance: z.string(),
+  importance: z.enum(['High', 'Medium', 'ASAP', 'On Fire!']),
   points: z.number().positive(),
   title: z.string().trim().min(3).max(100),
   startDate: dateSchema,
@@ -25,6 +26,31 @@ export const taskSchema = z.object({
   parentTaskId: idSchema,
   startTime: dateSchema,
   endTime: dateSchema,
+})
+export const taskSchemaOutput = z.object({
+  id: idSchema,
+  assignedUserId: idSchema.nullable(),
+  categoryId: idSchema.nullable(),
+  isCompleted: z.boolean(),
+  completedAt: z.date().nullable(),
+  createdByUserId: idSchema,
+  description: z.string().max(300).nullable(),
+  groupId: idSchema.nullable(),
+  importance: z.string().nullable(),
+  points: z.number().positive().nullable(),
+  title: z.string().min(3).max(100),
+  startDate: z.date(),
+  endDate: z.date().nullable(),
+  isFullDayEvent: z.boolean().nullable(),
+  startTime: z.date().nullable(),
+  endTime: z.date().nullable(),
+})
+
+const taskCompletedSchema = z.object({
+  completedAt: z.date(),
+  id: idSchema,
+  instanceDate: z.date(),
+  taskId: idSchema,
 })
 const taskOptional = taskSchema
   .omit({
@@ -63,23 +89,42 @@ export const taskUpdateOptional = taskSchema
   .partial()
 
 export const taskUpdateSchema = z.object({
-  id: idSchema,
-  task: taskUpdateOptional,
+  id: idSchema.describe('Task id'),
+  task: taskUpdateOptional.describe('Task updated data to save/change'),
 })
 
 export const taskCompletionSchema = z.object({
-  id: idSchema,
-  instanceDate: dateSchema,
-  isCompleted: z.boolean(),
+  id: idSchema.describe('Task id'),
+  instanceDate: dateSchema.describe('Task instance date'),
+  isCompleted: z
+    .boolean()
+    .describe('If you want to mark as completed - true, opposite - false'),
 })
-export const getTasksSchema = z.object({
-  title: taskSchema.shape.title.optional(),
-  importance: taskSchema.shape.importance.optional(),
-  categoryId: taskSchema.shape.categoryId.optional(),
-  groupId: taskSchema.shape.groupId.optional(),
-  assignedUserId: taskSchema.shape.assignedUserId.optional(),
-  createdByUserId: taskSchema.shape.createdByUserId.optional(),
-  id: taskSchema.shape.id.optional(),
+
+export const getTasksSchema = taskSchema
+  .pick({
+    title: true,
+    importance: true,
+    categoryId: true,
+    groupId: true,
+    assignedUserId: true,
+    createdByUserId: true,
+    id: true,
+  })
+  .partial()
+// export const getTasksSchema = z.object({
+//   title: taskSchema.shape.title.optional(),
+//   importance: taskSchema.shape.importance.optional(),
+//   categoryId: taskSchema.shape.categoryId.optional(),
+//   groupId: taskSchema.shape.groupId.optional(),
+//   assignedUserId: taskSchema.shape.assignedUserId.optional(),
+//   createdByUserId: taskSchema.shape.createdByUserId.optional(),
+//   id: taskSchema.shape.id.optional(),
+// })
+
+export const tasksDue = taskSchemaOutput.extend({
+  completed: taskCompletedSchema.nullable(),
+  recurrence: recurringPatternSchema.nullable(),
 })
 
 export const tasksKeysAll = Object.keys(taskSchema.shape) as (keyof Tasks)[]
@@ -97,6 +142,8 @@ export type TasksPublic = Pick<
 export type TasksUpdateables = Omit<Tasks, 'createdByUserId' | 'id'>
 
 export type InsertableTasks = Insertable<Tasks>
+
+export type BaseTaskDue = z.infer<typeof tasksDue>
 
 export interface TasksDue extends Selectable<Tasks> {
   completed: Selectable<CompletedTasks> | null
