@@ -20,3 +20,4 @@ coverage
 .env
 test.ts
 test.spec.ts
+TO-DO.md

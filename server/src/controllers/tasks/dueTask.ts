@@ -15,6 +15,11 @@ export default authenticatedProcedure
       tags: ['tasks'],
       summary: 'Get tasks for the given date',
       protect: true,
+      example: {
+        request: {
+          date: '2024-11-11',
+        },
+      },
     },
   })
   .input(z.object({ date: dateSchema }))

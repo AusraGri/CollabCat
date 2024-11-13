@@ -10,7 +10,15 @@ import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
 import type { GroupRepository } from '@server/repositories/groupsRepository'
 import type { InvitationsRepository } from '@server/repositories/invitationRepository'
+import { sentInvitationMail } from '@server/emailer'
 import groupsRouter from '..'
+
+vi.mock('@server/emailer', () => ({
+  sentInvitationMail: vi.fn().mockResolvedValue(undefined),
+  gmailTransporter: {
+    send: vi.fn().mockResolvedValue('Email sent successfully'),
+  },
+}))
 
 const createCaller = createCallerFactory(groupsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
@@ -94,22 +102,6 @@ it('should throw an error if user is already in the group', async () => {
   ).rejects.toThrow(/in the group/i)
 })
 
-it('should invite user to the group', async () => {
-  // ARRANGE
-  const { inviteUser } = createCaller({
-    authUser: { id: 1 },
-    repos,
-  } as any)
-
-  // ACT
-  const invitation = await inviteUser({
-    groupId: 123,
-    email: 'some@email.mail',
-  })
-
-  expect(invitation).toHaveProperty('invitationToken')
-})
-
 it('should invite user to the group (using database) ', async () => {
   // ARRANGE
   const [user] = await insertAll(db, 'user', [fakeUser()])
@@ -129,4 +121,31 @@ it('should invite user to the group (using database) ', async () => {
   })
 
   expect(invitation).toHaveProperty('invitationToken')
+})
+
+it('should invite user to the group', async () => {
+  // ARRANGE
+  const { inviteUser } = createCaller({
+    authUser: { id: 1 },
+    repos,
+  } as any)
+
+  // ACT
+  const invitation = await inviteUser({
+    groupId: 123,
+    email: 'some@email.mail',
+  })
+
+  // ASSERT: Verify the invitation token and that the email was sent
+  expect(invitation).toHaveProperty('invitationToken')
+  expect(invitation.invitationToken).toBeDefined()
+
+  // Check if sentInvitationMail was called with the expected parameters
+  expect(sentInvitationMail).toHaveBeenCalledWith(
+    expect.anything(),
+    expect.objectContaining({
+      email: 'some@email.mail',
+      inviteToken: expect.any(String),
+    })
+  )
 })

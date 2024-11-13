@@ -1,10 +1,6 @@
 import { z } from 'zod'
 import type { Selectable, Insertable } from 'kysely'
-import type {
-  Tasks,
-  CompletedTasks,
-  RecurringPattern,
-} from '@server/database/types'
+import type { Tasks, RecurringPattern } from '@server/database/types'
 import { idSchema, dateSchema } from './shared'
 import { recurringPatternSchema } from './recurrence'
 
@@ -47,11 +43,12 @@ export const taskSchemaOutput = z.object({
 })
 
 const taskCompletedSchema = z.object({
-  completedAt: z.date(),
+  completedAt: z.string(),
   id: idSchema,
-  instanceDate: z.date(),
+  instanceDate: z.string(),
   taskId: idSchema,
 })
+
 const taskOptional = taskSchema
   .omit({
     title: true,
@@ -89,7 +86,7 @@ export const taskUpdateOptional = taskSchema
   .partial()
 
 export const taskUpdateSchema = z.object({
-  id: idSchema.describe('Task id'),
+  id: idSchema.describe('Task id to update'),
   task: taskUpdateOptional.describe('Task updated data to save/change'),
 })
 
@@ -112,15 +109,6 @@ export const getTasksSchema = taskSchema
     id: true,
   })
   .partial()
-// export const getTasksSchema = z.object({
-//   title: taskSchema.shape.title.optional(),
-//   importance: taskSchema.shape.importance.optional(),
-//   categoryId: taskSchema.shape.categoryId.optional(),
-//   groupId: taskSchema.shape.groupId.optional(),
-//   assignedUserId: taskSchema.shape.assignedUserId.optional(),
-//   createdByUserId: taskSchema.shape.createdByUserId.optional(),
-//   id: taskSchema.shape.id.optional(),
-// })
 
 export const tasksDue = taskSchemaOutput.extend({
   completed: taskCompletedSchema.nullable(),
@@ -145,7 +133,9 @@ export type InsertableTasks = Insertable<Tasks>
 
 export type BaseTaskDue = z.infer<typeof tasksDue>
 
+export type TasksCompleted = z.infer<typeof taskCompletedSchema>
+
 export interface TasksDue extends Selectable<Tasks> {
-  completed: Selectable<CompletedTasks> | null
+  completed: TasksCompleted | null
   recurrence: Selectable<RecurringPattern> | null
 }

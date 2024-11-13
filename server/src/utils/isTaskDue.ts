@@ -1,5 +1,6 @@
 import type { TasksDue } from '@server/entities/tasks'
 
+
 export default function isTaskDue(task: TasksDue, date: Date): boolean {
   const { recurrence } = task
   const startDate = new Date(task.startDate)
@@ -23,22 +24,22 @@ export default function isTaskDue(task: TasksDue, date: Date): boolean {
   const daysBetween = (date1: Date, date2: Date) =>
     Math.floor((date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24))
 
-  // Helper function to check if date matches separation count
+  // Helper function to check if date matches separation count, separation count can't be 0
   const matchesSeparationCount = (interval: number) =>
     daysBetween(startDate, date) % (interval + 1) === 0
 
   switch (recurrence.recurringType) {
-    case 'Daily': // Daily recurrence
+    case 'Daily':
       if (separation === 0) {
-        return true // Always due for daily tasks
+        return true
       }
       return matchesSeparationCount(separation)
 
-    case 'Weekly': // Weekly recurrence
+    case 'Weekly':
       if (!recurrence.dayOfWeek || !recurrence.dayOfWeek.includes(dayOfWeek)) {
-        return false // Day of week doesn't match
+        return false
       }
-      return matchesSeparationCount(separation * 7) // Check weekly interval
+      return matchesSeparationCount(separation * 7)
 
     default:
       return false

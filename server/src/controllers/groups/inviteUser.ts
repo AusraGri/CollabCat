@@ -3,7 +3,7 @@ import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
-import { sentInvitationMail } from '@server/emailer'
+import { sentInvitationMail, gmailTransporter } from '@server/emailer'
 import jsonwebtoken from 'jsonwebtoken'
 import config from '@server/config'
 import { prepareInvitationTokenPayload } from '@server/trpc/tokenPayload'
@@ -20,7 +20,8 @@ export default groupAuthProcedure
       tags: ['group'],
       protect: true,
       summary: 'Invite user to the group',
-      description: 'First you need to create group to be able to invite the user'
+      description:
+        'First you need to create group to be able to invite the user',
     },
   })
   .input(
@@ -67,11 +68,14 @@ export default groupAuthProcedure
       expiresIn,
     })
 
-    // sent invitation
+    // sent invitation. should this be wrapped in try/catch :O ?
     try {
-      await sentInvitationMail({ email, inviteToken })
+      await sentInvitationMail(gmailTransporter, { email, inviteToken })
     } catch (error) {
-      throw new Error('error sending')
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to send the invitation',
+      })
     }
 
     // if sending invitation was successful only then save invitation to the database

@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer'
+import nodemailer, { type Transporter } from 'nodemailer'
 
 export interface EmailData {
   email: string
@@ -6,7 +6,7 @@ export interface EmailData {
 }
 
 // fake email provider
-const transporter = nodemailer.createTransport({
+export const fakeTransporter: Transporter = nodemailer.createTransport({
   host: 'smtp.ethereal.email',
   port: 587,
   auth: {
@@ -15,7 +15,22 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-export async function sentInvitationMail(emailData: EmailData) {
+// google email provider. TO DO: set this in more secure way
+export const gmailTransporter: Transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: 'mssg.bcor@gmail.com',
+    pass: 'spev wuzl mykm nuzl',
+  },
+})
+
+export async function sentInvitationMail(
+  transporter: Transporter,
+  emailData: EmailData
+) {
   const inviteLink = `${process.env.BASE_URL}/invite?token=${emailData.inviteToken}`
   const info = {
     from: '"Family App" <invitations@myapp.email>',

@@ -13,6 +13,14 @@ export default authenticatedProcedure
       tags: ['tasks'],
       summary: 'Update task',
       protect: true,
+      example: {
+        request: {
+          id: 1,
+          task: {
+            title: 'Updated Title',
+          },
+        },
+      },
     },
   })
   .input(taskUpdateSchema)
