@@ -14,6 +14,8 @@ export default groupAuthProcedure
       tags: ['group'],
       protect: true,
       summary: 'Remove user from group',
+      description:
+        'This will remove user from the group, but first you need to have users in your group',
     },
   })
   .input(
@@ -27,6 +29,24 @@ export default groupAuthProcedure
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message: 'User does not have permission to remove user from this group',
+      })
+    }
+
+    const groupMembers = await repos.groupsRepository.getGroupMembers(
+      userGroup.groupId
+    )
+
+    if (groupMembers.length < 1) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'No members found in the group',
+      })
+    }
+
+    if (!groupMembers.some((member) => member.id === user.userId)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'User not found in the group',
       })
     }
 

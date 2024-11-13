@@ -31,6 +31,8 @@ export default groupAuthProcedure
       })
     }
 
+    // TO DO: add check is user is in the group
+
     const points = {
       userId: pointsData.userId,
       groupId: userGroup?.groupId,

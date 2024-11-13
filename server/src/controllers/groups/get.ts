@@ -13,6 +13,7 @@ export default authenticatedProcedure
       tags: ['group'],
       protect: true,
       summary: 'Get groups of the user',
+      description: 'This will retrieve all groups that you created'
     },
   })
   .input(z.void())

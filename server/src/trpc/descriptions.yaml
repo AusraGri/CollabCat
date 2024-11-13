@@ -1,0 +1,4 @@
+descriptionAPI: |
+This is the description od an API
+To test endpoints, first sign up and login
+Authorize yourself with JWT token and yuo are good to go

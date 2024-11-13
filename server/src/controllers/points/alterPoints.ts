@@ -21,11 +21,11 @@ export default publicProcedure
   .input(alterPointsSchema)
   .output(pointsSchemaOutput)
   .mutation(async ({ input: pointsData, ctx: { repos } }) => {
-    const currectPoints = await repos.pointsRepository.getPoints(
+    const currentPoints = await repos.pointsRepository.getPoints(
       pointsData.userId
     )
 
-    if (!currectPoints) {
+    if (!currentPoints) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'User does not have points',
@@ -34,7 +34,7 @@ export default publicProcedure
 
     let points: PointAlterObject
 
-    if (pointsData.action === '-' && currectPoints.points < pointsData.points) {
+    if (pointsData.action === '-' && currentPoints.points < pointsData.points) {
       points = {
         ...pointsData,
         points: 0,

@@ -12,8 +12,13 @@ export default authenticatedProcedure
       tags: ['tasks'],
       summary: 'Create new task',
       protect: true,
-    },
-  })
+      example: {
+        request: {
+          title: 'New Task',
+          startDate: '2024-11-11',
+        }
+    }
+  }})
   .input(inputTaskSchema)
   .output(taskSchemaOutput)
   .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {

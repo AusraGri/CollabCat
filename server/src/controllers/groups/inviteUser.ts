@@ -20,11 +20,12 @@ export default groupAuthProcedure
       tags: ['group'],
       protect: true,
       summary: 'Invite user to the group',
+      description: 'First you need to create group to be able to invite the user'
     },
   })
   .input(
     z.object({
-      email: z.string().email(),
+      email: z.string().email().describe('User email that you want to invite'),
     })
   )
   .output(invitationSchema)
