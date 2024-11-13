@@ -4,6 +4,12 @@
 2. Create a PostgreSQL database (or use an existing one).
 3. Setup `.env` files in `client` and `server` based on `.env.example` files.
 
+## INTRO
+
+The client side is not yet implemented. I reused the monorepo example from TC example, so don't be bothered by existing files. Please :)
+
+Focus on the server side.
+
 ## Tests
 
 ```bash

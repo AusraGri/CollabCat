@@ -14,7 +14,7 @@ export const createTestDatabase = () => createDatabase(config.database)
 
 /**
  * Cleans a database from any data and resets the id sequence
- * for  accurate test results
+ * for accurate test results
  */
 export async function cleanDatabase(db: Kysely<any>) {
   // Disable foreign key constraints temporarily
