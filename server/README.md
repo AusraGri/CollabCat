@@ -22,7 +22,8 @@ The main idea is to create our family task app that will have main features:
 1. `npm install`
 2. Create a PostgreSQL database, or use an existing one from the previous exercises.
 3. Setup `.env` file based on `.env.example` files.
-4. Run the migrations to the latest.
+4. Run the migrations to the latest: `npm run migrate:latest`
+5. Additionally you can run `npm run gen:types` to make sure you have correct database types generated.
 
 ## Running the project in development
 
@@ -52,6 +53,9 @@ npm run migrate:latest
 
 # migrate down one migration
 npm run migrate:down
+
+# generate types of database
+npm run gen:types
 ```
 
 ## Running the server in production
