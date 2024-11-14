@@ -15,7 +15,7 @@ The main idea is to create our family task app that will have main features:
  2. tRPC-Panel - after running the server, you can go to `http://localhost:3000/api/v1/trpc-panel` and you should see UI for playing with endpoints. But this version will not support all endpoints, particularly where additional authentication is needed (for the group endpoints)
 
  ### Additional notes about current functionality
-  - Sending invitations to the email are implemented, I provided my created set up, so please be kind with data. Approving invitation does not yet work.
+  - Sending invitations to the email are implemented, I provided fake email provider in the env.example. If you want to fully test email sending, you will need to provide your real email service.
 
 ## Setup
 
