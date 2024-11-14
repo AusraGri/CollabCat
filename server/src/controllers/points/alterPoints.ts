@@ -5,7 +5,6 @@ import {
 import provideRepos from '@server/trpc/provideRepos'
 import { alterPointsSchema, pointsSchemaOutput } from '@server/entities/points'
 import { publicProcedure } from '@server/trpc'
-import { TRPCError } from '@trpc/server'
 
 export default publicProcedure
   .use(provideRepos({ pointsRepository }))
@@ -24,13 +23,6 @@ export default publicProcedure
     const currentPoints = await repos.pointsRepository.getPoints(
       pointsData.userId
     )
-
-    if (!currentPoints) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'User does not have points',
-      })
-    }
 
     let points: PointAlterObject
 

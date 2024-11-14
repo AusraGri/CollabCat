@@ -2,6 +2,8 @@ import path from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
 
 // https://vitejs.dev/config/
+
+/** @type {import('vite').UserConfig} */
 export default defineConfig({
   test: {
     environment: 'node',

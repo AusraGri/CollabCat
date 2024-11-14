@@ -46,7 +46,7 @@ export function groupsRepository(db: Database) {
 
       return newGroup
     },
-
+// getGroups- better name. Need to evaluate what is really needed, do I really need all those query options?
     async get(options: GetGroupsOptions): Promise<GroupsPublic[]> {
       if (
         options.createdByUserId === undefined &&

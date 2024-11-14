@@ -1,31 +1,12 @@
 import nodemailer, { type Transporter } from 'nodemailer'
+import config from '@server/config'
 
 export interface EmailData {
   email: string
   inviteToken: string
 }
 
-// fake email provider
-export const fakeTransporter: Transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
-  auth: {
-    user: 'alessandra.denesik@ethereal.email',
-    pass: 'xPSz9xRu22amcTJrnd',
-  },
-})
-
-// google email provider. TO DO: set this in more secure way
-export const gmailTransporter: Transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'mssg.bcor@gmail.com',
-    pass: 'spev wuzl mykm nuzl',
-  },
-})
+export const mailTransporter: Transporter = nodemailer.createTransport(config.emailService)
 
 export async function sentInvitationMail(
   transporter: Transporter,

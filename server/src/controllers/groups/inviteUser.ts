@@ -3,7 +3,7 @@ import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
-import { sentInvitationMail, gmailTransporter } from '@server/emailer'
+import { sentInvitationMail, mailTransporter } from '@server/emailer'
 import jsonwebtoken from 'jsonwebtoken'
 import config from '@server/config'
 import { prepareInvitationTokenPayload } from '@server/trpc/tokenPayload'
@@ -70,7 +70,7 @@ export default groupAuthProcedure
 
     // sent invitation. should this be wrapped in try/catch :O ?
     try {
-      await sentInvitationMail(gmailTransporter, { email, inviteToken })
+      await sentInvitationMail(mailTransporter, { email, inviteToken })
     } catch (error) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',

@@ -15,7 +15,7 @@ import groupsRouter from '..'
 
 vi.mock('@server/emailer', () => ({
   sentInvitationMail: vi.fn().mockResolvedValue(undefined),
-  gmailTransporter: {
+  mailTransporter: {
     send: vi.fn().mockResolvedValue('Email sent successfully'),
   },
 }))

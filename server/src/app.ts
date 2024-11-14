@@ -44,7 +44,6 @@ export default function createApp(db: Database) {
     })
   )
 
-  // not working, need to fix !!!
   if (config.env === 'development') {
     app.use('/api/v1/trpc-panel', (_, res) =>
       res.send(
@@ -71,18 +70,6 @@ export default function createApp(db: Database) {
 
   app.use('/', swaggerUi.serve)
   app.get('/', swaggerUi.setup(openApiDocument))
-
-  // not working, need to fix !!!
-  if (config.env === 'development') {
-    app.use('/api/v1/trpc-panel', (_, res) =>
-      res.send(
-        renderTrpcPanel(appRouter, {
-          url: `http://localhost:${config.port}/api/v1/trpc`,
-          transformer: 'superjson',
-        })
-      )
-    )
-  }
 
   return app
 }

@@ -34,6 +34,14 @@ const schema = z
     database: z.object({
       connectionString: z.string().url(),
     }),
+    emailService: z.object({
+      host: z.string(),
+      port: z.coerce.number().int().positive(),
+      auth: z.object({
+        user: z.string().email(),
+        pass: z.string()
+      })
+    })
   })
   .readonly()
 
@@ -51,6 +59,14 @@ const config = schema.parse({
   database: {
     connectionString: env.DATABASE_URL,
   },
+  emailService: {
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    auth: {
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS
+    }
+  }
 })
 
 export default config
