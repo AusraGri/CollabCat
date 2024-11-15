@@ -40,6 +40,10 @@ export const groupAuthProcedure = authenticatedProcedure
       })
     }
 
+    // if (userGroupRole.role === "Custom"){
+    //   // get the permissions as the set
+    // }
+
     // Add the role to the context
     ctx.userGroup = {
       role: userGroupRole.role,

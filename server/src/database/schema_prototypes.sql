@@ -74,3 +74,65 @@ WHERE (
      :date >= t.startDate AND
      (:date - t.startDate) % (rp.separationCount * INTERVAL '1 year') = INTERVAL '0 day')
 );
+
+
+-- Permissions
+
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_groups (
+    group_id INT PRIMARY KEY AUTO_INCREMENT,
+    group_name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE roles (
+    role_id INT PRIMARY KEY AUTO_INCREMENT,
+    role_name VARCHAR(50) NOT NULL UNIQUE,  -- e.g., 'Admin', 'Member'
+    description TEXT
+);
+
+CREATE TABLE permissions (
+    permission_id INT PRIMARY KEY AUTO_INCREMENT,
+    permission_name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT
+);
+
+-- Assigns default permissions to each role
+CREATE TABLE role_permissions (
+    role_id INT,
+    permission_id INT,
+    PRIMARY KEY (role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE,
+    FOREIGN KEY (permission_id) REFERENCES permissions(permission_id) ON DELETE CASCADE
+);
+
+-- Assigns a default role to each user within each group
+CREATE TABLE user_group_roles (
+    user_id INT,
+    group_id INT,
+    role_id INT,
+    PRIMARY KEY (user_id, group_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES user_groups(group_id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
+);
+
+-- Allows additional custom permissions for each user within each group (overrides)
+-- Or make this restrictions if roles are mostly static
+CREATE TABLE user_group_permissions (
+    user_id INT,
+    group_id INT,
+    permission_id INT,
+    PRIMARY KEY (user_id, group_id, permission_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES user_groups(group_id) ON DELETE CASCADE,
+    FOREIGN KEY (permission_id) REFERENCES permissions(permission_id) ON DELETE CASCADE
+);

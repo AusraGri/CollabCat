@@ -69,14 +69,7 @@ export default groupAuthProcedure
     })
 
     // sent invitation. should this be wrapped in try/catch :O ?
-    try {
       await sentInvitationMail(mailTransporter, { email, inviteToken })
-    } catch (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to send the invitation',
-      })
-    }
 
     // if sending invitation was successful only then save invitation to the database
     const invitation = await repos.invitationsRepository.createInvitation({
