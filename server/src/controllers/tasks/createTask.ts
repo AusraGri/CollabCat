@@ -9,7 +9,7 @@ export const createTaskProcedure = publicProcedure
   .meta({
     openapi: {
       method: 'POST',
-      path: '/tasks/create',
+      path: '/tasks/creates',
       tags: ['tasks'],
       summary: 'Create a new task',
       protect: true,

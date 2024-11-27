@@ -1,4 +1,4 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { inputTaskSchema, taskSchemaOutput } from '@server/entities/tasks'

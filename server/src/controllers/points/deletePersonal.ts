@@ -1,4 +1,4 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
 import { pointsRepository } from '@server/repositories/pointsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import z from 'zod'

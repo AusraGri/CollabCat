@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
 import { idSchema } from '@server/entities/shared'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '../provideRepos'

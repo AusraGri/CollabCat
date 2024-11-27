@@ -1,77 +1,113 @@
+import { promisify } from 'util'
 import config from '@server/config'
 import jsonwebtoken from 'jsonwebtoken'
 import { TRPCError } from '@trpc/server'
-import { parseTokenPayload } from '@server/trpc/tokenPayload'
+import jwksClient from 'jwks-rsa'
+import { userRepository } from '@server/repositories/userRepository'
 import { publicProcedure } from '..'
+import provideRepos from '../provideRepos'
 
-const { tokenKey } = config.auth
-
-function verify(token: string) {
-  return jsonwebtoken.verify(token, tokenKey)
+interface Auth0TokenPayload {
+  sub: string
+  email: string
+  name?: string
+  picture?: string
 }
 
-export function getUserFromToken(token: string) {
-  try {
-    const tokenVerified = verify(token)
-    const tokenParsed = parseTokenPayload(tokenVerified)
+const client = jwksClient({
+  jwksUri: `https://${config.auth0.issuerBaseURL}/.well-known/jwks.json`, // Replace with your Auth0 JWKS URI
+})
 
-    return tokenParsed.user
-  } catch (error) {
-    return null
+// Promisify the `getSigningKey` function
+const getSigningKey = promisify(client.getSigningKey)
+
+export async function verifyAuth0Token(
+  token: string,
+  audience: string,
+  issuer: string
+): Promise<Auth0TokenPayload> {
+  // Fetch the signing key dynamically
+  const decodedHeader = jsonwebtoken.decode(token, {
+    complete: true,
+  }) as { header: jsonwebtoken.JwtHeader } | null
+
+  if (!decodedHeader || !decodedHeader.header.kid) {
+    throw new Error('Invalid token in the header')
   }
+
+  const key = await getSigningKey(decodedHeader.header.kid)
+
+  if (!key) {
+    throw new Error('Signing key not found')
+  }
+
+  const publicKey = key.getPublicKey()
+
+  // Verify the token
+  const decoded = jsonwebtoken.verify(token, publicKey, {
+    audience,
+    issuer,
+    algorithms: ['RS256'], // Auth0 uses RS256 for signing tokens
+  }) as Auth0TokenPayload
+  return decoded // Return the decoded token payload
 }
 
-export const authenticatedProcedure = publicProcedure.use(({ ctx, next }) => {
-  if (ctx.authUser) {
-    // If we have an authenticated user, we can proceed.
+export const authenticatedProcedure = publicProcedure
+  .use(
+    provideRepos({
+      userRepository,
+    })
+  )
+  .use(async ({ ctx, next }) => {
+    if (ctx.authUser) {
+      return next({
+        ctx: {
+          authUser: ctx.authUser,
+        },
+      })
+    }
+
+    if (!ctx.req) {
+      const message =
+        config.env === 'development' || config.env === 'test'
+          ? 'Missing Express request object. If you are running tests, make sure to provide some req object in the procedure context.'
+          : 'Missing Express request object.'
+
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message,
+      })
+    }
+
+    if (!ctx.req.auth || !ctx.req.auth.payload) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Token is not validated',
+      })
+    }
+
+    const { token } = ctx.req.auth
+    const { sub } = ctx.req.auth.payload
+
+    if (!token || !sub) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Unauthenticated. Please log in.',
+      })
+    }
+
+    const user = await ctx.repos.userRepository.findByAuth0Id(sub)
+
+    if (!user) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Invalid token here.',
+      })
+    }
+
     return next({
       ctx: {
-        // This is a bit of a type hack.
-        // At this point ctx.authUser is AuthUser (no longer undefined).
-        // If we make sure that this middleware always returns
-        // ctx with authUser not undefined, then all routes using this
-        // middleware will also know that authUser is defined.
-        authUser: ctx.authUser,
+        authUser: { id: user.id },
       },
     })
-  }
-
-  // we depend on having an Express request object
-  if (!ctx.req) {
-    const message =
-      config.env === 'development' || config.env === 'test'
-        ? 'Missing Express request object. If you are running tests, make sure to provide some req object in the procedure context.'
-        : 'Missing Express request object.'
-
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message,
-    })
-  }
-
-  // if we do not have an authenticated user, we will try to authenticate
-  const token = ctx.req.header('Authorization')?.replace('Bearer ', '')
-
-  // if there is no token, we will throw an error
-  if (!token) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Unauthenticated. Please log in.',
-    })
-  }
-
-  const authUser = getUserFromToken(token)
-
-  if (!authUser) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: 'Invalid token.',
-    })
-  }
-
-  return next({
-    ctx: {
-      authUser,
-    },
   })
-})

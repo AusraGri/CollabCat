@@ -12,7 +12,7 @@ import groupsRouter from '..'
 
 const createCaller = createCallerFactory(groupsRouter)
 const testDb = createTestDatabase()
-await cleanDatabase(testDb)
+await cleanDatabase(testDb) // clean while in transaction
 const db = await wrapInRollbacks(testDb)
 
 it('should throw an error if user is not authenticated', async () => {

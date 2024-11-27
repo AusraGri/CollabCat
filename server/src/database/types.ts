@@ -36,6 +36,11 @@ export interface Invitations {
   invitationToken: string
 }
 
+export interface Permissions {
+  id: Generated<number>
+  permissionName: string
+}
+
 export interface Points {
   createdAt: Generated<Timestamp>
   groupId: number | null
@@ -54,11 +59,6 @@ export interface RecurringPattern {
   weekOfMonth: number[] | null
 }
 
-export interface RecurringTypes {
-  id: Generated<number>
-  recurringType: string | null
-}
-
 export interface Rewards {
   amount: number | null
   cost: number
@@ -67,18 +67,6 @@ export interface Rewards {
   id: Generated<number>
   targetUserIds: number[] | null
   title: string
-}
-
-export interface TaskInstanceException {
-  createdAt: Timestamp
-  createdBy: number
-  endDate: Timestamp
-  id: Generated<number>
-  isCanceled: boolean | null
-  isFullDayEvent: Generated<boolean | null>
-  isRescheduled: boolean | null
-  startDate: Timestamp
-  taskId: number
 }
 
 export interface Tasks {
@@ -94,7 +82,7 @@ export interface Tasks {
   importance: string | null
   isCompleted: Generated<boolean>
   isFullDayEvent: Generated<boolean | null>
-  parentTaskId: number | null
+  isRecurring: Generated<boolean | null>
   points: number | null
   startDate: Timestamp
   startTime: Timestamp | null
@@ -102,15 +90,19 @@ export interface Tasks {
 }
 
 export interface User {
-  auth0Id: string | null
+  auth0Id: string
   createdAt: Generated<Timestamp>
   email: string
-  firstName: string
   id: Generated<number>
-  lastName: string
-  password: string
   provider: Generated<string>
   updatedAt: Generated<Timestamp>
+  username: string | null
+}
+
+export interface UserGroupPermissions {
+  groupId: number
+  permissionId: number
+  userId: number
 }
 
 export interface UserGroups {
@@ -124,12 +116,12 @@ export interface DB {
   completedTasks: CompletedTasks
   groups: Groups
   invitations: Invitations
+  permissions: Permissions
   points: Points
   recurringPattern: RecurringPattern
-  recurringTypes: RecurringTypes
   rewards: Rewards
-  taskInstanceException: TaskInstanceException
   tasks: Tasks
   user: User
+  userGroupPermissions: UserGroupPermissions
   userGroups: UserGroups
 }

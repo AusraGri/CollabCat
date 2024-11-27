@@ -27,6 +27,25 @@ export function userRepository(db: Database) {
       return user
     },
 
+    async getAll(): Promise<Selectable<User>[] | undefined> {
+      const user = await db
+        .selectFrom('user')
+        .selectAll()
+        .execute()
+
+      return user
+    },
+
+    async findByAuth0Id(auth0Id: string): Promise<Selectable<User> | undefined> {
+      const user = await db
+        .selectFrom('user')
+        .select(userKeysAll)
+        .where('auth0Id', '=', auth0Id)
+        .executeTakeFirst()
+
+      return user
+    },
+
     async findById(id: number[]): Promise<Selectable<User>[]> {
       const user = await db
         .selectFrom('user')

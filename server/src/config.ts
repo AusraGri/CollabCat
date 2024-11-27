@@ -34,14 +34,19 @@ const schema = z
     database: z.object({
       connectionString: z.string().url(),
     }),
+    auth0: z.object({
+      audience: z.string(),
+      issuerBaseURL: z.string(),
+      clientOriginUrl: z.string()
+    }),
     emailService: z.object({
       host: z.string(),
       port: z.coerce.number().int().positive(),
       auth: z.object({
         user: z.string().email(),
-        pass: z.string()
-      })
-    })
+        pass: z.string(),
+      }),
+    }),
   })
   .readonly()
 
@@ -55,7 +60,11 @@ const config = schema.parse({
     expiresIn: env.TOKEN_EXPIRES_IN,
     passwordCost: env.PASSWORD_COST,
   },
-
+auth0: {
+  audience: env.AUTH0_AUDIENCE,
+  issuerBaseURL: env.AUTH0_DOMAIN,
+  clientOriginUrl: env.CLIENT_ORIGIN_URL
+},
   database: {
     connectionString: env.DATABASE_URL,
   },
@@ -64,9 +73,9 @@ const config = schema.parse({
     port: env.SMTP_PORT,
     auth: {
       user: env.SMTP_USER,
-      pass: env.SMTP_PASS
-    }
-  }
+      pass: env.SMTP_PASS,
+    },
+  },
 })
 
 export default config

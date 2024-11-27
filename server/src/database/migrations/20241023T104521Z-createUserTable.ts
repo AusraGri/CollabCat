@@ -7,11 +7,9 @@ export async function up(db: Kysely<any>) {
     .addColumn('id', 'integer', (c) =>
       c.primaryKey().generatedAlwaysAsIdentity()
     )
-    .addColumn('first_name', 'varchar(50)', (column) => column.notNull())
-    .addColumn('last_name', 'varchar(50)', (column) => column.notNull())
+    .addColumn('username', 'varchar(50)', (column) => column.unique())
     .addColumn('email', 'text', (c) => c.unique().notNull())
-    .addColumn('password', 'text', (c) => c.notNull())
-    .addColumn('auth0_id', 'text', (c) => c.unique())
+    .addColumn('auth0_id', 'text', (c) => c.unique().notNull())
     .addColumn('provider', 'text', (c) => c.notNull().defaultTo('email'))
     .addColumn('created_at', 'timestamptz', (c) =>
       c.defaultTo(sql`CURRENT_TIMESTAMP`).notNull()

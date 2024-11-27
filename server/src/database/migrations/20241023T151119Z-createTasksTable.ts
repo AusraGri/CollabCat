@@ -24,8 +24,8 @@ export async function up(db: Kysely<any>) {
     .addColumn('is_completed', 'boolean', (c) => c.notNull().defaultTo(false))
     .addColumn('completed_at', 'timestamptz')
     .addColumn('points', 'integer')
-    .addColumn('parent_task_id', 'integer', (c) =>
-      c.references('tasks.id').onDelete('cascade')
+    .addColumn('is_recurring', 'boolean', (c) =>
+      c.defaultTo('false')
     )
     .addColumn('start_date', 'timestamptz', (c) => c.notNull())
     .addColumn('end_date', 'timestamptz')

@@ -6,40 +6,52 @@ import {
 import cors from 'cors'
 import { renderTrpcPanel } from 'trpc-panel'
 import swaggerUi from 'swagger-ui-express'
-import { createOpenApiExpressMiddleware } from 'trpc-openapi' // tets
+import { createOpenApiExpressMiddleware } from 'trpc-openapi' 
 import type { Database } from './database'
 import { appRouter } from './controllers'
 import type { Context } from './trpc'
 import config from './config'
 import { openApiDocument } from './trpc/openApi'
+import { validateAccessToken } from './middlewares/auth0Middleware'
+
 
 export default function createApp(db: Database) {
   const app = express()
 
-  app.use(cors())
+  // app.use(cors());
+  app.use(
+    cors({
+      origin: config.auth0.clientOriginUrl,
+      allowedHeaders: ["Authorization", "Content-Type"],
+      maxAge: 86400,
+    })
+  );
+
   app.use(express.json())
 
-  // Endpoint for health checks - pinging the server to see if it's alive.
-  // This can be used by tests, load balancers, monitoring tools, etc.
   app.use('/api/health', (_, res) => {
     res.status(200).send('OK')
   })
 
-  // Using TRPC router, which will live under /api/v1/trpc
-  // path. It will be used for all our procedures.
+  // log requests to the API
+  // app.use((req, res, next) => {
+  //   console.log('Incoming Request Method:', req.method);
+  //   console.log('Incoming Request URL:',req.url);
+  //   console.log('Incoming Request Header:', req.headers);
+  //   next();
+  // });
+
+  app.use(validateAccessToken)
+
   app.use(
     '/api/v1/trpc',
     createExpressMiddleware({
-      // Created context for each request, which we will be able to
-      // access in our procedures.
       createContext: ({ req, res }: CreateExpressContextOptions): Context => ({
-        // What we provide to our procedures under `ctx` key.
         db,
         req,
         res,
       }),
 
-      // all routes
       router: appRouter,
     })
   )
@@ -60,7 +72,6 @@ export default function createApp(db: Database) {
     createOpenApiExpressMiddleware({
       router: appRouter,
       createContext: ({ req, res }: CreateExpressContextOptions): Context => ({
-        // What we provide to our procedures under `ctx` key.
         db,
         req,
         res,
@@ -70,6 +81,7 @@ export default function createApp(db: Database) {
 
   app.use('/', swaggerUi.serve)
   app.get('/', swaggerUi.setup(openApiDocument))
+
 
   return app
 }

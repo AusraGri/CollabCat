@@ -19,9 +19,9 @@ export const taskSchema = z.object({
   startDate: dateSchema,
   endDate: dateSchema,
   isFullDayEvent: z.boolean(),
-  parentTaskId: idSchema,
   startTime: dateSchema,
   endTime: dateSchema,
+  isRecurring: z.boolean().nullable(),
 })
 export const taskSchemaOutput = z.object({
   id: idSchema,
@@ -38,6 +38,7 @@ export const taskSchemaOutput = z.object({
   startDate: z.date(),
   endDate: z.date().nullable(),
   isFullDayEvent: z.boolean().nullable(),
+  isRecurring: z.boolean().nullable(),
   startTime: z.date().nullable(),
   endTime: z.date().nullable(),
 })
@@ -55,7 +56,6 @@ const taskOptional = taskSchema
     startDate: true,
     id: true,
     createdByUserId: true,
-    parentTaskId: true,
     isCompleted: true,
     completedAt: true,
   })
