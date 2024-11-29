@@ -32,6 +32,7 @@ export default publicProcedure
       auth0Token: z.string(),
       username: z.string(),
       email: z.string().email(),
+      picture: z.string().optional(),
     })
   )
   .output(
@@ -40,7 +41,7 @@ export default publicProcedure
     })
   )
   .mutation(
-    async ({ input: { auth0Token, email, username }, ctx: { repos, res } }) => {
+    async ({ input: { auth0Token, email, username }, ctx: { repos } }) => {
       // Verify the Auth0 token and get user info from Auth0
 
       const userFromAuth0 = await verifyAuth0Token(
@@ -93,9 +94,7 @@ export default publicProcedure
           throw error
         })
 
-        // res.setHeader('Set-Cookie', `authToken=${auth0Token}; HttpOnly; Secure; SameSite=Strict; Path=/;`);
-      
-        return {
+      return {
         id: userCreated.id,
       }
     }

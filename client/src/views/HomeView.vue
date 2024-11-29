@@ -39,11 +39,12 @@ const handleAuthRedirect = async () => {
     // Optionally store the token in localStorage or a state management library (like Vuex or Pinia)
     userStore.setAuthToken(idToken)
     try {
-      if (user.value?.email && user.value?.name) {
+      if (user.value?.email && user.value?.name && user.value.picture) {
         await trpc.user.signupAuth.mutate({
           auth0Token: idToken,
-          email: user.value?.email,
-          username: user.value?.email,
+          email: user.value.email,
+          username: user.value.name,
+          picture: user.value.picture
         })
       }
     } catch (error) {

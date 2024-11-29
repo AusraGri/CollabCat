@@ -94,6 +94,7 @@ export interface User {
   createdAt: Generated<Timestamp>
   email: string
   id: Generated<number>
+  picture: string | null
   provider: Generated<string>
   updatedAt: Generated<Timestamp>
   username: string | null

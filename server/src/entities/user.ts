@@ -11,11 +11,12 @@ export const userSchema = z.object({
   createdAt: z.date(),
   provider: z.string(),
   updatedAt: z.date(),
+  picture: z.string()
 })
 
 export const userKeysAll = Object.keys(userSchema.shape) as (keyof User)[]
 
-export const userKeysPublic = ['id', 'username', 'email'] as const
+export const userKeysPublic = ['id', 'username', 'email', 'picture'] as const
 
 export type UserPublic = Pick<Selectable<User>, (typeof userKeysPublic)[number]>
 

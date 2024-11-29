@@ -27,6 +27,17 @@ export function userRepository(db: Database) {
       return user
     },
 
+    async findAssignedUsersByTaskId(taskId: number): Promise<Selectable<User>[]> {
+      const user = await db
+        .selectFrom('tasks')
+        .where('tasks.id', '=', taskId)
+        .innerJoin('user', 'user.id', 'tasks.assignedUserId')
+        .select(userKeysAll)
+        .execute()
+
+      return user
+    },
+
     async getAll(): Promise<Selectable<User>[] | undefined> {
       const user = await db
         .selectFrom('user')
