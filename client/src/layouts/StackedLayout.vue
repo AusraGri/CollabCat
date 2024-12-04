@@ -22,8 +22,10 @@ const navigation = computed(() =>
 
 <template>
   <FwbNavbar>
+    <template #logo>
+        <img src="../assets/intro/01.jpeg" class=" h-20 rounded-full">
+    </template>
     <template #default="{ isShowMenu }">
-      <div class="px-4">
         <FwbNavbarCollapse :isShowMenu="isShowMenu">
           <FwbNavbarLink
             v-for="link in navigation"
@@ -37,7 +39,6 @@ const navigation = computed(() =>
           </FwbNavbarLink>
           <slot name="menu" />
         </FwbNavbarCollapse>
-      </div>
     </template>
   </FwbNavbar>
 

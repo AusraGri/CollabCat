@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue'
 import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
 import { FwbButton } from 'flowbite-vue'
-import { useAuthStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/userProfile'
 import { useAuth0 } from '@auth0/auth0-vue'
 // import useErrorMessage from '@/composables/useErrorMessage'
-const userStore = useAuthStore()
+const authStore = useAuthStore()
+const userStore = useUserStore()
 const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 const users = ref()
@@ -37,15 +39,17 @@ const handleAuthRedirect = async () => {
     const idToken = await getAccessTokenSilently() // The ID token (JWT)
 
     // Optionally store the token in localStorage or a state management library (like Vuex or Pinia)
-    userStore.setAuthToken(idToken)
+    authStore.setAuthToken(idToken)
     try {
       if (user.value?.email && user.value?.name && user.value.picture) {
-        await trpc.user.signupAuth.mutate({
+        const newUser = await trpc.user.signupAuth.mutate({
           auth0Token: idToken,
           email: user.value.email,
           username: user.value.name,
-          picture: user.value.picture
+          picture: user.value.picture,
         })
+
+        userStore.user = newUser
       }
     } catch (error) {
       console.log(error)
@@ -78,7 +82,7 @@ onMounted(async () => {
     <div v-if="isAuthenticated">authorized</div>
     <div v-if="!isAuthenticated">not authorized</div>
     <div>This is Home page view</div>
-    <div>{{ userStore.isLoggedIn }}</div>
+    <div>is user logged in by user store: {{ userStore.isLoggedIn }}</div>
     <div>{{ user }}</div>
     <div v-for="user in users" :key="user">{{ user }}</div>
     <div v-if="!userStore.isLoggedIn" class="rounded-md bg-white px-6 py-8">

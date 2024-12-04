@@ -15,7 +15,7 @@
     "migrate:new": "tsx ./src/database/migrate/new",
     "migrate:latest": "tsx src/database/migrate/latest",
     "migrate:down": "tsx src/database/migrate/down",
-    "migrate:gen" : "npm run migrate:latest && npm run gen:types",
+    "migrate:gen": "npm run migrate:latest && npm run gen:types",
     "migrate:latest:prod": "npm run node-es dist/database/migrate/latest.js",
     "node-es": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"./loader.js\", pathToFileURL(\"./\"));'",
     "prod": "npm run migrate:latest:prod && npm run start",
@@ -60,6 +60,7 @@
   "dependencies": {
     "@trpc/server": "^10.45.2",
     "@types/lodash-es": "^4.17.12",
+    "auth0": "^4.14.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

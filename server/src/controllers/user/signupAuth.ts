@@ -4,7 +4,9 @@ import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import { assertError } from '@server/utils/errors'
 import { idSchema } from '@server/entities/shared'
+import { userSchema } from '@server/entities/user'
 import { verifyAuth0Token } from '@server/trpc/authenticatedProcedure'
+import { authManagement } from '@server/auth0/getManagementToken'
 import z from 'zod'
 import config from '@server/config'
 
@@ -36,9 +38,7 @@ export default publicProcedure
     })
   )
   .output(
-    z.object({
-      id: idSchema,
-    })
+   userSchema
   )
   .mutation(
     async ({ input: { auth0Token, email, username }, ctx: { repos } }) => {
@@ -67,9 +67,7 @@ export default publicProcedure
       const existingUser = await repos.userRepository.findByEmail(email)
       if (existingUser) {
         // res.setHeader('Set-Cookie', `authToken=${auth0Token}; HttpOnly; Secure; SameSite=Strict; Path=/;`);
-        return {
-          id: existingUser.id,
-        }
+        return existingUser
       }
 
       // Create a new user record in your database (without the password field)
@@ -94,8 +92,6 @@ export default publicProcedure
           throw error
         })
 
-      return {
-        id: userCreated.id,
-      }
+      return userCreated
     }
   )

@@ -40,7 +40,7 @@ const props = defineProps({
     <div aria-label="task options">
       <div class="flex h-full w-fit flex-col justify-between">
         <div class=" " aria-label="points">
-          <FwbBadge size="sm" class="h-10 w-full rounded-e-full p-0">{{ task.points }}</FwbBadge>
+          <FwbBadge size="sm" class="w-full rounded-e-full p-0">{{ task.points }}</FwbBadge>
         </div>
         <div class="flex flex-col space-y-1" aria-label="task edit">
           <FwbButton color="red" size="xs" class="rounded-e-full">delete</FwbButton>

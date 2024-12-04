@@ -6,6 +6,7 @@ import { FwbButton, FwbHeading, FwbInput, FwbTextarea, Fwb } from 'flowbite-vue'
 import useErrorMessage from '@/composables/useErrorMessage'
 import AlertError from '@/components/AlertError.vue'
 import type { TasksPublic} from '@server/shared/types'
+import CreateTask from '@/components/CreateNewTask.vue'
 
 const today = ref(new Date())
 
@@ -55,65 +56,8 @@ function addTask(task: TasksPublic) {
 </script>
 
 <template>
-  <form aria-label="Article" @submit.prevent="createTask">
-    <div class="space-y-6">
-      <FwbHeading tag="h1" class="text-3xl">Create a new Task</FwbHeading>
-
-      <div class="mt-6">
-        <FwbInput
-          aria-label="Task title"
-          v-model="taskForm.title"
-          :minlength="2"
-          label="Task title"
-          placeholder="My task description"
-        />
-      </div>
-      <div class="mt-6">
-        <FwbInput
-          aria-label="Task description"
-          v-model="taskForm.description"
-          :minlength="2"
-          label="Task description"
-          placeholder="My task"
-        />
-      </div>
-
-      <div class="mt-6">
-        Task start date
-        <input
-          aria-label="Task date"
-          label="task date"
-          type="date"
-          id="start"
-          v-model="taskForm.startDay"
-          name="trip-start"
-          :min = "getToday()"
-        />
-      </div>
-      <div class="mt-6">
-        Task end date
-        <input
-          aria-label="Task date"
-          label="task date"
-          type="date"
-          id="start"
-          v-model="taskForm.endDay"
-          name="trip-start"
-          :min = "getToday()"
-        />
-      </div>
-    </div>
+  <CreateTask/>
 
     <AlertError :message="errorMessage" />
 
-    <div class="mt-6 flex justify-end">
-      <FwbButton size="lg" type="submit">Post Task</FwbButton>
-    </div>
-    <div>
-      <div>{{ all }}</div>
-      <div v-if="userTaskList">
-        <div v-for="task in userTaskList" :key="task.id"><div>----</div>{{ task }}</div>
-      </div>
-    </div>
-  </form>
 </template>

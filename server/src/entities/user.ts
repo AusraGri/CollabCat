@@ -6,12 +6,12 @@ import { idSchema } from './shared'
 export const userSchema = z.object({
   id: idSchema,
   email: z.string().trim().toLowerCase().email(),
-  username: z.string().min(1).max(500),
+  username: z.string().min(1).max(500).nullable(),
   auth0Id: z.string(),
   createdAt: z.date(),
   provider: z.string(),
   updatedAt: z.date(),
-  picture: z.string()
+  picture: z.string().nullable()
 })
 
 export const userKeysAll = Object.keys(userSchema.shape) as (keyof User)[]

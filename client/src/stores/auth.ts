@@ -1,3 +1,4 @@
+import { useAuth0 } from '@auth0/auth0-vue';
 import { defineStore } from 'pinia';
 import {
   clearStoredAccessToken,
@@ -9,7 +10,7 @@ import {
 const storageProvider = localStorage
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    authToken: getStoredAccessToken(storageProvider) as string | null,
+    authToken: null as string | null,
   }),
   getters: {
     authUserId: (state) =>
@@ -31,6 +32,19 @@ export const useAuthStore = defineStore('auth', {
     },
   },
 });
+
+const getToken = async () => {
+  const { getAccessTokenSilently } = useAuth0();
+
+  try {
+    const token = await getAccessTokenSilently();
+    console.log('Access Token:', token);
+    return token;
+  } catch (error) {
+    console.error('Failed to get access token:', error);
+    return null;
+  }
+};
 
 // We could wrap this inside of a Pinia store.
 // We could use @tanstack/vue-query for query caching.

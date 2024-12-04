@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { FwbNavbarLink } from 'flowbite-vue'
 import StackedLayout from './StackedLayout.vue'
-import { useAuthStore } from '@/stores/user'
-import { computed } from 'vue'
+import IntroPageLayout from './IntroPageLayout.vue'
+import UserLayout from './UserLayout.vue'
+import { useAuthStore } from '@/stores/auth'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
+
+const { user } = useAuth0()
 
 const userStore = useAuthStore()
 
@@ -12,8 +16,6 @@ const router = useRouter()
 const { logout } = useAuth0()
 
 const links = computed(() => [
-  { label: 'Articles', name: 'Home' },
-
   ...(userStore.isLoggedIn
     ? [{ label: 'Create New Task', name: 'WriteArticle' }]
     : [
@@ -23,16 +25,22 @@ const links = computed(() => [
 ])
 
 function logoutUser() {
-  logout({ logoutParams: { returnTo: window.location.origin } });
+  logout({ logoutParams: { returnTo: window.location.origin } })
   userStore.logout()
   router.push({ name: 'Login' })
 }
+
+const users = ref({ picture: user.value?.picture })
 </script>
 
 <template>
+  <UserLayout v-if="user" :user="user"></UserLayout>
+  <IntroPageLayout :links="links" />
   <StackedLayout :links="links">
     <template #menu>
-      <FwbNavbarLink v-if="userStore.isLoggedIn" @click.prevent="logoutUser" link="#">Logout</FwbNavbarLink>
+      <FwbNavbarLink v-if="userStore.isLoggedIn" @click.prevent="logoutUser" link="#"
+        >Logout</FwbNavbarLink
+      >
     </template>
   </StackedLayout>
 </template>

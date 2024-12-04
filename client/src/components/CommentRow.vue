@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { authUserId } from '@/stores/user'
+import { authUserId } from '@/stores/auth'
 import { trpc } from '@/trpc'
 import type { CommentPublic } from '@server/shared/types'
 import { computed } from 'vue'

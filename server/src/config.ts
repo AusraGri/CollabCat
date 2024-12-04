@@ -37,7 +37,9 @@ const schema = z
     auth0: z.object({
       audience: z.string(),
       issuerBaseURL: z.string(),
-      clientOriginUrl: z.string()
+      clientOriginUrl: z.string(),
+      clientId: z.string(), 
+      clientSecret: z.string()
     }),
     emailService: z.object({
       host: z.string(),
@@ -63,7 +65,9 @@ const config = schema.parse({
 auth0: {
   audience: env.AUTH0_AUDIENCE,
   issuerBaseURL: env.AUTH0_DOMAIN,
-  clientOriginUrl: env.CLIENT_ORIGIN_URL
+  clientOriginUrl: env.CLIENT_ORIGIN_URL,
+  clientId: env.AUTH0_CLIENT_ID,
+  clientSecret: env.AUTH0_CLIENT_SECRET
 },
   database: {
     connectionString: env.DATABASE_URL,

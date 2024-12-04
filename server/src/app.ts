@@ -33,7 +33,7 @@ export default function createApp(db: Database) {
     res.status(200).send('OK')
   })
 
-  // log requests to the API
+ // log requests to the API
   // app.use((req, res, next) => {
   //   console.log('Incoming Request Method:', req.method);
   //   console.log('Incoming Request URL:',req.url);

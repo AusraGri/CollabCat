@@ -7,13 +7,18 @@ import {
 } from '@server/entities/user'
 import type { Insertable, Selectable } from 'kysely'
 
+export type UserUpdatables = {
+  username?: string
+  picture?: string
+}
+
 export function userRepository(db: Database) {
   return {
-    async create(user: Insertable<User>): Promise<UserPublic> {
+    async create(user: Insertable<User>): Promise<Selectable<User>> {
       return db
         .insertInto('user')
         .values(user)
-        .returning(userKeysPublic)
+        .returning(userKeysAll)
         .executeTakeFirstOrThrow()
     },
 
@@ -27,7 +32,9 @@ export function userRepository(db: Database) {
       return user
     },
 
-    async findAssignedUsersByTaskId(taskId: number): Promise<Selectable<User>[]> {
+    async findAssignedUsersByTaskId(
+      taskId: number
+    ): Promise<Selectable<User>[]> {
       const user = await db
         .selectFrom('tasks')
         .where('tasks.id', '=', taskId)
@@ -39,15 +46,14 @@ export function userRepository(db: Database) {
     },
 
     async getAll(): Promise<Selectable<User>[] | undefined> {
-      const user = await db
-        .selectFrom('user')
-        .selectAll()
-        .execute()
+      const user = await db.selectFrom('user').select(userKeysAll).execute()
 
       return user
     },
 
-    async findByAuth0Id(auth0Id: string): Promise<Selectable<User> | undefined> {
+    async findByAuth0Id(
+      auth0Id: string
+    ): Promise<Selectable<User> | undefined> {
       const user = await db
         .selectFrom('user')
         .select(userKeysAll)
@@ -57,12 +63,31 @@ export function userRepository(db: Database) {
       return user
     },
 
-    async findById(id: number[]): Promise<Selectable<User>[]> {
+    async findById(id: number): Promise<Selectable<User>> {
       const user = await db
         .selectFrom('user')
         .select(userKeysAll)
-        .where('id', 'in', id)
-        .execute()
+        .where('id', '=', id)
+        .executeTakeFirstOrThrow()
+
+      return user
+    },
+
+    async update(
+      userId: number,
+      userData: UserUpdatables
+    ): Promise<Selectable<User>> {
+      await db
+        .updateTable('user')
+        .set(userData)
+        .where('id', 'in', userId)
+        .executeTakeFirstOrThrow()
+
+      const user = await db
+        .selectFrom('user')
+        .select(userKeysAll)
+        .where('id', 'in', userId)
+        .executeTakeFirstOrThrow()
 
       return user
     },

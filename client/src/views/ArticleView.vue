@@ -6,7 +6,7 @@ import { FwbButton, FwbHeading, FwbInput } from 'flowbite-vue'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Card from '@/components/Card.vue'
-import { isLoggedIn } from '@/stores/user'
+import { isLoggedIn } from '@/stores/auth'
 
 const route = useRoute()
 const comments = ref<CommentPublic[]>([])
@@ -17,9 +17,7 @@ const articleId = Number(route.params.id)
 
 onBeforeMount(async () => {
   // Promise.all allows to run multiple promises in parallel.
-  const [articleFound, commentsFound] = await Promise.all([
-    trpc.tasks.getDueTasks(new Date()),
-  ])
+  const [articleFound, commentsFound] = await Promise.all([trpc.tasks.getDueTasks(new Date())])
 
   article.value = articleFound
   comments.value = commentsFound
