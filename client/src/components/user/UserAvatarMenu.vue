@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useUserStore } from '@/stores/userProfile'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import ConfirmationModal from '../ConfirmationModal.vue'
 import {
   FwbAvatar,
   FwbDropdown,
@@ -11,16 +12,17 @@ import {
   FwbListGroupItem,
   FwbModal,
   FwbButton,
+  FwbInput,
 } from 'flowbite-vue'
-import { trpc } from '@/trpc'
 import { type UserPublic } from '@server/shared/types'
 
 const { user } = defineProps<{
   user: UserPublic
 }>()
 
-const username = ref('')
-const avatar = computed(()=> user.picture ? user.picture : undefined)
+const username = ref()
+const isShowConfirmation = ref(false)
+const avatar = computed(() => (user.picture ? user.picture : undefined))
 const router = useRouter()
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -35,7 +37,7 @@ function closeModal() {
 }
 
 function logoutUser() {
-  logout({ logoutParams: { returnTo: window.location.origin } })
+  logout()
   authStore.logout()
   router.push({ name: 'Home' })
 }
@@ -43,21 +45,37 @@ function logoutUser() {
 async function changeName() {
   try {
     userStore.updateUserName(username.value)
-    username.value = ''
+    username.value = user.username
   } catch (error) {
     console.log(error)
   }
   closeModal()
 }
+
+const handleDeletion = async (value:boolean) => {
+if (value){
+  await deleteAccount()
+}
+isShowConfirmation.value = false
+}
+
+async function deleteAccount () {
+logout()
+await userStore.deleteUser()
+}
+
+onMounted(() => {
+  username.value = user.username
+})
 </script>
 
 <template>
-  <div>
+  <div >
     <div>
       <FwbDropdown>
         <template #trigger>
           <span class="flex items-center hover:animate-pulse">
-            <FwbAvatar :img="avatar" rounded size="lg" class="align-middle" />
+            <FwbAvatar :img="avatar" rounded bordered size="lg" class="align-middle " />
             <span v-if="user.username" class="cursor-default p-2">{{ user.username }}</span>
           </span>
         </template>
@@ -73,21 +91,37 @@ async function changeName() {
     </div>
     <FwbModal v-if="showUserMenu" @close="closeModal">
       <template #header>
-        <div class="flex items-center text-lg">Terms of Service</div>
+        <div class="flex items-center text-lg">User Settings</div>
       </template>
       <template #body>
-        <form v-on:submit.prevent="changeName">
-          <input type="text" placeholder="name" v-model="username" />
-          <button type="submit">submit</button>
+        <form id="userSettingsForm" v-on:submit.prevent="changeName">
+          <div>
+            <FwbInput
+              type="text"
+              placeholder="Username"
+              v-model="username"
+              label="Username"
+              required
+            >
+            </FwbInput>
+          </div>
         </form>
       </template>
       <template #footer>
-        <div class="flex justify-end">
-          <fwb-button @click="closeModal" color="green"> save changes </fwb-button>
+        <div class="flex justify-between">
+          <div>
+            <FwbButton color="red" @click="isShowConfirmation = true">Delete account</FwbButton>
+          </div>
+          <div>
+            <fwb-button form="userSettingsForm" type="submit" color="green">
+              Save Changes
+            </fwb-button>
+          </div>
         </div>
       </template>
     </FwbModal>
   </div>
+  <ConfirmationModal :action="'delete'" :object="user.username" :is-show-modal="isShowConfirmation" @delete="handleDeletion"/>
 </template>
 
 <style scoped></style>

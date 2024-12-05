@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
 import { FwbButton } from 'flowbite-vue'
@@ -12,6 +12,7 @@ const userStore = useUserStore()
 const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 const users = ref()
+const currentUser = computed(()=> user.value)
 const signup = async () => {
   loginWithRedirect({
     appState: {
@@ -36,20 +37,22 @@ const handleAuthRedirect = async () => {
       return
     }
 
-    const idToken = await getAccessTokenSilently() // The ID token (JWT)
+    const idToken = await getAccessTokenSilently() 
+    // The ID token (JWT)
 
     // Optionally store the token in localStorage or a state management library (like Vuex or Pinia)
     authStore.setAuthToken(idToken)
     try {
       if (user.value?.email && user.value?.name && user.value.picture) {
-        const newUser = await trpc.user.signupAuth.mutate({
+        const newUser ={
           auth0Token: idToken,
           email: user.value.email,
           username: user.value.name,
           picture: user.value.picture,
-        })
-
-        userStore.user = newUser
+        }
+        console.log(newUser)
+        const signedUser = await trpc.user.signupAuth.mutate(newUser)
+        userStore.user = signedUser
       }
     } catch (error) {
       console.log(error)
@@ -79,10 +82,10 @@ onMounted(async () => {
 
 <template>
   <div class="dark:bg-gray-800">
-    <div v-if="isAuthenticated">authorized</div>
+    <div v-if="isAuthenticated">authorized {{user?.email}}</div>
     <div v-if="!isAuthenticated">not authorized</div>
     <div>This is Home page view</div>
-    <div>is user logged in by user store: {{ userStore.isLoggedIn }}</div>
+    <div>is user logged in by user store: {{ userStore.isLoggedIn }} {{ userStore.user?.email }}</div>
     <div>{{ user }}</div>
     <div v-for="user in users" :key="user">{{ user }}</div>
     <div v-if="!userStore.isLoggedIn" class="rounded-md bg-white px-6 py-8">

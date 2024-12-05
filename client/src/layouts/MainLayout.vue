@@ -35,7 +35,6 @@ const users = ref({ picture: user.value?.picture })
 
 <template>
   <UserLayout v-if="user" :user="user"></UserLayout>
-  <IntroPageLayout :links="links" />
   <StackedLayout :links="links">
     <template #menu>
       <FwbNavbarLink v-if="userStore.isLoggedIn" @click.prevent="logoutUser" link="#"

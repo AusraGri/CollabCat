@@ -6,13 +6,15 @@ import getUsers from './getUsers'
 import getAssignedUsers from './assignedUsers'
 import updateUser from './updateUser'
 import getUserProfile from './getUserProfile'
+import deleteUser from './deleteUser'
 
 export default router({
   login,
   signup,
   signupAuth,
   getUsers,
-  getAssignedUsers, 
-  updateUser, 
-  getUserProfile
+  getAssignedUsers,
+  updateUser,
+  getUserProfile,
+  deleteUser
 })

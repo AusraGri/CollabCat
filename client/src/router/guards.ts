@@ -11,7 +11,7 @@ export const authenticate = async () => {
   const token = await getAccessTokenSilently()
   authStore.authToken = token
 
-  if (!isAuthenticated && !authStore.authToken) return { name: 'Login' }
+  if (!isAuthenticated  || !authStore.authToken) return { name: 'Login' }
 
   userStore.fetchUserData()
 

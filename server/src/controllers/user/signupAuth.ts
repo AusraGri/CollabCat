@@ -3,10 +3,8 @@ import { TRPCError } from '@trpc/server'
 import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import { assertError } from '@server/utils/errors'
-import { idSchema } from '@server/entities/shared'
 import { userSchema } from '@server/entities/user'
 import { verifyAuth0Token } from '@server/trpc/authenticatedProcedure'
-import { authManagement } from '@server/auth0/getManagementToken'
 import z from 'zod'
 import config from '@server/config'
 
@@ -41,7 +39,7 @@ export default publicProcedure
    userSchema
   )
   .mutation(
-    async ({ input: { auth0Token, email, username }, ctx: { repos } }) => {
+    async ({ input: { auth0Token, email, username, picture }, ctx: { repos } }) => {
       // Verify the Auth0 token and get user info from Auth0
 
       const userFromAuth0 = await verifyAuth0Token(
@@ -77,6 +75,7 @@ export default publicProcedure
           auth0Id,
           username,
           provider,
+          picture
         })
         .catch((error: unknown) => {
           assertError(error)

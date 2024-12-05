@@ -1,11 +1,9 @@
 import type { Database } from '@server/database'
 import type { User } from '@server/database/types'
 import {
-  type UserPublic,
   userKeysAll,
-  userKeysPublic,
 } from '@server/entities/user'
-import type { Insertable, Selectable } from 'kysely'
+import type { DeleteResult, Insertable, Selectable } from 'kysely'
 
 export type UserUpdatables = {
   username?: string
@@ -73,20 +71,31 @@ export function userRepository(db: Database) {
       return user
     },
 
+    async deleteUser(userId: number): Promise<DeleteResult> {
+      const user = await db
+        .deleteFrom('user')
+        .where('id', '=', userId)
+        .executeTakeFirstOrThrow()
+
+      return user
+    },
+
     async update(
       userId: number,
       userData: UserUpdatables
     ): Promise<Selectable<User>> {
       await db
         .updateTable('user')
-        .set(userData)
-        .where('id', 'in', userId)
+        .set({...userData,
+          updatedAt: new Date()
+        })
+        .where('id', '=', userId)
         .executeTakeFirstOrThrow()
 
       const user = await db
         .selectFrom('user')
         .select(userKeysAll)
-        .where('id', 'in', userId)
+        .where('id', '=', userId)
         .executeTakeFirstOrThrow()
 
       return user

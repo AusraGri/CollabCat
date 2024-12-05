@@ -21,7 +21,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'Login',
-      component: () => import('../views/LoginView.vue'),
+      component: () => import('../views/HomeView.vue'),
     },
 
     {
@@ -32,6 +32,7 @@ const router = createRouter({
     {
       path: '',
       component: MainLayout,
+      beforeEnter: [authenticate],
       children: [
         {
           path: '/profile',

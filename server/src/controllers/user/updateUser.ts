@@ -12,7 +12,7 @@ export default authenticatedProcedure
     })
   )
   .input(z.object({
-    username: z.string().optional(),
+    username: z.string().min(1).max(15).optional(),
     picture: z.string().optional()
   })
   )
@@ -26,7 +26,20 @@ export default authenticatedProcedure
           })
     }
 
-    const updatedUser = await repos.userRepository.update(authUser.id, userData)
+    let updatedPicture : string | undefined
+    let updatedUser
+
+    if(!userData.username) return user
+
+    if(!user.provider.includes("google")){
+      const encodedUsername = encodeURIComponent(userData.username).replace(/%20/g, "+");
+       updatedPicture = `https://ui-avatars.com/api/?name=${encodedUsername}&size=128&background=random`
+       updatedUser = await repos.userRepository.update(authUser.id, {...userData, picture: updatedPicture})
+
+       return updatedUser
+    }
+
+    updatedUser = await repos.userRepository.update(authUser.id, {username: userData.username})
 
     return updatedUser
   })

@@ -17,7 +17,7 @@ function closeModal () {
 </script>
 
 <template>
-  <div v-if="userStore.user" class="flex items-center justify-between p-3">
+  <div v-if="userStore.user" class="flex items-center justify-between p-3 m-3 border-t border-b border-gray-200 bg-gray-50">
     <UserAvatarMenu :user="userStore.user" />
     <FwbDropdown close-inside>
       <div class="w-52">

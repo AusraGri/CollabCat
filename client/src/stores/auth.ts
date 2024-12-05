@@ -1,13 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-vue';
 import { defineStore } from 'pinia';
 import {
-  clearStoredAccessToken,
-  getStoredAccessToken,
   getUserIdFromToken,
-  storeAccessToken,
 } from '@/utils/auth'
 
-const storageProvider = localStorage
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     authToken: null as string | null,
@@ -21,13 +17,14 @@ export const useAuthStore = defineStore('auth', {
     setAuthToken(token: string | null) {
       this.authToken = token;
       if (token) {
-        storeAccessToken(storageProvider, token);
+       return
       } else {
-        clearStoredAccessToken(storageProvider);
+        getToken()
       }
     },
     logout() {
-      clearStoredAccessToken(storageProvider);
+      const {logout} = useAuth0()
+      logout()
       this.setAuthToken(null);
     },
   },
@@ -45,6 +42,7 @@ const getToken = async () => {
     return null;
   }
 };
+
 
 // We could wrap this inside of a Pinia store.
 // We could use @tanstack/vue-query for query caching.
