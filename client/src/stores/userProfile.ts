@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-
 import { trpc } from '@/trpc'
 
 interface UserPublic {

@@ -1,4 +1,4 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { groupsSchema } from '@server/entities/groups'
@@ -18,10 +18,8 @@ export default authenticatedProcedure
   })
   .input(z.void())
   .output(groupsSchema.omit({ createdAt: true }).array())
-  .mutation(async ({ ctx: { authUser, repos } }) => {
-    const groupsCreated = await repos.groupsRepository.get({
-      createdByUserId: authUser.id,
-    })
+  .query(async ({ ctx: { authUser, repos } }) => {
+    const groups = await repos.groupsRepository.getUserGroupsByUserId(authUser.id)
 
-    return groupsCreated
+    return groups
   })

@@ -1,5 +1,5 @@
 import './assets/style.css'
-import { createAuth0, LocalStorageCache } from '@auth0/auth0-vue'
+import { createAuth0} from '@auth0/auth0-vue'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { VueQueryPlugin } from '@tanstack/vue-query'
@@ -7,7 +7,6 @@ import App from './App.vue'
 import router from './router'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import { cache } from './utils/cache'
 
 const app = createApp(App)
 

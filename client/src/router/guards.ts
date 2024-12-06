@@ -13,7 +13,7 @@ export const authenticate = async () => {
 
   if (!isAuthenticated  || !authStore.authToken) return { name: 'Login' }
 
-  userStore.fetchUserData()
+  await userStore.fetchUserData()
 
   return true
 }

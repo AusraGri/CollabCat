@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { FwbAvatar, FwbButton, FwbDropdown, FwbListGroup, FwbListGroupItem, FwbModal } from 'flowbite-vue'
-import { User } from '@auth0/auth0-vue'
+import { ref, onMounted } from 'vue'
+import { FwbButton} from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
 import { useUserStore } from '@/stores/userProfile'
+import { useUserGroupsStore } from '@/stores/userGroups'
+import GroupSelection from '@/components/groups/GroupSelection.vue'
 
 const userStore = useUserStore()
-const showUserMenu = ref(false)
-const openUserMenu = () => {
-  showUserMenu.value = !showUserMenu.value
-}
-function closeModal () {
-  showUserMenu.value = false
-}
+const userGroupStore = useUserGroupsStore()
+const userGroups = ref()
+
+onMounted(async()=>{
+ await  userGroupStore.fetchUserGroupsData()
+} )
+
+
+
 </script>
 
 <template>
-  <div v-if="userStore.user" class="flex items-center justify-between p-3 m-3 border-t border-b border-gray-200 bg-gray-50">
+  <div v-if="userStore.user" class="flex items-center justify-between p-3 mt-3 mb-3 border-t border-b border-gray-200 bg-gray-50">
     <UserAvatarMenu :user="userStore.user" />
-    <FwbDropdown close-inside>
-      <div class="w-52">
-        <p class="p-2">Dropdown content line one</p>
-        <p class="p-2">Dropdown content line two</p>
-        <p class="p-2">Dropdown content line three</p>
-        <p class="p-2">Dropdown content line four</p>
-      </div>
-    </FwbDropdown>
     <FwbButton pill size="sm" class="h-10 w-10">S</FwbButton>
+    <GroupSelection :groups="userGroupStore.userGroups || []"/>
   </div>
-  <main>user main RouterView</main>
+  <main>
+    <div class="container mx-auto px-6 py-6">
+      <RouterView />
+    </div>
+  </main>
 </template>
 <style scoped></style>

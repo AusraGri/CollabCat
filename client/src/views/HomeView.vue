@@ -42,6 +42,7 @@ const handleAuthRedirect = async () => {
 
     // Optionally store the token in localStorage or a state management library (like Vuex or Pinia)
     authStore.setAuthToken(idToken)
+    let routeUsername: string
     try {
       if (user.value?.email && user.value?.name && user.value.picture) {
         const newUser ={
@@ -59,8 +60,12 @@ const handleAuthRedirect = async () => {
     }
     // Send the user data to your backend to store the user in the database
     await getUsers()
+    if(userStore.user?.username){
+      routeUsername = userStore.user?.username?.replace(' ', '')
+
+      router.push({ name: 'HomeProfile', params: {username: routeUsername} }) // Redirect to the profile page after signup
+    }
     // After saving the user, redirect to the profile page or another page
-    router.push({ name: 'Home' }) // Redirect to the profile page after signup
   } catch (error) {
     console.error('Error handling Auth0 redirect callback:', error)
   }

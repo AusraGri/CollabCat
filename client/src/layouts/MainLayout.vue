@@ -30,7 +30,6 @@ function logoutUser() {
   router.push({ name: 'Login' })
 }
 
-const users = ref({ picture: user.value?.picture })
 </script>
 
 <template>

@@ -97,6 +97,18 @@ export function groupsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
+    async getUserGroupsByUserId(userId: number): Promise<GroupsPublic[]> {
+      return db
+        .selectFrom('groups')
+        .select(groupsKeysPublic)
+        .innerJoin('userGroups', 'userGroups.groupId', 'groups.id')
+        .where((eb) => eb.or([
+          eb("groups.createdByUserId", '=', userId),
+          eb('userGroups.userId', '=', userId)
+        ]))
+        .execute()
+    },
+
     async updateName(groupData: GroupsUpdate): Promise<GroupsPublic> {
       return db
         .updateTable('groups')

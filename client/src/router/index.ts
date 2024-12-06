@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
+import UserLayout from '@/layouts/UserLayout.vue'
 import { authenticate } from './guards'
 
 const router = createRouter({
@@ -31,7 +32,12 @@ const router = createRouter({
     },
     {
       path: '',
-      component: MainLayout,
+      name: 'Home',
+      component: HomeView,
+    },
+    {
+      path: '/:username',
+      component: UserLayout,
       beforeEnter: [authenticate],
       children: [
         {
@@ -41,7 +47,7 @@ const router = createRouter({
         },
         {
           path: '',
-          name: 'Home',
+          name: 'HomeProfile',
           component: HomeView,
         },
         {
