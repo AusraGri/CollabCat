@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { idSchema } from '@server/entities/shared'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '../provideRepos'
@@ -30,7 +30,7 @@ export const groupAuthProcedure = authenticatedProcedure
 
     const userGroupRole = await repos.groupsRepository.getRole({
       userId: authUser.id,
-      groupId,
+      groupId: isGroup.id,
     })
 
     if (!userGroupRole || userGroupRole.role === undefined) {
@@ -40,14 +40,10 @@ export const groupAuthProcedure = authenticatedProcedure
       })
     }
 
-    // if (userGroupRole.role === "Custom"){
-    //   // get the permissions as the set
-    // }
-
-    // Add the role to the context
+    // Add the role and groupId to the context
     ctx.userGroup = {
       role: userGroupRole.role,
-      groupId,
+      groupId: isGroup.id,
     }
 
     return next({

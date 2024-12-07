@@ -41,9 +41,9 @@ const router = createRouter({
       beforeEnter: [authenticate],
       children: [
         {
-          path: '/profile',
-          name: 'Article',
-          component: () => import('../views/ArticleView.vue'),
+          path: ':group',
+          name: 'Group',
+          component: () => import('../views/GroupView.vue'),
         },
         {
           path: '',

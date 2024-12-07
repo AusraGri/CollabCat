@@ -6,11 +6,15 @@ import { VueQueryPlugin } from '@tanstack/vue-query'
 import App from './App.vue'
 import router from './router'
 import VueDatePicker from '@vuepic/vue-datepicker';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import '@vuepic/vue-datepicker/dist/main.css'
+
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 const app = createApp(App)
 
-app.use(createPinia())
+app.use(pinia)
 app.use(VueQueryPlugin)
 app.use(router)
 app.use(

@@ -16,14 +16,18 @@ const name = ref<string>('')
 function confirmAction(confirmed: boolean) {
   if (confirmed) {
     emit('create:group', name.value)
-    return
+    name.value = ''
   }
   emit('close')
+}
+
+const closeModal = () => {
+    emit('close')
 }
 </script>
 
 <template>
-  <FwbModal v-if="isShowModal">
+  <FwbModal v-if="isShowModal"  @close="closeModal">
     <template #header>
       <div class="flex items-center text-lg">Create New Group</div>
     </template>

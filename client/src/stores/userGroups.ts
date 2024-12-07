@@ -11,15 +11,17 @@ export interface UserGroups {
     role: string
     userId: number
   }
+
+export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
 interface GroupsState {
-    userGroups: GroupsPublic[] | null 
-    activeGroup: UserGroups | null
+    userGroups: GroupsPublic[] | null
+    activeGroup: ActiveGroup | null
   }
 
 export const useUserGroupsStore = defineStore('group', {
   state: () :GroupsState => ({
     userGroups:  null,
-    activeGroup: null
+    activeGroup: null,
   }),
 
   getters: {
@@ -52,6 +54,10 @@ export const useUserGroupsStore = defineStore('group', {
         console.error('Failed to fetch user data:', error)
       }
     },
+  },
+  persist: {
+    storage: sessionStorage,
+    pick: ['activeGroup'],
   },
 })
 

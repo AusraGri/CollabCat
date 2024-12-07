@@ -6,6 +6,7 @@ import {
   userGroupsKeysPublic,
   type UserGroupsPublic,
 } from '@server/entities/userGroups'
+import { jsonObjectFrom } from 'kysely/helpers/postgres'
 import { type DeleteResult, type Insertable } from 'kysely'
 
 export interface GetGroupsOptions {
@@ -144,6 +145,30 @@ export function groupsRepository(db: Database) {
         .innerJoin('userGroups', 'user.id', 'userGroups.userId')
         .where('userGroups.groupId', '=', groupId)
         .execute()
+    },
+
+    async getUserGroupMembershipInfo (data: GroupUserData)  {
+      return db
+      .selectFrom('userGroups')
+      .innerJoin('groups', 'groups.id', 'userGroups.groupId')
+      .select((eb) => [
+        'userGroups.groupId',
+        'userGroups.userId',
+        'userGroups.role',
+        'groups.name',
+        jsonObjectFrom(
+          eb
+            .selectFrom('permissions')
+            .select(['permissions.permissionName'])
+            .innerJoin('userGroupPermissions', 'permissions.id', 'userGroupPermissions.permissionId')
+            .whereRef('userGroupPermissions.groupId', '=', 'userGroups.groupId')
+            .where('userGroupPermissions.groupId', '=', data.groupId)
+            .where('userGroupPermissions.userId', '=', data.userId)
+        ).as('permissions'),
+      ])
+      .where('userGroups.groupId', '=', data.groupId)
+      .where('userGroups.userId', '=', data.userId)
+      .execute()
     },
 
     async getRole(

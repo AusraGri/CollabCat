@@ -22,9 +22,9 @@ export const trpc = createTRPCProxyClient<AppRouter>({
           throw new Error('Unauthorized: No token found')
         }
        // Log the headers for debugging purposes
-        console.log('Headers:', {
-          Authorization: `Bearer ${accessToken}`,
-        })
+        // console.log('Headers:', {
+        //   Authorization: `Bearer ${accessToken}`,
+        // })
 
         return {
           Authorization: `Bearer ${accessToken}`,

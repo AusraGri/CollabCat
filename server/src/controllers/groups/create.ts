@@ -1,4 +1,4 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { insertGroupSchema, groupsSchema } from '@server/entities/groups'
