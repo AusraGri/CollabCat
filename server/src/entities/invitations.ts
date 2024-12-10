@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { Invitations } from '@server/database/types'
+import { type Selectable } from 'kysely'
 import { idSchema } from './shared'
 
 export const invitationSchema = z.object({
@@ -19,4 +20,5 @@ export const invitationsKeysAll = Object.keys(
   invitationSchema.shape
 ) as (keyof Invitations)[]
 
+export type PublicInvitation = Selectable<Invitations>
 export type InsertableInvitation = z.infer<typeof createInvitationSchema>

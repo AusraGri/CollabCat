@@ -31,6 +31,11 @@ const router = createRouter({
       component: () => import('../views/SignupView.vue'),
     },
     {
+      path: '/invite',
+      name: 'Invite',
+      component: () => import('../views/InvitationView.vue'),
+    },
+    {
       path: '',
       name: 'Home',
       component: HomeView,
@@ -47,8 +52,8 @@ const router = createRouter({
         },
         {
           path: '',
-          name: 'HomeProfile',
-          component: HomeView,
+          name: 'Profile',
+          component: () => import('../views/ProfileView.vue'),
         },
         {
           path: '/intro',

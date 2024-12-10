@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { login } from '@/stores/auth'
+import { login } from '@/stores/authStore'
 import { ref } from 'vue'
 import PageForm from '@/components/PageForm.vue'
 import { FwbAlert, FwbButton, FwbInput } from 'flowbite-vue'

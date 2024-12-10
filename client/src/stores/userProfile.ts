@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
+import type { PublicInvitation } from '@server/shared/types'
 
 interface UserPublic {
   username: string | null
@@ -9,16 +10,18 @@ interface UserPublic {
 }
 
 interface UserUpdate {
-    picture?: string
-    username?: string
+  picture?: string
+  username?: string
 }
 interface UserState {
   user: UserPublic | null // Stores user information
+  invitations: PublicInvitation[] | null
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     user: null,
+    invitations: null,
   }),
 
   getters: {
@@ -30,8 +33,20 @@ export const useUserStore = defineStore('user', {
       try {
         const data = await trpc.user.getUserProfile.query() // Fetch from your API
         this.user = data
+
+        return data
       } catch (error) {
         console.error('Failed to fetch user data:', error)
+      }
+    },
+    async fetchInvitations() {
+      try {
+        const data = await trpc.invitations.getGroupInvitations.query()
+        this.invitations = data
+
+        return data
+      } catch (error) {
+        console.error('Failed to fetch user groups data:', error)
       }
     },
 
@@ -49,14 +64,14 @@ export const useUserStore = defineStore('user', {
       this.saveUserChanges({ picture: newPicture })
     },
 
-    async deleteUser () {
-        await trpc.user.deleteUser.mutate()
-        this.clearUser()
+    async deleteUser() {
+      await trpc.user.deleteUser.mutate()
+      this.clearUser()
     },
 
     async saveUserChanges(changes: UserUpdate) {
       try {
-       this.user = await trpc.user.updateUser.mutate(changes)
+        this.user = await trpc.user.updateUser.mutate(changes)
       } catch (error) {
         console.error('Failed to save user changes:', error)
       }

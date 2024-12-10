@@ -8,11 +8,14 @@ import jsonwebtoken from 'jsonwebtoken'
 import config from '@server/config'
 import { prepareInvitationTokenPayload } from '@server/trpc/tokenPayload'
 import { invitationSchema } from '@server/entities/invitations'
+import { userRepository } from '@server/repositories/userRepository'
 import { invitationsRepository } from '../../repositories/invitationRepository'
 
 const { expiresIn, tokenKey } = config.auth
 export default groupAuthProcedure
-  .use(provideRepos({ groupsRepository, invitationsRepository }))
+  .use(
+    provideRepos({ groupsRepository, invitationsRepository, userRepository })
+  )
   .meta({
     openapi: {
       method: 'POST',
@@ -51,8 +54,9 @@ export default groupAuthProcedure
       })
     }
     // check if this user is not already invited
-    const isUserInvited =
+    const [isUserInvited] =
       await repos.invitationsRepository.getInvitationByEmail(email)
+
 
     if (isUserInvited) {
       throw new TRPCError({
@@ -61,6 +65,8 @@ export default groupAuthProcedure
       })
     }
 
+    const userHasAccount = await repos.userRepository.findByEmail(email)
+
     // construct invitation token
     const payload = prepareInvitationTokenPayload({ email })
 
@@ -68,8 +74,10 @@ export default groupAuthProcedure
       expiresIn,
     })
 
-    // sent invitation. should this be wrapped in try/catch :O ?
+    if (!userHasAccount) {
+      //  send email invitation only if user does not have account
       await sentInvitationMail(mailTransporter, { email, inviteToken })
+    }
 
     // if sending invitation was successful only then save invitation to the database
     const invitation = await repos.invitationsRepository.createInvitation({

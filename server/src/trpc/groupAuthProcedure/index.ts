@@ -19,7 +19,7 @@ export const groupAuthProcedure = authenticatedProcedure
   .use(async ({ input: { groupId }, ctx, next }) => {
     const { authUser, repos } = ctx
 
-    const [isGroup] = await repos.groupsRepository.get({ id: groupId })
+    const [isGroup] = await repos.groupsRepository.getGroup({ id: groupId })
 
     if (!isGroup) {
       throw new TRPCError({

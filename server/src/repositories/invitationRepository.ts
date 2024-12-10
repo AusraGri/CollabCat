@@ -4,6 +4,11 @@ import { DeleteResult, type Selectable } from 'kysely'
 import type { InsertableInvitation } from '@server/entities/invitations'
 import { invitationsKeysAll } from '../entities/invitations'
 
+type GroupInvitationData = {
+  email: string
+  groupId: number
+}
+
 export function invitationsRepository(db: Database) {
   return {
     async createInvitation(
@@ -18,12 +23,33 @@ export function invitationsRepository(db: Database) {
 
     async getInvitationByEmail(
       email: Invitations['email']
-    ): Promise<Selectable<Invitations> | undefined> {
+    ): Promise<Selectable<Invitations>[]> {
       return db
         .selectFrom('invitations')
         .select(invitationsKeysAll)
         .where('email', '=', email)
-        .executeTakeFirst()
+        .execute()
+    },
+
+    async getInvitationByToken(
+      token: string
+    ): Promise<Selectable<Invitations> | undefined> {
+      return db
+        .selectFrom('invitations')
+        .select(invitationsKeysAll)
+        .where('invitationToken', '=', token)
+        .executeTakeFirstOrThrow()
+    },
+
+    async getInvitationByGroupAndEmail(
+      data: GroupInvitationData
+    ): Promise<Selectable<Invitations>[] | undefined> {
+      return db
+        .selectFrom('invitations')
+        .select(invitationsKeysAll)
+        .where('email', '=', data.email)
+        .where('groupId', '=', data.groupId)
+        .execute()
     },
 
     async deleteInvitation(

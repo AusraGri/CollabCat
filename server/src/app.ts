@@ -32,16 +32,21 @@ export default function createApp(db: Database) {
   app.use('/api/health', (_, res) => {
     res.status(200).send('OK')
   })
+  
 
  // log requests to the API
-  // app.use((req, res, next) => {
-  //   console.log('Incoming Request Method:', req.method);
-  //   console.log('Incoming Request URL:',req.url);
-  //   console.log('Incoming Request Header:', req.headers);
-  //   next();
-  // });
+  app.use((req, res, next) => {
+    console.log("REQUEST START:")
+    console.log('Incoming Request Method:', req.method);
+    console.log('Incoming Request URL:',req.url);
+    console.log('Incoming Request Header:', req.headers);
+    console.log('Incoming Request Header:', req.body);
+    next();
+  });
 
-  app.use(validateAccessToken)
+
+   // validation applied to all endpoints
+  // app.use(validateAccessToken)
 
   app.use(
     '/api/v1/trpc',

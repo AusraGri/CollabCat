@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/userProfile'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import ConfirmationModal from '../ConfirmationModal.vue'
-import {
-  FwbModal,
-  FwbButton,
-  FwbInput,
-} from 'flowbite-vue'
+import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
 import { type UserPublic } from '@server/shared/types'
 
 const { showUserSettings, user } = defineProps<{
@@ -28,14 +24,14 @@ const userStore = useUserStore()
 
 async function changeName() {
   try {
-    if(user.username === username.value){
-        emit('close')
-        return
+    if (user.username === username.value) {
+      emit('close')
+      return
     }
 
     userStore.updateUserName(username.value)
     username.value = user.username
-    router.push({ params: {username: username.value.replace(' ', '')} })
+    router.push({ params: { username: username.value.replace(' ', '') } })
   } catch (error) {
     console.log(error) // change to toast
   }
@@ -50,13 +46,13 @@ const handleDeletion = async (value: boolean) => {
 }
 
 async function deleteAccount() {
-    await userStore.deleteUser()
-    authStore.logout()
+  await userStore.deleteUser()
+  authStore.logout()
   router.push({ name: 'Home' })
 }
 
 const closeModal = () => {
-    emit('close')
+  emit('close')
 }
 
 onMounted(() => {

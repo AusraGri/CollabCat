@@ -4,7 +4,7 @@ import jsonwebtoken from 'jsonwebtoken'
 import { TRPCError } from '@trpc/server'
 import jwksClient from 'jwks-rsa'
 import { userRepository } from '@server/repositories/userRepository'
-import { publicProcedure } from '..'
+import { auth0Procedure } from '@server/middlewares/trpcAuthMiddleware'
 import provideRepos from '../provideRepos'
 
 interface Auth0TokenPayload {
@@ -26,7 +26,6 @@ export async function verifyAuth0Token(
   audience: string,
   issuer: string
 ): Promise<Auth0TokenPayload> {
-  // Fetch the signing key dynamically
   const decodedHeader = jsonwebtoken.decode(token, {
     complete: true,
   }) as { header: jsonwebtoken.JwtHeader } | null
@@ -52,7 +51,7 @@ export async function verifyAuth0Token(
   return decoded // Return the decoded token payload
 }
 
-export const authenticatedProcedure = publicProcedure
+export const authenticatedProcedure = auth0Procedure
   .use(
     provideRepos({
       userRepository,
@@ -107,7 +106,7 @@ export const authenticatedProcedure = publicProcedure
 
     return next({
       ctx: {
-        authUser: { id: user.id },
+        authUser: { id: user.id, email: user.email },
       },
     })
   })

@@ -1,11 +1,9 @@
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 // @ts-ignore - importing through a direct path propagates types faster
 import type { AppRouter } from '@server/shared/trpc'
-import { getStoredAccessToken } from './utils/auth'
 import { apiBase } from '@/config'
 import SuperJSON from 'superjson'
-import { useAuthStore } from './stores/auth'
-
+import { useAuthStore } from './stores/authStore'
 
 export const trpc = createTRPCProxyClient<AppRouter>({
   transformer: SuperJSON,
@@ -14,17 +12,16 @@ export const trpc = createTRPCProxyClient<AppRouter>({
       url: apiBase,
 
       headers: () => {
-
         const authStore = useAuthStore()
         const accessToken = authStore.authToken
 
-        if (!accessToken) {
-          throw new Error('Unauthorized: No token found')
-        }
-       // Log the headers for debugging purposes
-        // console.log('Headers:', {
-        //   Authorization: `Bearer ${accessToken}`,
-        // })
+        // if (!accessToken) {
+        //   throw new Error('Unauthorized: No token found')
+        // }
+        //  Log the headers for debugging purposes
+        console.log('Headers:', {
+          Authorization: `Bearer ${accessToken}`,
+        })
 
         return {
           Authorization: `Bearer ${accessToken}`,

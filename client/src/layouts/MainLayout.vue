@@ -3,7 +3,7 @@ import { FwbNavbarLink } from 'flowbite-vue'
 import StackedLayout from './StackedLayout.vue'
 import IntroPageLayout from './IntroPageLayout.vue'
 import UserLayout from './UserLayout.vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/authStore'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -29,7 +29,6 @@ function logoutUser() {
   userStore.logout()
   router.push({ name: 'Login' })
 }
-
 </script>
 
 <template>

@@ -6,7 +6,7 @@ import { FwbButton, FwbHeading, FwbInput } from 'flowbite-vue'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Card from '@/components/Card.vue'
-import { isLoggedIn } from '@/stores/auth'
+import { isLoggedIn } from '@/stores/authStore'
 
 const route = useRoute()
 const comments = ref<CommentPublic[]>([])

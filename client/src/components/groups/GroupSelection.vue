@@ -23,10 +23,12 @@ const isCreateNewGroup = ref(false)
 const selected = computed(()=> userGroupStore.activeGroup?.name)
 const dropdownRef = ref<HTMLElement | null>(null)
 
-const selectItem = (group: GroupsPublic) => {
+const selectItem = async (group: GroupsPublic) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdByUserId, ...activeGroup } = group;
   userGroupStore.activeGroup = activeGroup
+ 
+
   isOpen.value = false
   // emit('selected:group', group)
 }
@@ -59,7 +61,6 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
-
 <template>
   <div class="relative inline-block min-w-32" ref="dropdownRef">
     <button

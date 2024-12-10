@@ -12,7 +12,7 @@ export async function sentInvitationMail(
   transporter: Transporter,
   emailData: EmailData
 ) {
-  const inviteLink = `${process.env.BASE_URL}/invite?token=${emailData.inviteToken}`
+  const inviteLink = `${config.auth0.clientOriginUrl}/invite?token=${emailData.inviteToken}`
   const info = {
     from: '"Family App" <invitations@myapp.email>',
     to: emailData.email,

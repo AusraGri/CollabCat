@@ -48,7 +48,7 @@ export function groupsRepository(db: Database) {
       return newGroup
     },
 // getGroups- better name. Need to evaluate what is really needed, do I really need all those query options?
-    async get(options: GetGroupsOptions): Promise<GroupsPublic[]> {
+    async getGroup(options: GetGroupsOptions): Promise<GroupsPublic[]> {
       if (
         options.createdByUserId === undefined &&
         options.id === undefined &&
@@ -56,7 +56,8 @@ export function groupsRepository(db: Database) {
       )
         return []
 
-      let query = db.selectFrom('groups').selectAll()
+      let query = db.selectFrom('groups')
+      .select(groupsKeysPublic)
 
       const filters: Array<{
         column: keyof Groups
@@ -104,12 +105,10 @@ export function groupsRepository(db: Database) {
         .select(groupsKeysPublic)
         .innerJoin('userGroups', 'userGroups.groupId', 'groups.id')
         .where((eb) => eb.or([
-          eb("groups.createdByUserId", '=', userId),
           eb('userGroups.userId', '=', userId)
         ]))
         .execute()
     },
-
     async updateName(groupData: GroupsUpdate): Promise<GroupsPublic> {
       return db
         .updateTable('groups')
@@ -151,9 +150,12 @@ export function groupsRepository(db: Database) {
       return db
       .selectFrom('userGroups')
       .innerJoin('groups', 'groups.id', 'userGroups.groupId')
+      .innerJoin('user', 'userGroups.userId', 'user.id')
       .select((eb) => [
         'userGroups.groupId',
         'userGroups.userId',
+        'user.username',
+        'user.picture',
         'userGroups.role',
         'groups.name',
         jsonObjectFrom(
@@ -168,7 +170,7 @@ export function groupsRepository(db: Database) {
       ])
       .where('userGroups.groupId', '=', data.groupId)
       .where('userGroups.userId', '=', data.userId)
-      .execute()
+      .executeTakeFirstOrThrow()
     },
 
     async getRole(

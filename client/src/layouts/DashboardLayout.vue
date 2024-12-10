@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { FwbNavbarLink } from 'flowbite-vue'
 import StackedLayout from './StackedLayout.vue'
-import { logout } from '@/stores/auth'
+import { logout } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

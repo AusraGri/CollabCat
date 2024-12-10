@@ -1,48 +1,28 @@
-import { useAuth0 } from '@auth0/auth0-vue';
-import { defineStore } from 'pinia';
-import {
-  getUserIdFromToken,
-} from '@/utils/auth'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { trpc } from '@/trpc'
+import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     authToken: null as string | null,
   }),
   getters: {
-    authUserId: (state) =>
-      state.authToken ? getUserIdFromToken(state.authToken) : null,
     isLoggedIn: (state) => !!state.authToken,
   },
   actions: {
-    setAuthToken(token: string | null) {
-      this.authToken = token;
-      if (token) {
-       return
-      } else {
-        getToken()
+    async setAuthToken(token: string) {
+      try {
+        if (!token) throw new Error('Missing token')
+        this.authToken = token
+      } catch (error) {
+        throw new Error('Failed to get auth token')
       }
     },
     logout() {
-      const {logout} = useAuth0()
-      logout()
-      this.setAuthToken(null);
+      this.authToken = null
     },
   },
-});
-
-const getToken = async () => {
-  const { getAccessTokenSilently } = useAuth0();
-
-  try {
-    const token = await getAccessTokenSilently();
-    console.log('Access Token:', token);
-    return token;
-  } catch (error) {
-    console.error('Failed to get access token:', error);
-    return null;
-  }
-};
-
+})
 
 // We could wrap this inside of a Pinia store.
 // We could use @tanstack/vue-query for query caching.

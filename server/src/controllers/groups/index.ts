@@ -4,12 +4,19 @@ import remove from './remove'
 import inviteUser from './inviteUser'
 import removeUser from './removeUser'
 import getUserGroups from './getUserGroups'
+import getMembershipInfo from './getUserMembershipInfo'
+import getGroupMembers from './getGroupMembers'
+import getGroup from './getGroup'
+import addUserToGroup from './addUserToGroup'
 
 export default router({
-  // routes for groups
   create,
   remove,
   inviteUser,
   removeUser,
   getUserGroups,
+  getMembershipInfo,
+  getGroupMembers,
+  getGroup,
+  addUserToGroup
 })

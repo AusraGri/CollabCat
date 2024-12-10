@@ -8,32 +8,45 @@ import { useUserGroupsStore } from '@/stores/userGroups'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
 import { stringToUrl } from '@/utils/helpers'
 import { useRouter } from 'vue-router'
-import type { GroupsPublic } from '@server/shared/types'
+import GroupLayout from './GroupLayout.vue'
+import Invitations from '@/components/invitations/Invitations.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
+const invitations = ref()
 
 onMounted(async()=>{
  await userGroupStore.fetchUserGroupsData()
+ invitations.value = await userStore.fetchInvitations()
 })
 
-watchEffect(() => {
-    if (userGroupStore.activeGroup?.name) {
-      const groupName = stringToUrl(userGroupStore.activeGroup.name);
-      router.push({ name: 'Group', params: { group: groupName } });
-    }
-  });
+// watchEffect(async () => {
+//     if (userGroupStore.activeGroup?.name) {
+//       const groupName = stringToUrl(userGroupStore.activeGroup.name);
+//       router.push({ name: 'Group', params: { group: groupName } });
+
+//       await userGroupStore.fetchUserGroupsData()
+//       await userGroupStore.getGroupMembers()
+//     }
+//   });
 
 </script>
 
 <template>
+  <div>{{ userStore.invitations }}</div>
   <div v-if="userStore.user" class="flex items-center justify-between p-3 mt-3 mb-3 border-t border-b border-gray-200 bg-gray-50">
     <UserAvatarMenu :user="userStore.user" />
-    <FwbButton pill size="sm" class="h-10 w-10">S</FwbButton>
     <GroupSelection/>
+    <div v-if="userStore.invitations" >
+      <div v-for="invitation in invitations" :key="invitation.id">
+        <Invitations  :invitation="invitation"/>
+      </div>
+    </div>
   </div>
-<div>group shit</div>
+<div>
+  <GroupLayout v-if="userGroupStore.isInGroup"/>
+</div>
   <main>
     <div class="container mx-auto px-6 py-6">
       <RouterView />
