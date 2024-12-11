@@ -46,4 +46,6 @@ export const rewardsKeysAll = Object.keys(
   rewardsSchema.shape
 ) as (keyof Rewards)[]
 
+export type InsertableReward = z.infer<typeof createRewardSchema>
+export type PublicReward = z.infer<typeof rewardsSchemaOutput>
 export type RewardUpdateables = Omit<Rewards, 'createdByUserId' | 'id'>

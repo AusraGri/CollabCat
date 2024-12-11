@@ -8,6 +8,7 @@ import getMembershipInfo from './getUserMembershipInfo'
 import getGroupMembers from './getGroupMembers'
 import getGroup from './getGroup'
 import addUserToGroup from './addUserToGroup'
+import getGroupData from './getGroupData'
 
 export default router({
   create,
@@ -18,5 +19,6 @@ export default router({
   getMembershipInfo,
   getGroupMembers,
   getGroup,
-  addUserToGroup
+  addUserToGroup,
+  getGroupData
 })

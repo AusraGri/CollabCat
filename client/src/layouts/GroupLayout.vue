@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbButton } from 'flowbite-vue'
 import GroupMembers from '@/components/groups/GroupMembers.vue';
 import { stringToUrl } from '@/utils/helpers'
+import Rewards from '@/components/rewards/Rewards.vue';
 
 const userGroupStore = useUserGroupsStore()
 const router = useRouter()
@@ -17,7 +18,7 @@ watchEffect(async () => {
   });
 
   onMounted(async()=>{
- await userGroupStore.fetchUserGroupsData()
+ await userGroupStore.fetchUserGroups()
 })
 </script>
 <template>
@@ -28,6 +29,7 @@ watchEffect(async () => {
     </div>
     <!-- Available rewards names. detailed info can be shown in modal -->
     <div>Rewards</div>
+    <Rewards/>
     <!-- Settings: group name, member roles, delete group -->
     <div>
       <FwbButton>Settings</FwbButton>

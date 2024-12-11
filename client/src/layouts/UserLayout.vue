@@ -13,27 +13,27 @@ import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
 import NotificationList from '@/components/user/NotificationList.vue'
 import { type PublicInvitation } from '@server/shared/types'
-import user from '@server/controllers/user'
 
 const router = useRouter()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
-// const invitations = ref<PublicInvitation[]>()
-const invitations = computed(()=> userStore.invitations)
+const invitations = computed(() => userStore.invitations)
 
 onMounted(async () => {
-  await userGroupStore.fetchUserGroupsData()
- await refreshInvitations()
+  await userGroupStore.fetchUserGroups()
+
+  if (userGroupStore.activeGroup) {
+    await userGroupStore.fetchGroupData()
+  }
+  await refreshInvitations()
 })
 
 const refreshInvitations = async () => {
- await userStore.fetchInvitations()
+  await userStore.fetchInvitations()
 }
-
 </script>
 
 <template>
-  <div>{{ invitations }}</div>
   <div
     v-if="userStore.user"
     class="mb-1 mt-1 flex items-center justify-between border-b border-t border-gray-200 bg-gray-50 p-3"
@@ -43,12 +43,12 @@ const refreshInvitations = async () => {
     <Notifications :has-notifications="!!invitations?.length">
       <template #notifications>
         <FwbListGroupItem
-        class="flex flex-col p-4 space-y-2 bg-gray-100 dark:bg-gray-700"
-        v-for="invitation in invitations"
-        :key="invitation.id"
-      >
-        <Invitations :invitation="invitation" @invitation:action="refreshInvitations"/>
-      </FwbListGroupItem>
+          class="flex flex-col space-y-2 bg-gray-100 p-4 dark:bg-gray-700"
+          v-for="invitation in invitations"
+          :key="invitation.id"
+        >
+          <Invitations :invitation="invitation" @invitation:action="refreshInvitations" />
+        </FwbListGroupItem>
       </template>
     </Notifications>
   </div>

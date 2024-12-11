@@ -2,6 +2,7 @@ import { z } from 'zod'
 import type { Selectable, Insertable } from 'kysely'
 import type { Groups } from '@server/database/types'
 import { idSchema } from './shared'
+import { rewardsSchemaOutput } from './rewards'
 
 export const groupsSchema = z.object({
   createdAt: z.date(),
@@ -22,6 +23,20 @@ export const insertGroupSchema = groupsSchema.omit({
   createdAt: true,
 })
 
+export const groupDataSchema = z.object({
+  id: idSchema,
+  name: z.string(),
+  rewards: z.array(rewardsSchemaOutput.omit({groupId:true})).optional(),
+  members: z.array(z.object({
+    id: idSchema,
+    email: z.string().email(),
+    picture: z.string().nullable(),
+    username: z.string().nullable(),
+    role: z.string(),
+    points: z.number().nullable()
+  }))
+})
+
 // list keys that we will return to the client
 export const groupsKeysAll = Object.keys(groupsSchema.shape) as (keyof Groups)[]
 
@@ -32,6 +47,7 @@ export type GroupsPublic = Pick<
   (typeof groupsKeysPublic)[number]
 >
 
+export type GroupData = z.infer<typeof groupDataSchema>
 export type InsertableGroups = Insertable<Groups>
 
 export const authGroup = userGroupsSchema.omit({ userId: true })

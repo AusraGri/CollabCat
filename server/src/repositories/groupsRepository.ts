@@ -6,7 +6,7 @@ import {
   userGroupsKeysPublic,
   type UserGroupsPublic,
 } from '@server/entities/userGroups'
-import { jsonObjectFrom } from 'kysely/helpers/postgres'
+import { jsonArrayFrom } from 'kysely/helpers/postgres'
 import { type DeleteResult, type Insertable } from 'kysely'
 
 export interface GetGroupsOptions {
@@ -47,7 +47,7 @@ export function groupsRepository(db: Database) {
 
       return newGroup
     },
-// getGroups- better name. Need to evaluate what is really needed, do I really need all those query options?
+    // getGroups- better name. Need to evaluate what is really needed, do I really need all those query options?
     async getGroup(options: GetGroupsOptions): Promise<GroupsPublic[]> {
       if (
         options.createdByUserId === undefined &&
@@ -56,8 +56,7 @@ export function groupsRepository(db: Database) {
       )
         return []
 
-      let query = db.selectFrom('groups')
-      .select(groupsKeysPublic)
+      let query = db.selectFrom('groups').select(groupsKeysPublic)
 
       const filters: Array<{
         column: keyof Groups
@@ -104,9 +103,7 @@ export function groupsRepository(db: Database) {
         .selectFrom('groups')
         .select(groupsKeysPublic)
         .innerJoin('userGroups', 'userGroups.groupId', 'groups.id')
-        .where((eb) => eb.or([
-          eb('userGroups.userId', '=', userId)
-        ]))
+        .where((eb) => eb.or([eb('userGroups.userId', '=', userId)]))
         .execute()
     },
     async updateName(groupData: GroupsUpdate): Promise<GroupsPublic> {
@@ -146,31 +143,77 @@ export function groupsRepository(db: Database) {
         .execute()
     },
 
-    async getUserGroupMembershipInfo (data: GroupUserData)  {
+    async getUserGroupMembershipInfo(data: GroupUserData) {
       return db
-      .selectFrom('userGroups')
-      .innerJoin('groups', 'groups.id', 'userGroups.groupId')
-      .innerJoin('user', 'userGroups.userId', 'user.id')
-      .select((eb) => [
-        'userGroups.groupId',
-        'userGroups.userId',
-        'user.username',
-        'user.picture',
-        'userGroups.role',
-        'groups.name',
-        jsonObjectFrom(
-          eb
-            .selectFrom('permissions')
-            .select(['permissions.permissionName'])
-            .innerJoin('userGroupPermissions', 'permissions.id', 'userGroupPermissions.permissionId')
-            .whereRef('userGroupPermissions.groupId', '=', 'userGroups.groupId')
-            .where('userGroupPermissions.groupId', '=', data.groupId)
-            .where('userGroupPermissions.userId', '=', data.userId)
-        ).as('permissions'),
-      ])
-      .where('userGroups.groupId', '=', data.groupId)
-      .where('userGroups.userId', '=', data.userId)
-      .executeTakeFirstOrThrow()
+        .selectFrom('userGroups')
+        .innerJoin('groups', 'groups.id', 'userGroups.groupId')
+        .innerJoin('user', 'userGroups.userId', 'user.id')
+        .select((eb) => [
+          'userGroups.groupId',
+          'userGroups.userId',
+          'user.username',
+          'user.picture',
+          'userGroups.role',
+          'groups.name',
+          jsonArrayFrom(
+            eb
+              .selectFrom('permissions')
+              .select(['permissions.permissionName'])
+              .innerJoin(
+                'userGroupPermissions',
+                'permissions.id',
+                'userGroupPermissions.permissionId'
+              )
+              .whereRef(
+                'userGroupPermissions.groupId',
+                '=',
+                'userGroups.groupId'
+              )
+              .where('userGroupPermissions.groupId', '=', data.groupId)
+              .where('userGroupPermissions.userId', '=', data.userId)
+          ).as('permissions'),
+        ])
+        .where('userGroups.groupId', '=', data.groupId)
+        .where('userGroups.userId', '=', data.userId)
+        .executeTakeFirstOrThrow()
+    },
+    async getGroupMembersAndRewards(groupId: number) {
+      return db
+        .selectFrom('groups')
+        .select((eb) => [
+          'groups.id',
+          'groups.name',
+          jsonArrayFrom(
+            eb
+              .selectFrom('rewards')
+              .select([
+                'rewards.amount',
+                'rewards.cost',
+                'rewards.createdByUserId',
+                'rewards.id',
+                'rewards.targetUserIds',
+                'rewards.title',
+              ])
+              .where('rewards.groupId', '=', groupId)
+          ).as('rewards'),
+          jsonArrayFrom(
+            eb
+              .selectFrom('userGroups')
+              .innerJoin('user', 'user.id', 'userGroups.userId')
+              .leftJoin('points', 'points.groupId', 'userGroups.groupId')
+              .select([
+                'user.email',
+                'user.id',
+                'user.picture',
+                'user.username',
+                'userGroups.role',
+                'points.points',
+              ])
+              .where('userGroups.groupId', '=', groupId)
+          ).as('members'),
+        ])
+        .where('groups.id', '=', groupId)
+        .executeTakeFirst()
     },
 
     async getRole(

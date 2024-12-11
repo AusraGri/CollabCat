@@ -23,12 +23,13 @@ export default authenticatedProcedure
   .input(createRewardSchema)
   .output(rewardsSchemaOutput)
   .mutation(async ({ input: rewardData, ctx: { authUser, repos } }) => {
-    if (
-      rewardData.groupId !== undefined &&
-      rewardData.targetUserIds !== undefined &&
-      rewardData.targetUserIds.length > 0
-    ) {
-      const [isGroup] = await repos.groupsRepository.get({
+    // if (
+    //   rewardData.groupId !== undefined &&
+    //   rewardData.targetUserIds !== undefined &&
+    //   rewardData.targetUserIds.length > 0
+    // ) {
+    if(rewardData.groupId !== undefined ){
+      const [isGroup] = await repos.groupsRepository.getGroup({
         id: rewardData.groupId,
       })
 
@@ -38,15 +39,15 @@ export default authenticatedProcedure
           message: 'Invalid group provided',
         })
 
-      const users = await repos.userRepository.findById(
-        rewardData.targetUserIds
-      )
+      // const users = await repos.userRepository.findById(
+      //   rewardData.targetUserIds
+      // )
 
-      if (users.length === 0)
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Invalid reward targets',
-        })
+      // if (users.length === 0)
+      //   throw new TRPCError({
+      //     code: 'BAD_REQUEST',
+      //     message: 'Invalid reward targets',
+      //   })
     }
 
     const reward = {

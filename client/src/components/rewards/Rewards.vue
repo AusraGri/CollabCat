@@ -1,27 +1,24 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbAvatar} from 'flowbite-vue'
+import type { InsertableReward } from '@server/shared/types';
+import { onMounted, ref, computed } from 'vue'
+import { FwbDropdown, FwbListGroup, FwbListGroupItem,} from 'flowbite-vue'
 import { useUserGroupsStore } from '@/stores/userGroups'
-import InviteUsers from './InviteUsers.vue';
 import { trpc } from '@/trpc';
+import NewRewardModule from './NewRewardModule.vue';
 
 const userGroupStore = useUserGroupsStore()
-const isShowInvite = ref(false)
+const isNewReward = ref(false)
 
-const members = ref()
+const rewards = computed(()=> userGroupStore.rewards)
 
-onMounted(async () => {
-  await userGroupStore.getGroupMembers()
-  members.value = userGroupStore.groupMembers
-})
 
 const toggleAddReward = ()=> {
-    isShowInvite.value = !isShowInvite.value
+    isNewReward.value = !isNewReward.value
 }
 
-const handleInvitation = async(email:string)=>{
-    console.log('handling invitation', email)
-//    const invitation =  await userGroupStore.inviteUser(email)
+const handleNewReward= async(reward: InsertableReward)=>{
+    console.log('handling invitation', reward)
+    await userGroupStore.createNewReward(reward)
 if(!userGroupStore.activeGroup?.id){
     console.log('no group id')
     return
@@ -33,11 +30,10 @@ const invitation = await trpc.groups.inviteUser.mutate({groupId: userGroupStore.
 </script>
 <template>
   <div class="w-full">
-    <FwbDropdown text="Members">
+    <FwbDropdown text="Rewards">
       <fwb-list-group>
-        <FwbListGroupItem v-for="member in members" :key="member" hover >
-            <FwbAvatar :img="member.picture" rounded size="md"/>
-            <div class="ml-2">{{ member.username }}</div>
+        <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover >
+            <div class="ml-2">{{ reward.title }}</div>
         </FwbListGroupItem>
         <FwbListGroupItem>
           <button
@@ -49,7 +45,7 @@ const invitation = await trpc.groups.inviteUser.mutate({groupId: userGroupStore.
         </FwbListGroupItem>
       </fwb-list-group>
     </FwbDropdown>
-    <InviteUsers :is-show-modal="isShowInvite" @invite:user="handleInvitation" @close="toggleInviteUser"/>
+    <NewRewardModule :is-show-modal="isNewReward" @reward:new="handleNewReward" @close="toggleAddReward"/>
   </div>
 </template>
 

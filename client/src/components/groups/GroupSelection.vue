@@ -27,8 +27,8 @@ const selectItem = async (group: GroupsPublic) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdByUserId, ...activeGroup } = group;
   userGroupStore.activeGroup = activeGroup
- 
-
+  await userGroupStore.fetchGroupData()
+  // await userGroupStore.fetchUserGroups()
   isOpen.value = false
   // emit('selected:group', group)
 }
@@ -53,7 +53,7 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 onMounted(async()=>{
- await  userGroupStore.fetchUserGroupsData()
+ await  userGroupStore.fetchUserGroups()
  document.addEventListener('click', handleClickOutside)
 })
 

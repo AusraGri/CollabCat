@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type { PublicInvitation } from '@server/shared/types'
+import type {
+  PublicInvitation,
+  PublicReward,
+  GroupData,
+  InsertableReward,
+} from '@server/shared/types'
 type GroupsPublic = {
   id: number
   name: string
@@ -13,13 +18,15 @@ export interface UserGroups {
   userId: number
 }
 
+
 export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
 interface GroupsState {
   userGroups: GroupsPublic[] | null
   activeGroup: ActiveGroup | null
   userMembership: any | null
   groupMembers: any | null
-  invitations: PublicInvitation[] | null
+  rewards: Omit<PublicReward, 'groupId'>[] | null
+  groupData: GroupData | null
 }
 
 export const useUserGroupsStore = defineStore('group', {
@@ -28,7 +35,8 @@ export const useUserGroupsStore = defineStore('group', {
     userMembership: null,
     activeGroup: null,
     groupMembers: null,
-    invitations: null,
+    rewards: null,
+    groupData: null,
   }),
 
   getters: {
@@ -36,7 +44,7 @@ export const useUserGroupsStore = defineStore('group', {
   },
 
   actions: {
-    async fetchUserGroupsData() {
+    async fetchUserGroups() {
       try {
         const data = await trpc.groups.getUserGroups.query()
         this.userGroups = data
@@ -46,12 +54,22 @@ export const useUserGroupsStore = defineStore('group', {
         console.error('Failed to fetch user groups data:', error)
       }
     },
-    async fetchUserGroupInvitations() {
+    async fetchGroupData() {
       try {
-        const data = await trpc.invitations.getGroupInvitations.query()
-        this.invitations = data || null
+        const groupId = this.activeGroup?.id
+
+        if (!groupId) throw new Error('Missing group id')
+
+        const data = await trpc.groups.getGroupData.query({ groupId })
+
+        if (!data) return
+        this.groupData = data
+        this.groupMembers = data.members
+        this.rewards = data.rewards || null
+
+        return data
       } catch (error) {
-        console.error('Failed to fetch user group invitations:', error)
+        console.error('Failed to fetch user groups data:', error)
       }
     },
 
@@ -59,6 +77,20 @@ export const useUserGroupsStore = defineStore('group', {
       try {
         const newGroup = await trpc.groups.create.mutate({ name: groupName })
         this.userGroups?.push(newGroup)
+      } catch (error) {
+        console.error('Failed to create new group:', error)
+      }
+    },
+    async createNewReward(rewardData: InsertableReward) {
+      if(!this.activeGroup) throw new Error('Group id not provided')
+
+      const newReward = {
+        groupId: this.activeGroup.id,
+        ...rewardData,
+      }
+      try {
+        const reward = await trpc.rewards.create.mutate(newReward)
+        this.rewards?.push(reward)
       } catch (error) {
         console.error('Failed to create new group:', error)
       }

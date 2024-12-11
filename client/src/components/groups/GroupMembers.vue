@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect, computed } from 'vue'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbAvatar } from 'flowbite-vue'
 import { useUserGroupsStore } from '@/stores/userGroups'
 import InviteUsers from './InviteUsers.vue'
@@ -7,31 +7,27 @@ import InviteUsers from './InviteUsers.vue'
 const userGroupStore = useUserGroupsStore()
 const isShowInvite = ref(false)
 
-const members = ref()
+// const members = ref()
+const members = computed(()=>userGroupStore.groupMembers)
 
-onMounted(async () => {
-  await userGroupStore.getGroupMembers()
-  members.value = userGroupStore.groupMembers
-})
+// onMounted(async () => {
+//   members.value = userGroupStore.groupMembers
+// })
 
-watchEffect(async () => {
-  if (userGroupStore.activeGroup?.name) {
-    await userGroupStore.getGroupMembers()
-    members.value = userGroupStore.groupMembers
-  }
-})
+// watchEffect(async () => {
+//   if (userGroupStore.activeGroup?.name) {
+//     members.value = userGroupStore.groupMembers
+//   }
+// })
 
 const toggleInviteUser = () => {
   isShowInvite.value = !isShowInvite.value
 }
 
 const handleInvitation = async (email: string) => {
-
   if (!userGroupStore.activeGroup?.id) {
-
     return
   }
-
   await userGroupStore.inviteUser(email)
 }
 </script>
