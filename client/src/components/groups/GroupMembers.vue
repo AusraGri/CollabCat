@@ -26,10 +26,8 @@ const toggleInviteUser = () => {
 }
 
 const handleInvitation = async (email: string) => {
-  console.log('handling invitation', email)
 
   if (!userGroupStore.activeGroup?.id) {
-    console.log('no group id')
 
     return
   }

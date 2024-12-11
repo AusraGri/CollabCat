@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue'
-import { FwbButton} from 'flowbite-vue'
+import { ref, onMounted, watch, computed } from 'vue'
+import { FwbButton, FwbListGroupItem } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
 import { useUserStore } from '@/stores/userProfile'
@@ -10,43 +10,49 @@ import { stringToUrl } from '@/utils/helpers'
 import { useRouter } from 'vue-router'
 import GroupLayout from './GroupLayout.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
+import Notifications from '@/components/user/Notifications.vue'
+import NotificationList from '@/components/user/NotificationList.vue'
+import { type PublicInvitation } from '@server/shared/types'
+import user from '@server/controllers/user'
 
 const router = useRouter()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
-const invitations = ref()
+// const invitations = ref<PublicInvitation[]>()
+const invitations = computed(()=> userStore.invitations)
 
-onMounted(async()=>{
- await userGroupStore.fetchUserGroupsData()
- invitations.value = await userStore.fetchInvitations()
+onMounted(async () => {
+  await userGroupStore.fetchUserGroupsData()
+ await refreshInvitations()
 })
 
-// watchEffect(async () => {
-//     if (userGroupStore.activeGroup?.name) {
-//       const groupName = stringToUrl(userGroupStore.activeGroup.name);
-//       router.push({ name: 'Group', params: { group: groupName } });
-
-//       await userGroupStore.fetchUserGroupsData()
-//       await userGroupStore.getGroupMembers()
-//     }
-//   });
+const refreshInvitations = async () => {
+ await userStore.fetchInvitations()
+}
 
 </script>
 
 <template>
-  <div>{{ userStore.invitations }}</div>
-  <div v-if="userStore.user" class="flex items-center justify-between p-3 mt-3 mb-3 border-t border-b border-gray-200 bg-gray-50">
+  <div>{{ invitations }}</div>
+  <div
+    v-if="userStore.user"
+    class="mb-1 mt-1 flex items-center justify-between border-b border-t border-gray-200 bg-gray-50 p-3"
+  >
     <UserAvatarMenu :user="userStore.user" />
-    <GroupSelection/>
-    <div v-if="userStore.invitations" >
-      <div v-for="invitation in invitations" :key="invitation.id">
-        <Invitations  :invitation="invitation"/>
-      </div>
-    </div>
+    <GroupSelection />
+    <Notifications :has-notifications="!!invitations?.length">
+      <template #notifications>
+        <FwbListGroupItem
+        class="flex flex-col p-4 space-y-2 bg-gray-100 dark:bg-gray-700"
+        v-for="invitation in invitations"
+        :key="invitation.id"
+      >
+        <Invitations :invitation="invitation" @invitation:action="refreshInvitations"/>
+      </FwbListGroupItem>
+      </template>
+    </Notifications>
   </div>
-<div>
-  <GroupLayout v-if="userGroupStore.isInGroup"/>
-</div>
+  <GroupLayout v-if="userGroupStore.isInGroup" />
   <main>
     <div class="container mx-auto px-6 py-6">
       <RouterView />

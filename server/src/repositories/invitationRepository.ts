@@ -22,7 +22,7 @@ export function invitationsRepository(db: Database) {
     },
 
     async getInvitationByEmail(
-      email: Invitations['email']
+      email: Invitations['email'],
     ): Promise<Selectable<Invitations>[]> {
       return db
         .selectFrom('invitations')
@@ -43,13 +43,13 @@ export function invitationsRepository(db: Database) {
 
     async getInvitationByGroupAndEmail(
       data: GroupInvitationData
-    ): Promise<Selectable<Invitations>[] | undefined> {
+    ): Promise<Selectable<Invitations> | undefined> {
       return db
         .selectFrom('invitations')
         .select(invitationsKeysAll)
         .where('email', '=', data.email)
         .where('groupId', '=', data.groupId)
-        .execute()
+        .executeTakeFirst()
     },
 
     async deleteInvitation(

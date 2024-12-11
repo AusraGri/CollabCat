@@ -54,9 +54,11 @@ export default groupAuthProcedure
       })
     }
     // check if this user is not already invited
-    const [isUserInvited] =
-      await repos.invitationsRepository.getInvitationByEmail(email)
-
+    const isUserInvited =
+      await repos.invitationsRepository.getInvitationByGroupAndEmail({
+        email,
+        groupId: userGroup.groupId,
+      })
 
     if (isUserInvited) {
       throw new TRPCError({

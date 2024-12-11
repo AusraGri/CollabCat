@@ -1,32 +1,48 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import { UserPublic, type GroupsPublic, type PublicInvitation } from '@server/shared/types'
+import { trpc } from '@/trpc'
+import { useUserStore } from '@/stores/userProfile'
+import { type PublicInvitation, type InvitationData } from '@server/shared/types'
 import { FwbListGroup, FwbListGroupItem, FwbAvatar, FwbButton } from 'flowbite-vue'
-import { useInvitationStore } from '../../stores/invitationStore'
 
 const { invitation } = defineProps<{
   invitation: PublicInvitation
 }>()
 
-const invitationStore = useInvitationStore()
-const group = ref<GroupsPublic>()
-const inviter = ref<UserPublic>()
+const emit = defineEmits<{
+  (e: 'invitation:action'): void
+}>()
+const userStore = useUserStore()
+const invitationData = ref<InvitationData>()
 
-const isInvitationData = computed<Boolean>(() => !!(group.value && inviter.value))
+const isInvitationData = computed<Boolean>(() => !!invitationData.value)
+
+const getInvitationData = async (invitationToken: string) => {
+  try {
+    return await trpc.invitations.getInvitationData.query({ invitationToken })
+  } catch (error) {
+    console.log('error getting invitation data')
+  }
+}
 
 onMounted(async () => {
-  invitationStore.invitationToken = invitation.invitationToken
-  try {
-    await invitationStore.validateInvitationToken()
-  } catch {
-    await invitationStore.deleteInvitation()
-  }
-
-  if (invitationStore.invitationToken) {
-    group.value = await invitationStore.getGroupData()
-    inviter.value = await invitationStore.getInviterData()
-  }
+  invitationData.value = await getInvitationData(invitation.invitationToken)
 })
+
+const confirmInvitation = async (value: boolean) => {
+  try {
+    if (value) {
+      await trpc.groups.addUserToGroup.mutate({ groupId: invitation.groupId })
+
+    }
+
+    await userStore.deleteInvitation(invitation)
+    invitationData.value = undefined
+    emit('invitation:action')
+  } catch (error) {
+    console.log('error:', error)
+  }
+}
 </script>
 
 <template>
@@ -34,19 +50,23 @@ onMounted(async () => {
     <FwbListGroup>
       <FwbListGroupItem class="justify-between">
         <div class="flex w-fit flex-col align-middle">
-          <div class="border-b-2">{{ group?.name }}</div>
+          <div class="border-b-2">{{ invitationData?.groupName }}</div>
           <div class="mt-1 flex w-fit items-center justify-between">
             <div>
-              <FwbAvatar :img="inviter?.picture || undefined" rounded size="sm" />
+              <FwbAvatar :img="invitationData?.groupOwner.picture || undefined" rounded size="sm" />
             </div>
             <div class="w-fit whitespace-nowrap">
-              {{ inviter?.username }}
+              {{ invitationData?.groupOwner.username }}
             </div>
           </div>
         </div>
         <div class="ml-3 flex w-fit flex-col align-middle">
-          <FwbButton color="green" size="xs" class="m-1">accept</FwbButton>
-          <FwbButton color="pink" size="xs" class="m-1">decline</FwbButton>
+          <FwbButton @click="confirmInvitation(true)" color="green" size="xs" class="m-1"
+            >accept</FwbButton
+          >
+          <FwbButton @click="confirmInvitation(false)" color="pink" size="xs" class="m-1"
+            >decline</FwbButton
+          >
         </div>
       </FwbListGroupItem>
     </FwbListGroup>

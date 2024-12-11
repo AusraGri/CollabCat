@@ -75,13 +75,14 @@ export const useUserGroupsStore = defineStore('group', {
       }
     },
     async inviteUser(email: string) {
+      console.log('store trying to invite')
       try {
         const groupId = this.activeGroup?.id
+        if (!groupId) throw new Error('No group id')
 
-        if (groupId) {
-          const invitation = await trpc.groups.inviteUser.mutate({ groupId, email })
-          return invitation
-        }
+        const invitation = await trpc.groups.inviteUser.mutate({ groupId, email })
+
+        return invitation
       } catch (error) {
         console.error('Failed to invite user:', error)
       }

@@ -49,6 +49,17 @@ export const useUserStore = defineStore('user', {
         console.error('Failed to fetch user groups data:', error)
       }
     },
+    async deleteInvitation(invitation: PublicInvitation) {
+      try {
+        this.invitations = this.invitations?.filter((inv) => inv != invitation) || null
+
+        await trpc.invitations.deleteInvitation.mutate({
+          invitationToken: invitation.invitationToken,
+        })
+      } catch (error) {
+        console.log('error while deleting invitation')
+      }
+    },
 
     updateUserName(newName: string) {
       if (!this.user) return
