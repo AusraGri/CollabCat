@@ -5,6 +5,7 @@ import type {
   PublicReward,
   GroupData,
   InsertableReward,
+  GroupMember,
 } from '@server/shared/types'
 type GroupsPublic = {
   id: number
@@ -24,7 +25,7 @@ interface GroupsState {
   userGroups: GroupsPublic[] | null
   activeGroup: ActiveGroup | null
   userMembership: any | null
-  groupMembers: any | null
+  groupMembers: GroupMember[] | null
   rewards: Omit<PublicReward, 'groupId'>[] | null
   groupData: GroupData | null
 }
@@ -95,17 +96,17 @@ export const useUserGroupsStore = defineStore('group', {
         console.error('Failed to create new group:', error)
       }
     },
-    async getGroupMembers() {
-      try {
-        const groupId = this.activeGroup?.id
-        if (groupId) {
-          const members = await trpc.groups.getGroupMembers.query({ groupId })
-          this.groupMembers = members
-        }
-      } catch (error) {
-        console.error('Failed to create new group:', error)
-      }
-    },
+    // async getGroupMembers() {
+    //   try {
+    //     const groupId = this.activeGroup?.id
+    //     if (groupId) {
+    //       const members = await trpc.groups.getGroupMembers.query({ groupId })
+    //       this.groupMembers = members
+    //     }
+    //   } catch (error) {
+    //     console.error('Failed to create new group:', error)
+    //   }
+    // },
     async inviteUser(email: string) {
       console.log('store trying to invite')
       try {

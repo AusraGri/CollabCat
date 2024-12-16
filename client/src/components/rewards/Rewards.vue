@@ -3,10 +3,12 @@ import type { InsertableReward } from '@server/shared/types';
 import { onMounted, ref, computed } from 'vue'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem,} from 'flowbite-vue'
 import { useUserGroupsStore } from '@/stores/userGroups'
-import { trpc } from '@/trpc';
+import { useUserStore } from '@/stores/userProfile';
 import NewRewardModule from './NewRewardModule.vue';
+import RewardItem from './RewardItem.vue';
 
 const userGroupStore = useUserGroupsStore()
+const userStore = useUserStore()
 const isNewReward = ref(false)
 
 const rewards = computed(()=> userGroupStore.rewards)
@@ -17,23 +19,28 @@ const toggleAddReward = ()=> {
 }
 
 const handleNewReward= async(reward: InsertableReward)=>{
-    console.log('handling invitation', reward)
-    await userGroupStore.createNewReward(reward)
-if(!userGroupStore.activeGroup?.id){
+  if(!userGroupStore.activeGroup?.id){
     console.log('no group id')
     return
+  }
+  console.log('handling reward', reward)
+  await userGroupStore.createNewReward(reward)
 }
 
-const invitation = await trpc.groups.inviteUser.mutate({groupId: userGroupStore.activeGroup?.id, email: 'dmforlove@yahoo.com'})
-   console.log('invitation', invitation)
-}
+const currentUser = computed(() => {
+  const groupMembers = userGroupStore.groupMembers || [];
+  const currentUser = userStore.user;
+
+  return currentUser ? groupMembers.find((member) => member.id === currentUser.id)  : undefined
+});
+
 </script>
 <template>
-  <div class="w-full">
+  <div class="flex flex-col flex-nowrap">
     <FwbDropdown text="Rewards">
-      <fwb-list-group>
-        <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover >
-            <div class="ml-2">{{ reward.title }}</div>
+      <fwb-list-group class="w-fit">
+        <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover>
+            <RewardItem v-if="currentUser" :reward="reward" :member="currentUser"/>
         </FwbListGroupItem>
         <FwbListGroupItem>
           <button
@@ -45,7 +52,9 @@ const invitation = await trpc.groups.inviteUser.mutate({groupId: userGroupStore.
         </FwbListGroupItem>
       </fwb-list-group>
     </FwbDropdown>
-    <NewRewardModule :is-show-modal="isNewReward" @reward:new="handleNewReward" @close="toggleAddReward"/>
+    <div>
+      <NewRewardModule :is-show-modal="isNewReward" @reward:new="handleNewReward" @close="toggleAddReward"/>
+    </div>
   </div>
 </template>
 

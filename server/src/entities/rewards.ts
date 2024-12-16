@@ -48,4 +48,5 @@ export const rewardsKeysAll = Object.keys(
 
 export type InsertableReward = z.infer<typeof createRewardSchema>
 export type PublicReward = z.infer<typeof rewardsSchemaOutput>
+export type GroupReward = Omit<PublicReward, 'groupId'>
 export type RewardUpdateables = Omit<Rewards, 'createdByUserId' | 'id'>

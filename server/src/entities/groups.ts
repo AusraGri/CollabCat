@@ -23,6 +23,14 @@ export const insertGroupSchema = groupsSchema.omit({
   createdAt: true,
 })
 
+export const memberSchema = z.object({
+  id: idSchema,
+  email: z.string().email(),
+  picture: z.string().nullable(),
+  username: z.string().nullable(),
+  role: z.string(),
+  points: z.number().nullable()
+});
 export const groupDataSchema = z.object({
   id: idSchema,
   name: z.string(),
@@ -49,6 +57,8 @@ export type GroupsPublic = Pick<
 
 export type GroupData = z.infer<typeof groupDataSchema>
 export type InsertableGroups = Insertable<Groups>
+export type GroupMember = z.infer<typeof memberSchema>;
+
 
 export const authGroup = userGroupsSchema.omit({ userId: true })
 

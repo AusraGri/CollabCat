@@ -33,7 +33,7 @@ const closeModal = () => {
     </template>
     <template #body>
       <div>
-        <form action="">
+        <form>
           <FwbInput label="Group Name" placeholder="enter group name" v-model="name" />
         </form>
       </div>
