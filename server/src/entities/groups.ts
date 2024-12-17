@@ -34,7 +34,7 @@ export const memberSchema = z.object({
 export const groupDataSchema = z.object({
   id: idSchema,
   name: z.string(),
-  rewards: z.array(rewardsSchemaOutput.omit({groupId:true})).optional(),
+  rewards: z.array(rewardsSchemaOutput).optional(),
   members: z.array(z.object({
     id: idSchema,
     email: z.string().email(),

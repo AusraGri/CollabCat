@@ -3,6 +3,7 @@ import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { idSchema } from '@server/entities/shared'
 import z from 'zod'
+import type { GroupMember } from '@server/entities/groups'
 
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
@@ -12,7 +13,8 @@ export default groupAuthProcedure
     })
   )
   .query(async ({ input: { userId }, ctx: { authUser, repos, userGroup } }) => {
-    let groupMembership
+    let groupMembership: GroupMember
+    
     if (!userGroup?.groupId) {
       throw new Error('Group ID is missing in the context.')
     }
@@ -26,6 +28,5 @@ export default groupAuthProcedure
         { userId: authUser.id, groupId: userGroup.groupId }
       )
     }
-
     return groupMembership
   })

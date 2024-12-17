@@ -51,7 +51,8 @@ function confirmAction(confirmed: boolean) {
     isTitleValid.value = titleValidation(reward.value.title)
     return
   }
-  emit('reward:new', { ...reward.value, amount: amount.value })
+  const targetIds = selectedMembers.value.length ? selectedMembers.value.map((member)=> member.id) : null
+  emit('reward:new', { ...reward.value, amount: amount.value, targetUserIds: targetIds })
   emit('close')
   resetReactiveValues()
 

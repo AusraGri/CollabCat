@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type {
-  PublicInvitation,
   PublicReward,
   GroupData,
   InsertableReward,
@@ -24,9 +23,9 @@ export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
 interface GroupsState {
   userGroups: GroupsPublic[] | null
   activeGroup: ActiveGroup | null
-  userMembership: any | null
+  userMembership: GroupMember | null
   groupMembers: GroupMember[] | null
-  rewards: Omit<PublicReward, 'groupId'>[] | null
+  rewards: PublicReward[] | null
   groupData: GroupData | null
 }
 
@@ -121,7 +120,7 @@ export const useUserGroupsStore = defineStore('group', {
       }
     },
     // fetch active user group information with role and permissions
-    async fetchUserMembershipInfo(userId: number) {
+    async fetchUserMembershipInfo(userId?: number) {
       try {
         const groupId = this.activeGroup?.id
 

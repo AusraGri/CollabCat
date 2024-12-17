@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { GroupMember, GroupReward } from '@server/shared/types'
+import type { GroupMember, PublicReward } from '@server/shared/types'
 import { FwbBadge, FwbButton } from 'flowbite-vue'
 
 const { reward, member } = defineProps<{
-  reward: GroupReward
+  reward: PublicReward
   member: GroupMember
+  claimers?: GroupMember[]
 }>()
 
 const emit = defineEmits<{
-  (event: 'reward:edit', value: GroupReward): void
-  (event: 'reward:delete', value: GroupReward ): void
-  (event: 'reward:claim', value: GroupReward ): void
+  (event: 'reward:change', value: {reward: PublicReward, action: 'delete' | 'edit' | 'claim'}): void
 }>()
 
 const isAdmin = computed(() => member.role === 'Admin')
@@ -23,6 +22,11 @@ const isEnoughPoints = computed(() => {
 })
 
 const pointsBadgeColor = computed(() => (isEnoughPoints.value ? 'green' : 'red'))
+
+
+const handleRewardEvents = (action: 'delete' | 'edit' | 'claim') => {
+  emit('reward:change', { reward, action });
+};
 </script>
 <template>
   <div class="flex w-full flex-col">
@@ -57,14 +61,17 @@ const pointsBadgeColor = computed(() => (isEnoughPoints.value ? 'green' : 'red')
         </FwbBadge>
       </div>
     </div>
+    <div> targets: {{ reward.targetUserIds }}</div>
 
     <div class="mt-3 flex justify-end">
-      <div v-if="isEnoughPoints" class="mr-3 bg-slate-400">claim</div>
+      <div v-if="isEnoughPoints" @click="handleRewardEvents('claim')" class="mr-3 bg-slate-400">
+        claim
+      </div>
       <div v-if="isAdmin" class="mr-3">
-        <FwbButton color="yellow" size="xs" @click="editReward">Edit</FwbButton>
+        <FwbButton color="yellow" size="xs" @click="handleRewardEvents('edit')">Edit</FwbButton>
       </div>
       <div v-if="isAdmin">
-        <FwbButton color="red" size="xs">delete</FwbButton>
+        <FwbButton color="red" size="xs" @click="handleRewardEvents('delete')">delete</FwbButton>
       </div>
     </div>
   </div>

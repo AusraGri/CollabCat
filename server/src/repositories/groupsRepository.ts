@@ -146,32 +146,15 @@ export function groupsRepository(db: Database) {
     async getUserGroupMembershipInfo(data: GroupUserData) {
       return db
         .selectFrom('userGroups')
-        .innerJoin('groups', 'groups.id', 'userGroups.groupId')
         .innerJoin('user', 'userGroups.userId', 'user.id')
-        .select((eb) => [
-          'userGroups.groupId',
-          'userGroups.userId',
+        .leftJoin('points', 'userGroups.groupId', 'points.groupId')
+        .select([
+          'user.id',
           'user.username',
           'user.picture',
+          'user.email',
           'userGroups.role',
-          'groups.name',
-          jsonArrayFrom(
-            eb
-              .selectFrom('permissions')
-              .select(['permissions.permissionName'])
-              .innerJoin(
-                'userGroupPermissions',
-                'permissions.id',
-                'userGroupPermissions.permissionId'
-              )
-              .whereRef(
-                'userGroupPermissions.groupId',
-                '=',
-                'userGroups.groupId'
-              )
-              .where('userGroupPermissions.groupId', '=', data.groupId)
-              .where('userGroupPermissions.userId', '=', data.userId)
-          ).as('permissions'),
+          'points.points',
         ])
         .where('userGroups.groupId', '=', data.groupId)
         .where('userGroups.userId', '=', data.userId)
@@ -187,6 +170,7 @@ export function groupsRepository(db: Database) {
             eb
               .selectFrom('rewards')
               .select([
+                'rewards.groupId',
                 'rewards.amount',
                 'rewards.cost',
                 'rewards.createdByUserId',
