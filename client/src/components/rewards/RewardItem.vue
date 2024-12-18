@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'
 import type { GroupMember, PublicReward } from '@server/shared/types'
 import { FwbBadge, FwbButton } from 'flowbite-vue'
+import UserBasicProfile from '../user/UserBasicProfile.vue';
+import ConfirmationModal from '../ConfirmationModal.vue';
 
 const { reward, member } = defineProps<{
   reward: PublicReward
@@ -13,6 +15,7 @@ const emit = defineEmits<{
   (event: 'reward:change', value: {reward: PublicReward, action: 'delete' | 'edit' | 'claim'}): void
 }>()
 
+const isDeletion = ref(false)
 const isAdmin = computed(() => member.role === 'Admin')
 
 const isEnoughPoints = computed(() => {
@@ -27,6 +30,17 @@ const pointsBadgeColor = computed(() => (isEnoughPoints.value ? 'green' : 'red')
 const handleRewardEvents = (action: 'delete' | 'edit' | 'claim') => {
   emit('reward:change', { reward, action });
 };
+
+const confirmDeletion = () => {
+isDeletion.value = true
+}
+
+const handleConfirmation = (event: boolean) => {
+  if(event){
+    handleRewardEvents('delete')
+  }
+  isDeletion.value = false
+}
 </script>
 <template>
   <div class="flex w-full flex-col">
@@ -61,7 +75,9 @@ const handleRewardEvents = (action: 'delete' | 'edit' | 'claim') => {
         </FwbBadge>
       </div>
     </div>
-    <div> targets: {{ reward.targetUserIds }}</div>
+    <div v-if="claimers" class=flex >
+        <UserBasicProfile v-for="claimer in claimers" :key="claimer.id" :user="claimer"/>
+    </div>
 
     <div class="mt-3 flex justify-end">
       <div v-if="isEnoughPoints" @click="handleRewardEvents('claim')" class="mr-3 bg-slate-400">
@@ -71,10 +87,11 @@ const handleRewardEvents = (action: 'delete' | 'edit' | 'claim') => {
         <FwbButton color="yellow" size="xs" @click="handleRewardEvents('edit')">Edit</FwbButton>
       </div>
       <div v-if="isAdmin">
-        <FwbButton color="red" size="xs" @click="handleRewardEvents('delete')">delete</FwbButton>
+        <FwbButton color="red" size="xs" @click="confirmDeletion">delete</FwbButton>
       </div>
     </div>
   </div>
+  <ConfirmationModal :is-show-modal="isDeletion" :action="'delete'" :object="reward.title" @delete="handleConfirmation"/>
 </template>
 
 <style scoped></style>

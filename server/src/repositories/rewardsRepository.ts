@@ -3,13 +3,11 @@ import type { Rewards } from '@server/database/types'
 import type { DeleteResult, Insertable, Selectable, Updateable } from 'kysely'
 import {
   rewardsKeysAll,
-  type RewardUpdateables,
 } from '@server/entities/rewards'
 
 export interface RewardUpdate {
   id: number
-  createdByUserId: number
-  reward: Updateable<RewardUpdateables>
+  reward: Updateable<Rewards>
 }
 
 export interface GetRewards {
@@ -73,12 +71,11 @@ export function rewardsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async updateReward(object: RewardUpdate): Promise<Selectable<Rewards>> {
+    async updateReward(reward: RewardUpdate): Promise<Selectable<Rewards>> {
       return db
         .updateTable('rewards')
-        .set(object.reward)
-        .where('createdByUserId', '=', object.createdByUserId)
-        .where('id', '=', object.id)
+        .set(reward.reward)
+        .where('id', '=', reward.id)
         .returning(rewardsKeysAll)
         .executeTakeFirstOrThrow()
     },

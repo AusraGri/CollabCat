@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import { FwbListGroupItem, FwbCheckbox } from 'flowbite-vue';
+import type { UserPublic} from '@server/shared/types';
 
 
 

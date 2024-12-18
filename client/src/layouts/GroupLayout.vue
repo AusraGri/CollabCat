@@ -33,10 +33,6 @@ watchEffect(async () => {
 })
 </script>
 <template>
-  <div>
-    reward store: {{ rewardStore.hasRewards }} {{ rewardStore.rewards}} {{ rewardStore.claimers }}
-  </div>
-  <div> active user {{rewardStore.activeUser}}</div>
   <div class="flex">
     <div>
       <!-- Show invited users in the same dropdown -->

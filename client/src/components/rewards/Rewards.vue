@@ -1,71 +1,67 @@
 <script setup lang="ts">
-import type { InsertableReward, PublicReward, GroupMember} from '@server/shared/types'
+import type { InsertableReward, PublicReward, GroupMember, RewardUpdateable} from '@server/shared/types'
 import { onMounted, ref, computed } from 'vue'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
 import { useUserGroupsStore } from '@/stores/userGroups'
 import { useUserStore } from '@/stores/userProfile'
+import { useRewardStore } from '@/stores/rewardStore'
 import NewRewardModule from './NewRewardModule.vue'
 import RewardItem from './RewardItem.vue'
 
-const { rewards, member } = defineProps<{
-  rewards: PublicReward[]
-  member: GroupMember
-  claimers?: GroupMember []
-}>()
 
-const userGroupStore = useUserGroupsStore()
-const userStore = useUserStore()
+const rewardStore = useRewardStore()
 const isNewReward = ref(false)
+const rewardToUpdate = ref()
+const rewards = computed(() => rewardStore.rewards)
 
+const getRewardClaimers = (reward: PublicReward) => {
 
-// prop for rewards and user
-// set rewards into reward store. each group or user fetch data will provide new rewards. 
-// const rewards = computed(() => userGroupStore.rewards)
+  return rewardStore.claimers?.filter((user) => 
+  reward.targetUserIds?.includes(user.id)
+) || [];
+}
 
 const isShowRewards = computed(() => {
-  const isRewards = rewards ? rewards.length > 0 : false
-  const isAdmin = member.role ? member.role === 'Admin' : false
+  const isRewards = rewardStore.hasRewards
+  const isAdmin = rewardStore.activeUser?.role ? rewardStore.activeUser?.role === 'Admin' : false
 
   return isAdmin || isRewards
 })
 
 const toggleAddReward = () => {
   isNewReward.value = !isNewReward.value
+  rewardToUpdate.value = ''
 }
 
 const handleNewReward = async (reward: InsertableReward) => {
-  if (!userGroupStore.activeGroup?.id) {
-    console.log('no group id')
-    return
-  }
   console.log('handling reward', reward)
-  await userGroupStore.createNewReward(reward)
+  await rewardStore.createReward(reward)
 }
-// better get the user data in the user store or assign userMembership from userGroups
-// const currentUser = computed(() => {
-//   const groupMembers = userGroupStore.groupMembers || []
-//   const currentUser = userStore.user
 
-//   return currentUser ? groupMembers.find((member) => member.id === currentUser.id) : undefined
-// })
 const currentUser = computed(() => {
-  // return userGroupStore.userMembership
-  return member
+  return rewardStore.activeUser
 })
 
-const handleRewardChange = ({ reward, action }: { reward: PublicReward; action: 'delete' | 'edit' | 'claim' }) => {
+const handleRewardUpdate = async (reward: RewardUpdateable) => {
+  console.log('updated reward: ', reward)
+  await rewardStore.updateReward(reward)
+}
+
+const handleRewardChange = async ({ reward, action }: { reward: PublicReward; action: 'delete' | 'edit' | 'claim' }) => {
   switch (action) {
     case 'delete':
-      // Handle delete
+    await rewardStore.deleteReward(reward.id)
       break;
     case 'edit':
-      // Handle edit
+      rewardToUpdate.value = reward
+      isNewReward.value = true
       break;
     case 'claim':
       // Handle claim
       break;
     default:
-      console.error('Unknown action');
+      isNewReward.value = false
+      rewardToUpdate.value = ''
   }
 };
 </script>
@@ -74,7 +70,7 @@ const handleRewardChange = ({ reward, action }: { reward: PublicReward; action: 
     <FwbDropdown text="Rewards">
       <fwb-list-group class="w-fit">
         <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover>
-          <RewardItem v-if="currentUser" :reward="reward" :member="currentUser" @reward:change="handleRewardChange" />
+          <RewardItem v-if="currentUser" :reward="reward" :member="currentUser" :claimers="getRewardClaimers(reward)" @reward:change="handleRewardChange" />
         </FwbListGroupItem>
         <FwbListGroupItem>
           <button
@@ -89,7 +85,9 @@ const handleRewardChange = ({ reward, action }: { reward: PublicReward; action: 
     <div>
       <NewRewardModule
         :is-show-modal="isNewReward"
+        :reward-update="rewardToUpdate"
         @reward:new="handleNewReward"
+        @reward:update="handleRewardUpdate"
         @close="toggleAddReward"
       />
     </div>

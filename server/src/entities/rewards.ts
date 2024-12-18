@@ -42,6 +42,33 @@ export const createRewardSchema = rewardsSchema.omit({
   createdByUserId: true,
   id: true,
 })
+
+export const updateRewardSchema = z.object({
+  amount: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Amount of reward claims'),
+  cost: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('The needed points to claim the reward'),
+  groupId: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('To what group reward is created'),
+  id: idSchema,
+  targetUserIds: z
+    .array(idSchema)
+    .optional()
+    .describe('For making reward available for picked users only'),
+  title: z.string().min(3).max(100).optional(),
+})
 export const rewardsKeysAll = Object.keys(
   rewardsSchema.shape
 ) as (keyof Rewards)[]
@@ -49,4 +76,4 @@ export const rewardsKeysAll = Object.keys(
 export type InsertableReward = z.infer<typeof createRewardSchema>
 export type PublicReward = z.infer<typeof rewardsSchemaOutput>
 
-export type RewardUpdateables = Omit<Rewards, 'createdByUserId' | 'id'>
+export type RewardUpdateable = z.infer<typeof updateRewardSchema>

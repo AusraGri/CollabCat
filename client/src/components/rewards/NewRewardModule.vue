@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useUserGroupsStore } from '@/stores/userGroups'
+import { ref, computed, watch } from 'vue'
+import { useRewardStore } from '@/stores/rewardStore'
 import {
   FwbButton,
   FwbModal,
@@ -12,27 +12,32 @@ import {
   FwbListGroup,
   FwbListGroupItem,
 } from 'flowbite-vue'
-import type { GroupMember } from '@server/shared/types'
+import type { GroupMember, PublicReward, RewardUpdateable } from '@server/shared/types'
 
-const { isShowModal } = defineProps<{
+const { isShowModal, rewardUpdate } = defineProps<{
   isShowModal: boolean
+  rewardUpdate?: PublicReward
 }>()
 
 const emit = defineEmits<{
   (event: 'reward:new', value: any): void
+  (event: 'reward:update', value: RewardUpdateable): void
   (event: 'close'): void
 }>()
 
-const userGroupStore = useUserGroupsStore()
+const headerText = computed(() => (rewardUpdate ? 'Update Reward' : 'Create New Reward'))
+const buttonText = computed(() => (rewardUpdate ? 'Update' : 'Add'))
+
+const rewardStore = useRewardStore()
 const isClaims = ref(false)
 const isForAll = ref(true)
+const isForGroup = computed(() => rewardStore.isGroup)
 const claimValue = ref(1)
-const claimValueLabel = computed(()=> `Reward claims: ${claimValue.value}`)
-const members = computed(() => userGroupStore.groupMembers)
+const claimValueLabel = computed(() => `Reward claims: ${claimValue.value}`)
+const members = computed(() => rewardStore.claimers)
 const selectedMembers = ref<GroupMember[]>([])
-const cost = ref()
 
-const amount = computed(() => isClaims.value ? Number(claimValue.value) : undefined)
+const amount = computed(() => (isClaims.value ? Number(claimValue.value) : undefined))
 
 const isCostValid = ref(true)
 const isTitleValid = ref(true)
@@ -51,18 +56,30 @@ function confirmAction(confirmed: boolean) {
     isTitleValid.value = titleValidation(reward.value.title)
     return
   }
-  const targetIds = selectedMembers.value.length ? selectedMembers.value.map((member)=> member.id) : null
-  emit('reward:new', { ...reward.value, amount: amount.value, targetUserIds: targetIds })
+  const targetIds = selectedMembers.value.length
+    ? selectedMembers.value.map((member) => member.id)
+    : undefined
+
+  if (rewardUpdate) {
+    emit('reward:update', {
+      ...rewardUpdate,
+      groupId: rewardUpdate.groupId || undefined,
+      title: reward.value.title,
+      cost: Number(reward.value.cost) || undefined,
+      amount: amount.value || undefined,
+      targetUserIds: targetIds,
+    })
+  } else {
+    emit('reward:new', { ...reward.value, amount: amount.value, targetUserIds: targetIds, groupId: rewardStore.groupId || undefined })
+  }
   emit('close')
   resetReactiveValues()
-
 }
 
 const resetReactiveValues = () => {
   isClaims.value = false
   claimValue.value = 1
   isCostValid.value = true
-  cost.value = ''
   reward.value = {
     title: '',
     cost: '',
@@ -71,7 +88,7 @@ const resetReactiveValues = () => {
 
 const closeModal = () => {
   console.log(reward.value)
- resetReactiveValues()
+  resetReactiveValues()
   emit('close')
 }
 
@@ -88,6 +105,14 @@ const titleValidation = (value: any) => {
   return title.length >= 3 && title.length <= 40
 }
 
+function getSelectedMembersForUpdate(): GroupMember[] {
+  const selectedMembers = rewardStore.claimers?.filter((user) =>
+    rewardUpdate?.targetUserIds?.includes(user.id)
+  )
+
+  return selectedMembers ?? []
+}
+
 const isMemberChecked = (member: GroupMember) => {
   return selectedMembers.value.some((selected) => selected.id === member.id)
 }
@@ -100,12 +125,27 @@ const updateValue = (event: Event, member: GroupMember) => {
     selectedMembers.value = selectedMembers.value.filter((selected) => selected.id !== member.id)
   }
 }
+
+watch(
+  () => rewardUpdate,
+  (newRewardUpdate) => {
+    if (newRewardUpdate) {
+      selectedMembers.value = getSelectedMembersForUpdate()
+      reward.value.title = newRewardUpdate.title
+      reward.value.cost = String(newRewardUpdate.cost)
+      isClaims.value = newRewardUpdate.amount ? true : false
+      claimValue.value = newRewardUpdate.amount || 1
+      isForAll.value = newRewardUpdate.targetUserIds ? false : true
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <FwbModal v-if="isShowModal" @close="closeModal">
     <template #header>
-      <div class="flex items-center text-lg">Create New Reward</div>
+      <div class="flex items-center text-lg">{{ headerText }}</div>
     </template>
     <template #body>
       <form @submit.prevent>
@@ -117,20 +157,20 @@ const updateValue = (event: Event, member: GroupMember) => {
             placeholder="enter reward title"
             v-model="reward.title"
           >
-          <template #validationMessage v-if="!isTitleValid">
+            <template #validationMessage v-if="!isTitleValid">
               <span class="text-red-600">Please enter a valid reward title</span>
             </template>
-        </FwbInput>
+          </FwbInput>
         </div>
         <div class="flex flex-col">
           <div class="mb-3">
             <FwbToggle label="Limit Reward Claims" v-model="isClaims" />
           </div>
-          <div v-if="isClaims" class="flex-grow mb-3">
+          <div v-if="isClaims" class="mb-3 flex-grow">
             <FwbRange v-model="claimValue" :label="claimValueLabel" :min="1" />
           </div>
         </div>
-        <div>
+        <div v-if="isForGroup">
           <div class="mb-3">
             <FwbToggle label="All Members Can Claim" v-model="isForAll" />
           </div>
@@ -174,7 +214,9 @@ const updateValue = (event: Event, member: GroupMember) => {
     <template #footer>
       <div class="flex justify-between">
         <fwb-button @click="confirmAction(false)" color="alternative"> Decline </fwb-button>
-        <fwb-button @click="confirmAction(true)" color="green"> Add Reward </fwb-button>
+        <fwb-button @click="confirmAction(true)" color="green">
+          {{ buttonText }} Reward
+        </fwb-button>
       </div>
     </template>
   </FwbModal>

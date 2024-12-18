@@ -6,6 +6,7 @@ import type {
   GroupMember,
   InsertableReward,
   UserPublic,
+  RewardUpdateable,
 } from '@server/shared/types'
 
 export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
@@ -42,7 +43,6 @@ export const useRewardStore = defineStore('reward', {
         this.rewards = data.rewards ?? null
         this.claimers = data.members
         this.activeUser = await trpc.groups.getMembershipInfo.query({ groupId })
-
       } catch (error) {
         throw new Error('Failed to initialize group rewards')
       }
@@ -67,16 +67,19 @@ export const useRewardStore = defineStore('reward', {
       }
     },
 
-    async editReward(rewardId: number) {
+    async updateReward(reward: RewardUpdateable) {
       try {
-        console.log(rewardId)
+        const updatedReward = await trpc.rewards.update.mutate(reward)
+
+        this.rewards = this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
       } catch (error) {
         throw new Error('Failed to edit reward')
       }
     },
     async deleteReward(rewardId: number) {
       try {
-        console.log(rewardId)
+        await trpc.rewards.deleteReward.mutate({ rewardId })
+        this.rewards = this.rewards?.filter((r) => r.id !== rewardId) || null
       } catch (error) {
         throw new Error('Failed to delete reward')
       }

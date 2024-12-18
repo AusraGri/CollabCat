@@ -25,7 +25,7 @@ function confirmAction(confirmed: boolean) {
       <div class="flex items-center text-lg">Please Confirm the Action</div>
     </template>
     <template #body>
-    <p>Do you really want to <span class=" text-red-600">{{ action }}</span> {{ object }}</p>
+    <p>Do you really want to <span class=" text-red-600">{{ action }}</span> <span class=" font-extrabold text-base">{{ object }}</span> ?</p>
     </template>
     <template #footer>
       <div class="flex justify-between">
