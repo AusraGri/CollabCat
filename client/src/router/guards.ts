@@ -5,17 +5,15 @@ import { useUserStore, type UserStore } from '@/stores/userProfile'
 import { useAuthService } from '@/services/auth0'
 
 // export const authenticate = async () => {
-//   // const { isAuthenticated, getAccessTokenSilently } = useAuth0()
-//   const { isAuth, getToken } = useAuthService()
+//   const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 
 //   const authStore = useAuthStore()
 //   const userStore = useUserStore()
 
-//   // const token = await getAccessTokenSilently()
-//   const token = await getToken()
+//   const token = await getAccessTokenSilently()
 //   authStore.authToken = token
 
-//   if (!isAuth || !authStore.authToken) return { name: 'Login' }
+//   if (!isAuthenticated || !authStore.authToken) return { name: 'Login' }
 
 //   await userStore.fetchUserData()
 
@@ -27,24 +25,23 @@ export const authenticate = async (
   from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) => {
-  console.log('Authentication in progress...')
-
-  const { isAuth, getToken } = useAuthService()
+  // const { isAuth, getToken } = useAuthService()
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0()
   const authStore = useAuthStore()
-  const userStore :UserStore = useUserStore()
+  const userStore: UserStore = useUserStore()
 
   try {
-    const token = await getToken()
+    // const token = await getToken()
+    const token = await getAccessTokenSilently()
 
     authStore.authToken = token
 
-    if (!isAuth || !authStore.authToken) {
-      console.log('Authentication failed, redirecting to login...')
+    if (!isAuthenticated || !authStore.authToken) {
+      console.log('not authenticated')
       return next({ name: 'Login' })
     }
 
     await userStore.fetchUserData()
-    console.log('User data fetched successfully')
 
     next()
   } catch (error) {

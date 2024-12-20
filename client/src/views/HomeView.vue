@@ -28,11 +28,7 @@ const users = ref()
 
 const handleAuthRedirect = async () => {
   try {
-    // Check if the user is authenticated after the redirect
-    // if (!isAuthenticated.value) {
-    //   console.log('User is not authenticated yet.')
-    //   return
-    // }
+ 
     if (!isAuth) {
       console.log('User is not authenticated yet.')
       return
@@ -45,13 +41,7 @@ const handleAuthRedirect = async () => {
     authStore.setAuthToken(idToken)
     let routeUsername: string
     try {
-      // if (user.value?.email && user.value?.name && user.value.picture) {
-      //   const newUser = {
-      //     auth0Token: idToken,
-      //     email: user.value.email,
-      //     username: user.value.name,
-      //     picture: user.value.picture,
-      //   }
+    
       const newUser = await getUserData()
         const signedUser = await trpc.user.signupAuth.mutate(newUser)
         userStore.user = signedUser
