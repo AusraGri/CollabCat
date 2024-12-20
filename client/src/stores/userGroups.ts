@@ -41,6 +41,8 @@ export const useUserGroupsStore = defineStore('group', {
 
   getters: {
     isInGroup: (state) => !!state.activeGroup,
+    isAdmin: (state) => state.userMembership?.role === 'Admin',
+    hasPoints: (state)=> state.userMembership?.points !== null,
   },
 
   actions: {
@@ -133,10 +135,10 @@ export const useUserGroupsStore = defineStore('group', {
       }
     },
   },
-  persist: {
-    storage: sessionStorage,
-    pick: ['activeGroup'],
-  },
+  // persist: {
+  //   storage: sessionStorage,
+  //   pick: ['activeGroup'],
+  // },
 })
 
 export type UserGroupsStore = ReturnType<typeof useUserGroupsStore>

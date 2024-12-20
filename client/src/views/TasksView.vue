@@ -1,19 +1,18 @@
 
 <script setup lang="ts">
-import TaskCard from '@/components/TaskCard.vue';
-import { type TasksDue } from '@server/shared/types';
+import {ref} from 'vue'
 
-const task = {
+const task = ref({
     title: 'title',
     points: 23,
     importance: 'High',
     assignedUserId: 1,
-} as Partial<TasksDue>
+})
 
 </script>
 <template>
     <div>
-<TaskCard :task="task"></TaskCard>
+Task view {{ task }}
     </div>
 </template>
 

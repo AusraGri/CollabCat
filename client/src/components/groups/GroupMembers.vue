@@ -6,19 +6,13 @@ import InviteUsers from './InviteUsers.vue'
 
 const userGroupStore = useUserGroupsStore()
 const isShowInvite = ref(false)
-
-// const members = ref()
 const members = computed(()=>userGroupStore.groupMembers)
 
-// onMounted(async () => {
-//   members.value = userGroupStore.groupMembers
-// })
+const openMemberSettings = () => {
+  if(!userGroupStore.isAdmin) return
 
-// watchEffect(async () => {
-//   if (userGroupStore.activeGroup?.name) {
-//     members.value = userGroupStore.groupMembers
-//   }
-// })
+  console.log('opening settings...')
+}
 
 const toggleInviteUser = () => {
   isShowInvite.value = !isShowInvite.value
@@ -33,13 +27,22 @@ const handleInvitation = async (email: string) => {
 </script>
 <template>
   <div class="w-full">
-    <FwbDropdown text="Members">
+    <FwbDropdown>
+      <template #trigger>
+      <span class=" self-center p-3 bg-slate-300 rounded cursor-pointer hover:bg-blue-100">
+        Members
+      </span>
+    </template>
       <fwb-list-group>
-        <FwbListGroupItem v-for="member in members" :key="member" hover>
-          <FwbAvatar :img="member.picture" rounded size="md" />
-          <div class="ml-2">{{ member.username }}</div>
+        <FwbListGroupItem v-for="member in members" :key="member.id" hover>
+          <button @click="openMemberSettings">
+            <div class="flex items-center">
+              <FwbAvatar :img="member.picture || undefined" rounded size="md" />
+              <div class="ml-2">{{ member.username }}</div>
+            </div>
+          </button>
         </FwbListGroupItem>
-        <FwbListGroupItem>
+        <FwbListGroupItem v-if="userGroupStore.isAdmin">
           <button
             class="w-full px-4 py-2 font-medium text-green-600 hover:bg-green-50"
             @click="toggleInviteUser"

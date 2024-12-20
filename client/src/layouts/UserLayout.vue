@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, watchEffect } from 'vue'
 import { FwbButton, FwbListGroupItem } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
 import { useUserStore } from '@/stores/userProfile'
 import { useUserGroupsStore } from '@/stores/userGroups'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
-import { stringToUrl } from '@/utils/helpers'
-import { useRouter } from 'vue-router'
 import GroupLayout from './GroupLayout.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
-import NotificationList from '@/components/user/NotificationList.vue'
-import { type PublicInvitation } from '@server/shared/types'
+import { useRouter } from 'vue-router'
+import { stringToUrl } from '@/utils/helpers'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -20,8 +18,6 @@ const userGroupStore = useUserGroupsStore()
 const invitations = computed(() => userStore.invitations)
 
 onMounted(async () => {
-  await userGroupStore.fetchUserGroups()
-
   if (userGroupStore.activeGroup) {
     await userGroupStore.fetchGroupData()
   }
@@ -31,6 +27,19 @@ onMounted(async () => {
 const refreshInvitations = async () => {
   await userStore.fetchInvitations()
 }
+watch(
+  () => userGroupStore.activeGroup?.name,
+  async (newGroupName, oldGroupName) => {
+    if (newGroupName !== oldGroupName && newGroupName) {
+      const groupName = stringToUrl(newGroupName)
+
+      router.push({ name: 'Group', params: { group: groupName } })
+
+      await userGroupStore.fetchGroupData()
+      await userGroupStore.fetchUserMembershipInfo()
+    }
+  }
+)
 </script>
 
 <template>
@@ -52,9 +61,8 @@ const refreshInvitations = async () => {
       </template>
     </Notifications>
   </div>
-  <GroupLayout v-if="userGroupStore.isInGroup" />
   <main>
-    <div class="container mx-auto px-6 py-6">
+    <div class="container">
       <RouterView />
     </div>
   </main>

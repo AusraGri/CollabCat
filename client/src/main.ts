@@ -2,7 +2,6 @@ import './assets/style.css'
 import { createAuth0} from '@auth0/auth0-vue'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { VueQueryPlugin } from '@tanstack/vue-query'
 import App from './App.vue'
 import router from './router'
 import VueDatePicker from '@vuepic/vue-datepicker';
@@ -15,7 +14,6 @@ pinia.use(piniaPluginPersistedstate);
 const app = createApp(App)
 
 app.use(pinia)
-app.use(VueQueryPlugin)
 app.use(router)
 app.use(
   createAuth0({

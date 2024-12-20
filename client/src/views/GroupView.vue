@@ -1,11 +1,13 @@
 
 <script setup lang="ts">
 import {ref} from 'vue'
+import { useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/userProfile';
 import { useAuthService } from '@/services/auth0';
 import { useUserGroupsStore } from '../stores/userGroups';
 
 const {isAuth} = useAuthService()
+const route = useRoute()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
 const groupData = ref()
@@ -23,10 +25,9 @@ this is Group page
 <br>
 <div>{{ groupData }}</div>
 <br>
-<div>{{ userGroupStore.activeGroup }}</div>
-<div>is loggedIn: {{ userStore.isLoggedIn }}</div>
-<div>is auth service {{ isAuth }}</div>
-<div>{{ userStore.user }}</div>
+    </div>
+    <div>
+        {{ route.fullPath }}
     </div>
 </template>
 

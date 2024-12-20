@@ -36,6 +36,7 @@ export default groupAuthProcedure
     const points = {
       userId: pointsData.userId,
       groupId: userGroup?.groupId,
+      points: 0
     }
 
     const pointsCreated = await repos.pointsRepository.createPoints(points)

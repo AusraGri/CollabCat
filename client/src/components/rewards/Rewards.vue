@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { InsertableReward, PublicReward, GroupMember, RewardUpdateable} from '@server/shared/types'
-import { onMounted, ref, computed } from 'vue'
+import type { InsertableReward, PublicReward, RewardUpdateable} from '@server/shared/types'
+import { ref, computed } from 'vue'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
-import { useUserGroupsStore } from '@/stores/userGroups'
-import { useUserStore } from '@/stores/userProfile'
 import { useRewardStore } from '@/stores/rewardStore'
 import NewRewardModule from './NewRewardModule.vue'
 import RewardItem from './RewardItem.vue'
@@ -67,7 +65,12 @@ const handleRewardChange = async ({ reward, action }: { reward: PublicReward; ac
 </script>
 <template>
   <div v-if="isShowRewards" class="flex flex-col flex-nowrap">
-    <FwbDropdown text="Rewards">
+    <FwbDropdown>
+      <template #trigger>
+      <span class=" self-center p-3 bg-slate-300 rounded cursor-pointer hover:bg-blue-100">
+        Rewards
+      </span>
+    </template>
       <fwb-list-group class="w-fit">
         <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover>
           <RewardItem v-if="currentUser" :reward="reward" :member="currentUser" :claimers="getRewardClaimers(reward)" @reward:change="handleRewardChange" />

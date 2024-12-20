@@ -1,56 +1,70 @@
 <script setup lang="ts">
 import { ref, onMounted, watchEffect, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useUserGroupsStore } from '@/stores/userGroups'
 import { useRouter } from 'vue-router'
-import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbButton } from 'flowbite-vue'
-import GroupMembers from '@/components/groups/GroupMembers.vue';
+import { FwbButton, FwbTabs, FwbTab } from 'flowbite-vue'
+import GroupMembers from '@/components/groups/GroupMembers.vue'
 import { stringToUrl } from '@/utils/helpers'
-import { useRewardStore } from '@/stores/rewardStore';
-import Rewards from '@/components/rewards/Rewards.vue';
+import { RouterView } from 'vue-router'
+import { useRewardStore } from '@/stores/rewardStore'
+import Rewards from '@/components/rewards/Rewards.vue'
+import Points from '@/components/points/Points.vue'
+import { RouterLink } from 'vue-router'
+
+type TabName = 'tasks' | 'calendar' | 'grades'
 
 const userGroupStore = useUserGroupsStore()
 const rewardStore = useRewardStore()
 const router = useRouter()
-
-const rewards = computed(()=> userGroupStore.rewards)
-const member = computed(()=> userGroupStore.userMembership)
-const claimers = computed(()=> userGroupStore.groupMembers ?? undefined)
+const route = useRoute()
+const points = computed(() => userGroupStore.userMembership?.points || 0)
+const activeTab = ref<TabName>('tasks')
 
 watchEffect(async () => {
-    if (userGroupStore.activeGroup?.name) {
-      const groupName = stringToUrl(userGroupStore.activeGroup.name);
-      router.push({ name: 'Group', params: { group: groupName } });
-      await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)
-    }
-    await userGroupStore.fetchUserGroups()
-    await userGroupStore.fetchGroupData()
-    await userGroupStore.fetchUserMembershipInfo()
-
-  });
-
-  onMounted(async()=>{
- await userGroupStore.fetchUserGroups()
+  if (userGroupStore.activeGroup?.name) {
+    await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)
+  }
 })
+
+onMounted(async () => {
+  await userGroupStore.fetchUserGroups()
+})
+
+const handlePaneClick = () => {
+  router
+    .push({ name: activeTab.value })
+    .then(() => {})
+    .catch((err) => {
+      console.error('Navigation error:', err)
+    })
+}
 </script>
 <template>
-  <div class="flex">
-    <div>
-      <!-- Show invited users in the same dropdown -->
-       <GroupMembers/>
+  <div class="flex flex-col">
+    <div class="flex flex-wrap items-center justify-center space-x-1 space-y-1">
+      <FwbTabs v-model="activeTab" @click:pane="handlePaneClick" variant="underline" class="p-5">
+        <FwbTab name="Tasks" title="Tasks"> </FwbTab>
+        <FwbTab name="Calendar" title="Calendar"> </FwbTab>
+        <FwbTab name="Grades" title="Grades"> </FwbTab>
+      </FwbTabs>
+      <div>
+        <GroupMembers />
+      </div>
+      <RouterLink :to="{ name: 'Tasks' }">tasks</RouterLink>
+      <div v-if="rewardStore.hasRewards || userGroupStore.isAdmin">
+        <Rewards />
+      </div>
+      <div>
+        <FwbButton>Settings</FwbButton>
+      </div>
+      <div v-if="userGroupStore.hasPoints">
+        <Points :points="points" />
+      </div>
     </div>
-    <!-- Available rewards names. detailed info can be shown in modal -->
-    <div v-if="rewards && member">
-      <Rewards :rewards="rewards" :member="member" :claimers="claimers" />
-    </div>
-    <!-- Settings: group name, member roles, delete group -->
-    <div>
-      <FwbButton>Settings</FwbButton>
-    </div>
-    <!-- just show points -->
-    <div>Points</div>
-    <div>
-      <FwbButton color="red">Grades</FwbButton>
-    </div>
+  </div>
+  <div class="container">
+    <RouterView />
   </div>
 </template>
 

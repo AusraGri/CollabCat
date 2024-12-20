@@ -1,24 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import MainLayout from '@/layouts/MainLayout.vue'
+import GroupView from '../views/GroupView.vue'
 import UserLayout from '@/layouts/UserLayout.vue'
+import MainLayout2 from '@/layouts/MainLayout2.vue'
+import TasksView from '../views/TasksView.vue'
 import { authenticate } from './guards'
+import GroupLayout from '@/layouts/GroupLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/dashboard',
-      component: MainLayout,
-      beforeEnter: [authenticate],
-      children: [
-        {
-          path: 'write-article',
-          name: 'WriteArticle',
-          component: () => import('../views/CreateTask.vue'),
-        },
-      ],
-    },
     {
       path: '/login',
       name: 'Login',
@@ -43,12 +34,34 @@ const router = createRouter({
     {
       path: '/:username',
       component: UserLayout,
-      beforeEnter: [authenticate],
+      beforeEnter: authenticate,
       children: [
         {
           path: ':group',
           name: 'Group',
-          component: () => import('../views/GroupView.vue'),
+          component: () => import('../layouts/GroupLayout.vue'),
+          children: [
+            {
+              path: '',
+              name: 'GroupPage',
+              component: () => import('../views/GroupView.vue'),
+            },
+            {
+              path: 'tasks',
+              name: 'Tasks',
+              component: TasksView
+            },
+            {
+              path: 'calendar',
+              name: 'Calendar',
+              component: () => import('../views/CalendarView.vue'),
+            },
+            {
+              path: 'grades',
+              name: 'Grades',
+              component: () => import('../views/GradesView.vue'),
+            },
+          ],
         },
         {
           path: '',
@@ -56,19 +69,9 @@ const router = createRouter({
           component: () => import('../views/ProfileView.vue'),
         },
         {
-          path: '/intro',
-          name: 'intro',
-          component: () => import('../views/MainView.vue'),
-        },
-        {
-          path: '/tasks',
-          name: 'tasks',
-          component: () => import('../views/TasksView.vue'),
-        },
-        {
-          path: '/callback', // Define the callback route
+          path: '/callback',
           name: 'callback',
-          component: () => import('../views/CallbackView.vue'), // Use a Callback component or handle it directly here
+          component: () => import('../views/CallbackView.vue'),
         },
       ],
     },

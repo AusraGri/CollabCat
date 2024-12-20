@@ -93,3 +93,5 @@ export const useUserStore = defineStore('user', {
     },
   },
 })
+
+export type UserStore = ReturnType<typeof useUserStore>

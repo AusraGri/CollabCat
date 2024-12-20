@@ -32,7 +32,7 @@ function logoutUser() {
 </script>
 
 <template>
-  <UserLayout v-if="user" :user="user"></UserLayout>
+  <!-- <UserLayout v-if="user" :user="user"></UserLayout> -->
   <StackedLayout :links="links">
     <template #menu>
       <FwbNavbarLink v-if="userStore.isLoggedIn" @click.prevent="logoutUser" link="#"
