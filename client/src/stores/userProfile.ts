@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type { PublicInvitation } from '@server/shared/types'
+import type { PublicInvitation, CategoriesPublic } from '@server/shared/types'
 
 interface UserPublic {
   username: string | null
@@ -16,12 +16,15 @@ interface UserUpdate {
 interface UserState {
   user: UserPublic | null // Stores user information
   invitations: PublicInvitation[] | null
+  categories: CategoriesPublic [] | null
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     user: null,
     invitations: null,
+    categories: null
+
   }),
 
   getters: {
@@ -31,8 +34,10 @@ export const useUserStore = defineStore('user', {
   actions: {
     async fetchUserData() {
       try {
-        const data = await trpc.user.getUserProfile.query() // Fetch from your API
+        const data = await trpc.user.getUserProfile.query()
         this.user = data
+
+        this.categories = await trpc.categories.getUserCategories.query()
 
         return data
       } catch (error) {

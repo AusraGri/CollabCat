@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
-import { useUserGroupsStore } from '@/stores/userGroups';
+import { useUserGroupsStore } from '@/stores/userGroups'
 import { type GroupsPublic } from '@server/shared/types'
-import CreateNewGroupModal from './CreateNewGroupModal.vue';
+import CreateNewGroupModal from './CreateNewGroupModal.vue'
 
 // const { groups } = defineProps<{
 //   groups: GroupsPublic[]
@@ -15,17 +15,17 @@ const emit = defineEmits<{
 
 const userGroupStore = useUserGroupsStore()
 
-const groups = computed(()=> {
-return userGroupStore.userGroups || []
+const groups = computed(() => {
+  return userGroupStore.userGroups || []
 })
 const isOpen = ref(false)
 const isCreateNewGroup = ref(false)
-const selected = computed(()=> userGroupStore.activeGroup?.name)
+const selected = computed(() => userGroupStore.activeGroup?.name)
 const dropdownRef = ref<HTMLElement | null>(null)
 
 const selectItem = async (group: GroupsPublic) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { createdByUserId, ...activeGroup } = group;
+  const { createdByUserId, ...activeGroup } = group
   userGroupStore.activeGroup = activeGroup
   // await userGroupStore.fetchGroupData()
   // await userGroupStore.fetchUserGroups()
@@ -42,8 +42,8 @@ const toggleCreateNewGroup = () => {
   isOpen.value = false
 }
 
-const createNewGroup = async (name:string) => {
-await userGroupStore.createNewGroup(name)
+const createNewGroup = async (name: string) => {
+  await userGroupStore.createNewGroup(name)
 }
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -52,14 +52,19 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-onMounted(async()=>{
- await  userGroupStore.fetchUserGroups()
- document.addEventListener('click', handleClickOutside)
+onMounted(async () => {
+  await userGroupStore.fetchUserGroups()
+  document.addEventListener('click', handleClickOutside)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+const handleNoGroup = () => {
+  userGroupStore.activeGroup = null
+  isOpen.value = false
+}
 </script>
 <template>
   <div class="relative inline-block min-w-32" ref="dropdownRef">
@@ -84,7 +89,7 @@ onBeforeUnmount(() => {
         />
       </svg>
     </button>
-<!-- Drop down menu items -->
+    <!-- Drop down menu items -->
     <div
       v-if="isOpen"
       class="absolute right-0 z-10 mt-2 w-fit rounded-md border border-gray-300 bg-white shadow-lg"
@@ -99,6 +104,7 @@ onBeforeUnmount(() => {
           {{ group.name }}
         </fwb-list-group-item>
         <FwbListGroupItem v-if="!groups.length">You have no groups 👇</FwbListGroupItem>
+        <FwbListGroupItem v-if="selected" hover @click="handleNoGroup">-- No Group --</FwbListGroupItem>
       </fwb-list-group>
       <div class="my-1 border-t border-gray-200"></div>
       <button
@@ -109,6 +115,10 @@ onBeforeUnmount(() => {
       </button>
     </div>
   </div>
-  <CreateNewGroupModal :is-show-modal="isCreateNewGroup" @create:group="createNewGroup" @close="isCreateNewGroup=false"/>
+  <CreateNewGroupModal
+    :is-show-modal="isCreateNewGroup"
+    @create:group="createNewGroup"
+    @close="isCreateNewGroup = false"
+  />
 </template>
 <style scoped></style>

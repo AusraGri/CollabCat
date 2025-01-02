@@ -1,11 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import GroupView from '../views/GroupView.vue'
 import UserLayout from '@/layouts/UserLayout.vue'
-import MainLayout2 from '@/layouts/MainLayout2.vue'
 import TasksView from '../views/TasksView.vue'
 import { authenticate } from './guards'
-import GroupLayout from '@/layouts/GroupLayout.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

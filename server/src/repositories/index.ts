@@ -5,11 +5,10 @@ import { groupsRepository } from './groupsRepository'
 import { recurringRepository } from './recurrenceRepository'
 import { rewardsRepository } from './rewardsRepository'
 import { pointsRepository } from './pointsRepository'
+import { categoriesRepository } from './categoriesRepository'
 import { invitationsRepository } from './invitationRepository'
 
 export type RepositoryFactory = <T>(db: Database) => T
-
-// index of all repositories for provideRepos
 const repositories = {
   userRepository,
   tasksRepository,
@@ -18,6 +17,7 @@ const repositories = {
   pointsRepository,
   rewardsRepository,
   invitationsRepository,
+  categoriesRepository,
 }
 
 export type RepositoriesFactories = typeof repositories

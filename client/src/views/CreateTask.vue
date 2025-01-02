@@ -6,7 +6,7 @@ import { FwbButton, FwbHeading, FwbInput, FwbTextarea, Fwb } from 'flowbite-vue'
 import useErrorMessage from '@/composables/useErrorMessage'
 import AlertError from '@/components/AlertError.vue'
 import type { TasksPublic} from '@server/shared/types'
-import CreateTask from '@/components/CreateNewTask.vue'
+import CreateTask from '@/components/task/CreateNewTask.vue'
 
 const today = ref(new Date())
 

@@ -5,6 +5,7 @@ import type {
   GroupData,
   InsertableReward,
   GroupMember,
+  CategoriesPublic
 } from '@server/shared/types'
 type GroupsPublic = {
   id: number
@@ -27,6 +28,7 @@ interface GroupsState {
   groupMembers: GroupMember[] | null
   rewards: PublicReward[] | null
   groupData: GroupData | null
+  categories: CategoriesPublic[] | null
 }
 
 export const useUserGroupsStore = defineStore('group', {
@@ -37,6 +39,7 @@ export const useUserGroupsStore = defineStore('group', {
     groupMembers: null,
     rewards: null,
     groupData: null,
+    categories: null,
   }),
 
   getters: {
@@ -63,6 +66,7 @@ export const useUserGroupsStore = defineStore('group', {
         if (!groupId) throw new Error('Missing group id')
 
         const data = await trpc.groups.getGroupData.query({ groupId })
+        this.categories = await trpc.categories.getGroupCategories.query({groupId})
 
         if (!data) return
         this.groupData = data
@@ -97,7 +101,7 @@ export const useUserGroupsStore = defineStore('group', {
         console.error('Failed to create new group:', error)
       }
     },
-    // async getGroupMembers() {
+    // async createCategory(title:string) {
     //   try {
     //     const groupId = this.activeGroup?.id
     //     if (groupId) {

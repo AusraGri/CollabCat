@@ -8,33 +8,33 @@ import { useAuthStore } from '@/stores/authStore'
 import { useUserStore } from '@/stores/userProfile'
 import { useAuth0 } from '@auth0/auth0-vue'
 // import useErrorMessage from '@/composables/useErrorMessage'
-const { signup, getToken, isAuth, getUserData } = useAuthService()
+const { getUserData } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 const users = ref()
-// const signup = async () => {
-//   loginWithRedirect({
-//     appState: {
-//       target: '/', // Where to redirect after successful login
-//     },
-//     authorizationParams: {
-//       prompt: 'login', // Forces the login form to appear
-//       screen_hint: 'signup', // Forces the signup screen to appear
-//     },
-//   })
-// }
+const signup = async () => {
+  loginWithRedirect({
+    appState: {
+      target: '/', // Where to redirect after successful login
+    },
+    authorizationParams: {
+      prompt: 'login', // Forces the login form to appear
+      screen_hint: 'signup', // Forces the signup screen to appear
+    },
+  })
+}
 
 const handleAuthRedirect = async () => {
   try {
  
-    if (!isAuth) {
+    if (!isAuthenticated) {
       console.log('User is not authenticated yet.')
       return
     }
 
-    const idToken = await getToken()
+    const idToken = await getAccessTokenSilently()
     // The ID token (JWT)
 
     // Optionally store the token in localStorage or a state management library (like Vuex or Pinia)
@@ -62,7 +62,7 @@ const handleAuthRedirect = async () => {
 
 onMounted(async () => {
   try {
-    if (isAuth) {
+    if (isAuthenticated) {
       // Handle post-authentication actions if already authenticated
       await handleAuthRedirect()
     } else {
@@ -76,7 +76,7 @@ onMounted(async () => {
 
 <template>
   <div class="dark:bg-gray-800">
-    <div>isAuth: {{isAuth}}</div>
+    <div>isAuth: {{isAuthenticated}}</div>
     <div v-if="isAuthenticated">authorized {{ user?.email }}</div>
     <div v-if="!isAuthenticated">not authorized</div>
     <div>This is Home page view</div>

@@ -29,8 +29,8 @@ export async function up(db: Kysely<any>) {
     )
     .addColumn('start_date', 'timestamptz', (c) => c.notNull())
     .addColumn('end_date', 'timestamptz')
-    .addColumn('start_time', 'timestamptz')
-    .addColumn('end_time', 'timestamptz')
+    .addColumn('start_time', 'time')
+    .addColumn('end_time', 'time')
     .addColumn('is_full_day_event', 'boolean', (c) => c.defaultTo(false))
     .execute()
 

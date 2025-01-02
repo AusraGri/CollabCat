@@ -38,6 +38,10 @@ watch(
       await userGroupStore.fetchGroupData()
       await userGroupStore.fetchUserMembershipInfo()
     }
+    if(userGroupStore.activeGroup === null){
+      router.push({ name: 'Profile' })
+    }
+   
   }
 )
 </script>

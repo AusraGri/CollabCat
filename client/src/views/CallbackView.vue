@@ -15,7 +15,7 @@ const router = useRouter()
 onMounted(async () => {
   try {
     if (isAuthenticated.value) {
-      router.push({ name: 'Home' })
+      router.push({ name: 'Profile' })
     } else {
       router.push({ name: 'Login' })
     }

@@ -9,6 +9,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
 export interface Categories {
   createdByUserId: number | null
+  groupId: number | null
   id: Generated<number>
   isDefault: Generated<boolean>
   title: string
@@ -34,11 +35,6 @@ export interface Invitations {
   groupId: number
   id: Generated<number>
   invitationToken: string
-}
-
-export interface Permissions {
-  id: Generated<number>
-  permissionName: string
 }
 
 export interface Points {
@@ -76,7 +72,7 @@ export interface Tasks {
   createdByUserId: number
   description: string | null
   endDate: Timestamp | null
-  endTime: Timestamp | null
+  endTime: string | null
   groupId: number | null
   id: Generated<number>
   importance: string | null
@@ -85,7 +81,7 @@ export interface Tasks {
   isRecurring: Generated<boolean | null>
   points: number | null
   startDate: Timestamp
-  startTime: Timestamp | null
+  startTime: string | null
   title: string
 }
 
@@ -100,12 +96,6 @@ export interface User {
   username: string | null
 }
 
-export interface UserGroupPermissions {
-  groupId: number
-  permissionId: number
-  userId: number
-}
-
 export interface UserGroups {
   groupId: number
   role: string
@@ -117,12 +107,10 @@ export interface DB {
   completedTasks: CompletedTasks
   groups: Groups
   invitations: Invitations
-  permissions: Permissions
   points: Points
   recurringPattern: RecurringPattern
   rewards: Rewards
   tasks: Tasks
   user: User
-  userGroupPermissions: UserGroupPermissions
   userGroups: UserGroups
 }
