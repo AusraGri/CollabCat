@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { type Insertable } from 'kysely'
+import { type Insertable, type Selectable } from 'kysely'
 import type { RecurringPattern } from '@server/database/types'
 import { idSchema } from './shared'
 
@@ -9,7 +9,7 @@ export const recurringPatternSchema = z.object({
   maxNumOfOccurrences: z.number().int().nullable(),
   monthOfYear: z.array(z.number().int().positive().gte(1).lte(12)).nullable(),
   recurringType: z.string(),
-  separationCount: z.number().int().min(0).nullable(),
+  separationCount: z.number().int().min(0),
   taskId: idSchema,
   weekOfMonth: z.array(z.number().int()).nullable(),
 })
@@ -17,6 +17,10 @@ export const recurringPatternSchema = z.object({
 export const recurringTypeSchema = z.object({
   id: idSchema,
   recurringType: z.string(),
+})
+
+export const inputRecurrenceSchema = recurringPatternSchema.omit({
+  taskId: true,
 })
 
 export const recurrencePattern = recurringPatternSchema.omit({
@@ -32,4 +36,6 @@ export const recurringPatternKeysAll = Object.keys(
 
 export type RecurrenceInsertable = Insertable<RecurringPattern>
 
-export type RecurrencePattern = z.infer<typeof recurrencePattern>
+export type RecurrencePatternInsertable = z.infer<typeof inputRecurrenceSchema>
+
+export type RecurrencePattern = Selectable<RecurringPattern>

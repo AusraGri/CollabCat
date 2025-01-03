@@ -1,14 +1,16 @@
 import type { Database } from '@server/database'
 import type { Tasks, CompletedTasks } from '@server/database/types'
+import type { RecurrencePatternInsertable } from '@server/entities/recurrence'
 import {
   type TasksPublic,
   type TasksUpdateables,
   type TasksDue,
+  type TaskData,
   tasksKeysPublic,
 } from '@server/entities/tasks'
+import { recurringPatternKeysAll } from '@server/entities/recurrence'
 import type { DeleteResult, Insertable, Updateable, Selectable } from 'kysely'
-import { jsonObjectFrom } from 'kysely/helpers/postgres'
-import { sql } from 'kysely'
+import { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres'
 
 export type SelectableCompletedTask = Selectable<CompletedTasks>
 
@@ -16,13 +18,9 @@ export interface GetTasksOptions {
   assignedUserId?: number
   categoryId?: number
   limit?: number
-  isCompleted?: boolean
   createdByUserId?: number
-  deadline?: Date
   groupId?: number
   id?: number
-  importance?: string
-  title?: string
 }
 
 export interface TaskUpdate {
@@ -35,6 +33,11 @@ export interface TaskCompletion {
   instanceDate: Date
 }
 
+export interface CreateTaskData {
+  task: Insertable<Tasks>
+  recurrence?: RecurrencePatternInsertable
+}
+
 export function tasksRepository(db: Database) {
   return {
     async create(task: Insertable<Tasks>): Promise<TasksPublic> {
@@ -44,15 +47,39 @@ export function tasksRepository(db: Database) {
         .returning(tasksKeysPublic)
         .executeTakeFirstOrThrow()
     },
+    async createTask(taskData: CreateTaskData): Promise<TasksPublic> {
+      return db.transaction().execute(async (trx) => {
+        if (taskData.task.isRecurring && !taskData.recurrence)
+          throw new Error('Missing task data')
 
-    async getTasks(options: GetTasksOptions): Promise<TasksPublic[] | []> {
+        const newTask = await trx
+          .insertInto('tasks')
+          .values(taskData.task)
+          .returning(tasksKeysPublic)
+          .executeTakeFirstOrThrow()
+
+        if (newTask && taskData.recurrence) {
+          try {
+            await trx
+              .insertInto('recurringPattern')
+              .values({ ...taskData.recurrence, taskId: newTask.id })
+              .executeTakeFirstOrThrow()
+          } catch (error) {
+            throw new Error(`Failed to save recurrence pattern: ${error}`)
+          }
+        }
+
+        return newTask
+      })
+    },
+
+    async getTasksOld(options: GetTasksOptions): Promise<TasksPublic[] | []> {
       let query = db.selectFrom('tasks').selectAll()
 
       const filters: Array<{
         column: keyof Tasks
         operator: string
         value: any
-        isString?: boolean
       }> = [
         {
           column: 'assignedUserId',
@@ -60,7 +87,6 @@ export function tasksRepository(db: Database) {
           value: options.assignedUserId,
         },
         { column: 'categoryId', operator: '=', value: options.categoryId },
-        { column: 'isCompleted', operator: '=', value: options.isCompleted },
         {
           column: 'createdByUserId',
           operator: '=',
@@ -68,21 +94,74 @@ export function tasksRepository(db: Database) {
         },
         { column: 'groupId', operator: '=', value: options.groupId },
         { column: 'id', operator: '=', value: options.id },
-        { column: 'importance', operator: '=', value: options.importance },
-        {
-          column: 'title',
-          operator: 'like',
-          value: options.title ? `%${options.title.toLowerCase()}%` : undefined,
-          isString: true,
-        },
       ]
 
       filters.forEach((filter) => {
         if (filter.value !== undefined) {
           query = query.where(
-            filter.isString
-              ? sql`LOWER(${sql.ref(filter.column)})`
-              : filter.column,
+            filter.column,
+            filter.operator as any,
+            filter.value
+          )
+        }
+      })
+
+      if (options.limit !== undefined) {
+        query = query.limit(options.limit)
+      }
+
+      return query.execute()
+    },
+    async getTasks(options: GetTasksOptions): Promise<TaskData[] | []> {
+      let query = db
+        .selectFrom('tasks')
+        .select((eb) => [
+          ...tasksKeysPublic,
+          jsonObjectFrom(
+            eb
+              .selectFrom('recurringPattern')
+              .select(recurringPatternKeysAll)
+              .whereRef('tasks.id', '=', 'recurringPattern.taskId')
+              .where('tasks.isRecurring', '=', true)
+          ).as('recurrence'),
+          jsonArrayFrom(
+            eb
+              .selectFrom('completedTasks')
+              .select([
+                'completedTasks.completedAt',
+                'completedTasks.instanceDate',
+                'completedTasks.id',
+                'completedTasks.taskId',
+              ])
+              .whereRef('tasks.id', '=', 'completedTasks.taskId')
+              .where('tasks.isRecurring', '=', true)
+          ).as('completed'),
+        ])
+
+      const filters: Array<{
+        column: keyof Tasks
+        operator: string
+        value: any
+      }> = [
+        {
+          column: 'assignedUserId',
+          operator: '=',
+          value: options.assignedUserId,
+        },
+        { column: 'categoryId', operator: '=', value: options.categoryId },
+        {
+          column: 'createdByUserId',
+          operator: '=',
+          value: options.createdByUserId,
+        },
+        { column: 'groupId', operator: '=', value: options.groupId },
+        { column: 'id', operator: '=', value: options.id },
+      ]
+
+      filters.forEach((filter) => {
+        if (filter.value !== undefined) {
+          query = query.where(
+            filter.column,
             filter.operator as any,
             filter.value
           )
@@ -136,32 +215,14 @@ export function tasksRepository(db: Database) {
       const tasksToDate = await db
         .selectFrom('tasks as t')
         .select((eb) => [
-          't.id',
-          't.title',
-          't.description',
-          't.createdByUserId',
-          't.assignedUserId',
-          't.categoryId',
-          't.startDate',
-          't.endDate',
-          't.completedAt',
-          't.groupId',
-          't.parentTaskId',
-          't.importance',
-          't.isCompleted',
-          't.points',
-          't.startTime',
-          't.endTime',
-          't.isFullDayEvent',
-
-          // Use jsonObjectFrom to structure the recurrence pattern as a nested object
+          ...tasksKeysPublic,
           jsonObjectFrom(
             eb
               .selectFrom('recurringPattern as rp')
               .selectAll()
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
-          jsonObjectFrom(
+          jsonArrayFrom(
             eb
               .selectFrom('completedTasks as ct')
               .selectAll()

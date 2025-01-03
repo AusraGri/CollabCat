@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import type { Selectable, Insertable } from 'kysely'
+import type { Selectable, Insertable} from 'kysely'
 import type { Tasks, RecurringPattern } from '@server/database/types'
+import type { RecurrencePatternInsertable } from './recurrence'
 import { idSchema, dateSchema } from './shared'
 import { recurringPatternSchema } from './recurrence'
 
@@ -19,8 +20,8 @@ export const taskSchema = z.object({
   startDate: dateSchema,
   endDate: dateSchema,
   isFullDayEvent: z.boolean(),
-  startTime: dateSchema,
-  endTime: dateSchema,
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
   isRecurring: z.boolean().nullable(),
 })
 export const taskSchemaOutput = z.object({
@@ -39,14 +40,33 @@ export const taskSchemaOutput = z.object({
   endDate: z.date().nullable(),
   isFullDayEvent: z.boolean().nullable(),
   isRecurring: z.boolean().nullable(),
-  startTime: z.date().nullable(),
-  endTime: z.date().nullable(),
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
+})
+
+const newTaskSchema = z.object({
+  assignedUserId: idSchema.optional(),
+  categoryId: idSchema.optional(),
+  isCompleted: z.boolean().optional(),
+  completedAt: z.date().optional(),
+  createdByUserId: idSchema.optional(),
+  description: z.string().trim().max(300),
+  groupId: idSchema.optional(),
+  importance: z.enum(['High', 'Medium', 'ASAP', 'On Fire!']).optional(),
+  points: z.number().positive().optional(),
+  title: z.string().trim().min(3).max(100),
+  startDate: z.string(),
+  endDate: z.string().optional(),
+  isFullDayEvent: z.boolean().optional(),
+  startTime: z.string().nullable().optional(),
+  endTime: z.string().nullable().optional(),
+  isRecurring: z.boolean().nullable().optional(),
 })
 
 const taskCompletedSchema = z.object({
-  completedAt: z.string(),
+  completedAt: z.date(),
   id: idSchema,
-  instanceDate: z.string(),
+  instanceDate: z.date(),
   taskId: idSchema,
 })
 
@@ -115,6 +135,11 @@ export const tasksDue = taskSchemaOutput.extend({
   recurrence: recurringPatternSchema.nullable(),
 })
 
+export const taskDataSchema = taskSchemaOutput.extend({
+  completed: z.array(taskCompletedSchema).nullable(),
+  recurrence: recurringPatternSchema.nullable(),
+})
+
 export const tasksKeysAll = Object.keys(taskSchema.shape) as (keyof Tasks)[]
 
 const excludedKeys = ['parentTaskId'] as const
@@ -129,13 +154,25 @@ export type TasksPublic = Pick<
 
 export type TasksUpdateables = Omit<Tasks, 'createdByUserId' | 'id'>
 
-export type InsertableTasks = Insertable<Tasks>
+export type InsertableTask = Insertable<Tasks>
+export type NewTask = z.infer<typeof newTaskSchema>
 
 export type BaseTaskDue = z.infer<typeof tasksDue>
 
 export type TasksCompleted = z.infer<typeof taskCompletedSchema>
 
 export interface TasksDue extends Selectable<Tasks> {
-  completed: TasksCompleted | null
+  completed: TasksCompleted[] | null
   recurrence: Selectable<RecurringPattern> | null
+}
+
+export type TaskData = z.infer<typeof taskDataSchema>
+// export interface TaskData extends Selectable<Tasks> {
+//   completed: TasksCompleted[] | null
+//   recurrence: Selectable<RecurringPattern> | null
+// }
+
+export interface InsertTaskData {
+  task: NewTask
+  recurrence?: RecurrencePatternInsertable
 }

@@ -1,7 +1,7 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { getTasksSchema, taskSchemaOutput } from '@server/entities/tasks'
+import { getTasksSchema, taskDataSchema } from '@server/entities/tasks'
 import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure
@@ -16,7 +16,7 @@ export default authenticatedProcedure
     },
   })
   .input(getTasksSchema)
-  .output(taskSchemaOutput.array())
+  .output(taskDataSchema.array())
   .query(async ({ input: requiredTaskData, ctx: { authUser, repos } }) => {
     const taskSearchOptions = {
       ...requiredTaskData,

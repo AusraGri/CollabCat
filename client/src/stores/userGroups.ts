@@ -5,7 +5,8 @@ import type {
   GroupData,
   InsertableReward,
   GroupMember,
-  CategoriesPublic
+  CategoriesPublic, 
+  TaskData
 } from '@server/shared/types'
 type GroupsPublic = {
   id: number
@@ -29,6 +30,7 @@ interface GroupsState {
   rewards: PublicReward[] | null
   groupData: GroupData | null
   categories: CategoriesPublic[] | null
+  tasks: TaskData[] | null
 }
 
 export const useUserGroupsStore = defineStore('group', {
@@ -40,6 +42,7 @@ export const useUserGroupsStore = defineStore('group', {
     rewards: null,
     groupData: null,
     categories: null,
+    tasks: null
   }),
 
   getters: {
@@ -67,6 +70,7 @@ export const useUserGroupsStore = defineStore('group', {
 
         const data = await trpc.groups.getGroupData.query({ groupId })
         this.categories = await trpc.categories.getGroupCategories.query({groupId})
+        this.tasks = await trpc.tasks.get.query({groupId})
 
         if (!data) return
         this.groupData = data
@@ -139,10 +143,10 @@ export const useUserGroupsStore = defineStore('group', {
       }
     },
   },
-  // persist: {
-  //   storage: sessionStorage,
-  //   pick: ['activeGroup'],
-  // },
+  persist: {
+    storage: sessionStorage,
+    pick: ['activeGroup'],
+  },
 })
 
 export type UserGroupsStore = ReturnType<typeof useUserGroupsStore>

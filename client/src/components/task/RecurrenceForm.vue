@@ -24,7 +24,7 @@ const endDate = defineModel('endDate', {type: [Date, String] as PropType<Date | 
 
 // const startDate = ref<Date | string>('')
 // const endDate = ref<Date | string>('')
-const recurringType = ref('daily')
+const recurringType = ref<'daily' | 'weekly' >('daily')
 const selectedDaysOfWeek = ref<number[]>([])
 const everyXCount = ref('1')
 const countLabel = computed(() => {
@@ -67,9 +67,9 @@ const weekdays = [
   { value: 7, name: 'Sunday' },
 ]
 
-const recurringPattern = computed<RecurrencePattern>(() => ({
+const recurringPattern = computed<Partial<RecurrencePattern>>(() => ({
   recurringType: recurringType.value,
-  separationCount: everyXCount.value === '1' ? null : Number(everyXCount.value) - 1,
+  separationCount: everyXCount.value === '1' ? 0 : Number(everyXCount.value) - 1,
   dayOfWeek: selectedDaysOfWeek.value.length ? selectedDaysOfWeek.value : null,
 }))
 

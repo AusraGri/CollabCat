@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { trpc } from '@/trpc'
-import type { InsertableCategory } from '@server/shared/types'
+import type { CategoriesPublic} from '@server/shared/types'
 import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
 import { ref } from 'vue'
 
@@ -10,7 +10,7 @@ const { isShowModal, groupId } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (event: 'create:category', value: Partial<InsertableCategory>): void
+  (event: 'create:category', value: CategoriesPublic): void
   (event: 'close'): void
 }>()
 

@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { FwbModal, FwbButton, FwbTextarea, FwbInput, FwbCheckbox, FwbSelect } from 'flowbite-vue'
+import { FwbModal, FwbButton, FwbTextarea, FwbInput, FwbCheckbox } from 'flowbite-vue'
 import RecurrenceForm from './RecurrenceForm.vue'
 import CategorySelect from '../categories/CategorySelect.vue'
-import { type RecurrencePattern, type CategoriesPublic, type GroupMember } from '@server/shared/types'
+import { useTasksStore } from '@/stores/taskStore'
+import {
+  type CategoriesPublic,
+  type GroupMember,
+  type RecurrencePatternInsertable,
+} from '@server/shared/types'
 
 const { isShowModal, categories, groupId } = defineProps<{
   isShowModal: boolean
@@ -21,29 +26,42 @@ const time = ref({
   hours: new Date().getHours(),
   minutes: new Date().getMinutes(),
 })
+const tasksStore = useTasksStore()
 
 const selectedCategory = ref<string | undefined>()
-const recurringPattern = ref()
-const startDate = ref<Date | string >('')
+const recurringPattern = ref<RecurrencePatternInsertable>()
+const startDate = ref<Date | string>('')
 const endDate = ref<Date | string>('')
+const points = ref<string>('')
 
-const taskData = computed(()=>({
-    assignedUserId: null,
-    categoryId: selectedCategory.value && !isNaN(Number(selectedCategory.value)) ? Number(selectedCategory.value) : null,
-    description: taskForm.value.description || null,
-    endDate: endDate.value ? endDate.value : null,
-    startDate: startDate.value ? startDate.value : null,
+const taskData = computed(() => {
+  if (!taskForm.value.title || !startDate.value) {
+    return
+  }
+
+  const taskTime = `${time.value.hours}:${time.value.minutes}`
+
+  const newTaskData = {
+    title: taskForm.value.title,
+    categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
+    description: taskForm.value.description,
+    endDate: endDate.value ? endDate.value.toString() : undefined,
+    startDate: startDate.value.toString(),
     isRecurring: taskForm.value.isRecurring,
-    startTime: time.value,
-    groupId: groupId ? groupId : null
+    startTime: taskForm.value.isTime ? taskTime : undefined,
+    groupId: groupId ? groupId : undefined,
+    points: points.value ? Number(points.value) : undefined,
+  }
 
-}))
+  return newTaskData
+})
 
 const taskForm = ref({
   title: '',
   description: '',
   isRecurring: false,
   isTime: false,
+  isPoints: false,
 })
 
 function closeModal() {
@@ -55,18 +73,46 @@ function handleRecurringPatternUpdate(newPattern: any) {
   recurringPattern.value = newPattern
 }
 
-function confirmAction(confirmed: boolean) {
+async function confirmAction(confirmed: boolean) {
   if (!confirmed) {
+    resetForm()
     emit('close')
+    return
   }
-  emit('close')
-  console.log('task pattern:', recurringPattern.value)
-  console.log('task info:', taskData.value)
+  try {
+    if (!taskData.value) return
 
+    if (taskData.value.isRecurring && !recurringPattern.value) return
+
+    const newTaskData = {
+      task: taskData.value,
+      recurrence: recurringPattern.value,
+    }
+    const newTask = await tasksStore.createTask(newTaskData)
+    console.log(newTask)
+  } catch (error) {
+    console.log('Error while saving task', error)
+  }
+  resetForm()
+  emit('close')
 }
 
 const format = (date: Date) => {
   return date.toLocaleDateString('en-CA')
+}
+
+const resetForm = () => {
+  recurringPattern.value = undefined
+  startDate.value = ''
+  endDate.value = ''
+  points.value = ''
+  taskForm.value = {
+    title: '',
+    description: '',
+    isRecurring: false,
+    isTime: false,
+    isPoints: false,
+  }
 }
 </script>
 
@@ -128,14 +174,22 @@ const format = (date: Date) => {
           </div>
         </div>
         <div v-if="categories">
-            <CategorySelect v-model:selected-category="selectedCategory" :categories="categories" />
+          <CategorySelect v-model:selected-category="selectedCategory" :categories="categories" />
         </div>
-        <div class="flex h-11 items-center space-x-3">
+        <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
           <div>
             <FwbCheckbox v-model="taskForm.isTime" label="Tasks Time" />
           </div>
           <div v-if="taskForm.isTime" class="grow">
             <VueDatePicker v-model="time" time-picker auto-apply />
+          </div>
+        </div>
+        <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
+          <div>
+            <FwbCheckbox v-model="taskForm.isPoints" label="Task Points" />
+          </div>
+          <div v-if="taskForm.isPoints" class="grow">
+            <FwbInput v-model="points" type="number" placeholder="Enter point amount" min="1" />
           </div>
         </div>
       </form>

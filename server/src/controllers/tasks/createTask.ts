@@ -1,17 +1,18 @@
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
+import { inputRecurrenceSchema } from '@server/entities/recurrence'
 import { inputTaskSchema, taskSchemaOutput } from '@server/entities/tasks'
-import { TRPCError } from '@trpc/server'
-import { publicProcedure } from '../../trpc/index'
+import z from 'zod'
 
-export const createTaskProcedure = publicProcedure
+export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
   .meta({
     openapi: {
       method: 'POST',
-      path: '/tasks/creates',
+      path: '/tasks/createTask',
       tags: ['tasks'],
-      summary: 'Create a new task',
+      summary: 'Create new task',
       protect: true,
       example: {
         request: {
@@ -21,31 +22,23 @@ export const createTaskProcedure = publicProcedure
       },
     },
   })
-  .input(inputTaskSchema)
+  .input(z.object({
+    task: inputTaskSchema,
+    recurrence: inputRecurrenceSchema.optional()
+  }))
   .output(taskSchemaOutput)
-  .mutation(async ({ input: taskData, ctx }) => {
-    // Validate required context
-    if (!ctx.authUser) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: 'User must be authenticated.',
-      })
-    }
-
-    const newTaskData = { ...taskData }
-
-    if (ctx.userGroup) {
-    // TO DO: check permission and add user group id to the task
-
-    newTaskData.groupId = ctx.userGroup.groupId
-    }
+  .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {
 
     const task = {
-      ...newTaskData,
-      createdByUserId: ctx.authUser.id,
+      ...taskData.task,
+      createdByUserId: authUser.id,
     }
 
-    const taskCreated = await ctx.repos.tasksRepository.create(task)
+    const newTaskData = {
+      task,
+      recurrence: taskData.recurrence
+    }
+    const taskCreated = await repos.tasksRepository.createTask(newTaskData)
 
     return taskCreated
   })

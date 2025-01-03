@@ -41,8 +41,8 @@ const handlePaneClick = () => {
 }
 </script>
 <template>
-  <div class="flex flex-col">
-    <div class="flex flex-wrap items-center justify-center space-x-1 space-y-1">
+  <div class="flex flex-col divide-x-2 mb-1">
+    <div class="flex flex-wrap items-center  space-x-1 space-y-1">
       <FwbTabs v-model="activeTab" @click:pane="handlePaneClick" variant="underline" class="p-5">
         <FwbTab name="Tasks" title="Tasks"> </FwbTab>
         <FwbTab name="Calendar" title="Calendar"> </FwbTab>
@@ -51,7 +51,6 @@ const handlePaneClick = () => {
       <div>
         <GroupMembers />
       </div>
-      <RouterLink :to="{ name: 'Tasks' }">tasks</RouterLink>
       <div v-if="rewardStore.hasRewards || userGroupStore.isAdmin">
         <Rewards />
       </div>

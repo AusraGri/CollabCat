@@ -5,13 +5,14 @@ import getDueTasks from './dueTask'
 import taskCompletion from './taskCompletion'
 import update from './updateTask'
 import getAllTasks from './getAllTasks'
+import createTask from './createTask'
 
 export default router({
-  // routes for tasks
   create,
   get,
   getDueTasks,
   taskCompletion,
   update,
-  getAllTasks
+  getAllTasks,
+  createTask,
 })
