@@ -5,6 +5,7 @@ import type { CategoriesPublic } from '@server/shared/types'
 
 const { categories } = defineProps<{
   categories: CategoriesPublic[]
+  label?: string
 }>()
 
 const selectedCategory = defineModel('selectedCategory', { type: String })
@@ -22,7 +23,7 @@ const categoryOptions = computed(() => {
     <FwbSelect
       v-model="selectedCategory"
       :options="categoryOptions"
-      label="Select Category"
+      :label="label"
       placeholder="Select Category"
     />
   </div>

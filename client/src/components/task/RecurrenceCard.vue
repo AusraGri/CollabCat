@@ -33,21 +33,21 @@ function getWeekdayNames(weekdays: number[]) {
   return weekdays.map((number) => weekDays[number % 7])
 }
 
-function separation (count: number) {
-return count + 1
+function separation(count: number) {
+  return count + 1
 }
 </script>
 <template>
   <div class="text-sm">
     <div v-if="isDaily">daily</div>
-    <div v-if="isWeekly">
+    <div v-if="isWeekly" class="flex space-x-3">
       <div v-if="recurrence.dayOfWeek" class="flex space-x-1">
         <div v-for="day in weekdays" :key="day">
           {{ day }}
         </div>
       </div>
       <div>
-{{ separationLabel }}
+       | {{ separationLabel }}
       </div>
     </div>
   </div>

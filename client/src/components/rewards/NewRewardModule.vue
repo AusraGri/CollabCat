@@ -7,12 +7,9 @@ import {
   FwbInput,
   FwbRange,
   FwbToggle,
-  FwbDropdown,
-  FwbAvatar,
-  FwbListGroup,
-  FwbListGroupItem,
 } from 'flowbite-vue'
-import type { GroupMember, PublicReward, RewardUpdateable } from '@server/shared/types'
+import type { PublicReward, RewardUpdateable, InsertableReward } from '@server/shared/types'
+import MembersSelection from '../groups/MembersSelection.vue'
 
 const { isShowModal, rewardUpdate } = defineProps<{
   isShowModal: boolean
@@ -20,7 +17,7 @@ const { isShowModal, rewardUpdate } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (event: 'reward:new', value: any): void
+  (event: 'reward:new', value: InsertableReward): void
   (event: 'reward:update', value: RewardUpdateable): void
   (event: 'close'): void
 }>()
@@ -34,8 +31,8 @@ const isForAll = ref(true)
 const isForGroup = computed(() => rewardStore.isGroup)
 const claimValue = ref(1)
 const claimValueLabel = computed(() => `Reward claims: ${claimValue.value}`)
-const members = computed(() => rewardStore.claimers)
-const selectedMembers = ref<GroupMember[]>([])
+const members = computed(() => rewardStore.claimers || undefined)
+const selectedMembers = ref<number[]>([])
 
 const amount = computed(() => (isClaims.value ? Number(claimValue.value) : undefined))
 
@@ -56,21 +53,25 @@ function confirmAction(confirmed: boolean) {
     isTitleValid.value = titleValidation(reward.value.title)
     return
   }
-  const targetIds = selectedMembers.value.length
-    ? selectedMembers.value.map((member) => member.id)
-    : undefined
+  const targetIds = selectedMembers.value.length ? selectedMembers.value : undefined
 
   if (rewardUpdate) {
     emit('reward:update', {
       ...rewardUpdate,
       groupId: rewardUpdate.groupId || undefined,
       title: reward.value.title,
-      cost: Number(reward.value.cost) || undefined,
+      cost: Number(reward.value.cost),
       amount: amount.value || undefined,
       targetUserIds: targetIds,
     })
   } else {
-    emit('reward:new', { ...reward.value, amount: amount.value, targetUserIds: targetIds, groupId: rewardStore.groupId || undefined })
+    emit('reward:new', {
+      title: reward.value.title,
+      cost: Number(reward.value.cost),
+      amount: amount.value,
+      targetUserIds: targetIds,
+      groupId: rewardStore.groupId || undefined,
+    })
   }
   emit('close')
   resetReactiveValues()
@@ -78,6 +79,7 @@ function confirmAction(confirmed: boolean) {
 
 const resetReactiveValues = () => {
   isClaims.value = false
+  selectedMembers.value = []
   claimValue.value = 1
   isCostValid.value = true
   reward.value = {
@@ -105,25 +107,12 @@ const titleValidation = (value: any) => {
   return title.length >= 3 && title.length <= 40
 }
 
-function getSelectedMembersForUpdate(): GroupMember[] {
+function getSelectedMembersForUpdate(): number[] {
   const selectedMembers = rewardStore.claimers?.filter((user) =>
     rewardUpdate?.targetUserIds?.includes(user.id)
   )
 
-  return selectedMembers ?? []
-}
-
-const isMemberChecked = (member: GroupMember) => {
-  return selectedMembers.value.some((selected) => selected.id === member.id)
-}
-
-const updateValue = (event: Event, member: GroupMember) => {
-  const target = event.target as HTMLInputElement
-  if (target.checked) {
-    selectedMembers.value.push(member)
-  } else {
-    selectedMembers.value = selectedMembers.value.filter((selected) => selected.id !== member.id)
-  }
+  return selectedMembers?.map((member) => member.id) ?? []
 }
 
 watch(
@@ -174,26 +163,8 @@ watch(
           <div class="mb-3">
             <FwbToggle label="All Members Can Claim" v-model="isForAll" />
           </div>
-          <div v-if="!isForAll" class="mb-3">
-            <FwbDropdown placement="bottom" text="Choose members">
-              <FwbListGroup>
-                <FwbListGroupItem v-for="member in members" :key="member.id" hover>
-                  <label class="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      :value="member"
-                      :checked="isMemberChecked(member)"
-                      @change.prevent="(event) => updateValue(event, member)"
-                      class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span>
-                      <FwbAvatar :img="member.picture || undefined" rounded size="sm" />
-                    </span>
-                    <span class="text-sm text-gray-900">{{ member.username }}</span>
-                  </label>
-                </FwbListGroupItem>
-              </FwbListGroup>
-            </FwbDropdown>
+          <div v-if="!isForAll && members" class="mb-3">
+            <MembersSelection :selectedMembers="selectedMembers" :groupMembers="members" />
           </div>
         </div>
         <div>

@@ -17,7 +17,7 @@ const picked = ref()
      <FwbListGroupItem>
       <FwbCheckbox
         v-model="picked"
-        label="Svelte"
+        label="User"
         name="list-radio"
         :value="user.id"
       />

@@ -9,6 +9,7 @@ import {
   type GroupMember,
   type RecurrencePatternInsertable,
 } from '@server/shared/types'
+import MembersSelection from '../groups/MembersSelection.vue'
 
 const { isShowModal, categories, groupId } = defineProps<{
   isShowModal: boolean
@@ -29,6 +30,7 @@ const time = ref({
 const tasksStore = useTasksStore()
 
 const selectedCategory = ref<string | undefined>()
+const selectedMembers = ref<number[]>([])
 const recurringPattern = ref<RecurrencePatternInsertable>()
 const startDate = ref<Date | string>('')
 const endDate = ref<Date | string>('')
@@ -41,6 +43,8 @@ const taskData = computed(() => {
 
   const taskTime = `${time.value.hours}:${time.value.minutes}`
 
+  const assignedUserId = selectedMembers.value[0] || undefined
+
   const newTaskData = {
     title: taskForm.value.title,
     categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
@@ -51,6 +55,7 @@ const taskData = computed(() => {
     startTime: taskForm.value.isTime ? taskTime : undefined,
     groupId: groupId ? groupId : undefined,
     points: points.value ? Number(points.value) : undefined,
+    assignedUserId: assignedUserId,
   }
 
   return newTaskData
@@ -103,6 +108,7 @@ const format = (date: Date) => {
 
 const resetForm = () => {
   recurringPattern.value = undefined
+  selectedMembers.value = []
   startDate.value = ''
   endDate.value = ''
   points.value = ''
@@ -174,7 +180,11 @@ const resetForm = () => {
           </div>
         </div>
         <div v-if="categories">
-          <CategorySelect v-model:selected-category="selectedCategory" :categories="categories" />
+          <CategorySelect v-model:selected-category="selectedCategory" :categories="categories" :label="'Select Category'"/>
+        </div>
+        <div v-if="groupMembers" class="flex items-center space-x-3">
+          <span class="text-sm">Assign To:</span>
+          <MembersSelection :selected-members="selectedMembers" :group-members="groupMembers" :max-selections="1" />
         </div>
         <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
           <div>
