@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
+import { FwbModal, FwbButton } from 'flowbite-vue'
 import type { TaskData, CategoriesPublic, GroupMember } from '@server/shared/types'
 import { ref, computed, nextTick } from 'vue'
 import UserBasicProfile from '../user/UserBasicProfile.vue'
@@ -7,8 +7,8 @@ import RecurrenceCard from './RecurrenceCard.vue'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
 import CategorySelect from '../categories/CategorySelect.vue'
 import MembersSelection from '../groups/MembersSelection.vue'
+import TaskDateModal from './TaskDateModal.vue'
 import { type Ref } from 'vue'
-import { error } from 'console'
 
 const emit = defineEmits<{
   (event: 'close'): void
@@ -22,28 +22,22 @@ const { task, categories, groupMembers, isShowModal } = defineProps<{
 }>()
 
 const errorMessage = ref()
-const selectedCategory = ref(String(task.categoryId) || undefined)
+const selectedCategory = ref(String(task.categoryId) || '')
 const selectedMember = ref(task.assignedUserId ? [task.assignedUserId] : [])
 const assignedMember = computed(() =>
   selectedMember.value[0] ? selectedMember.value[0] : undefined
 )
 const isEditingPoints = ref(false)
 const editableTask = ref({
-    ...task,
-    categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
-    assignedUserId: assignedMember.value,
-//   title: task.title,
-//   assignedUserId: assignedMember.value,
-//   recurrence: task.recurrence,
-//   points: task.points,
-//   categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
-//   description: task.description,
-//   startDate: task.startDate,
-//   endDate: task.endDate
+  ...task,
+  categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
+  assignedUserId: assignedMember.value,
 })
+const isRecurring = computed(() => (editableTask.value.recurrence ? true : false))
 const isEditingTitle = ref(false)
 const isEditingAssignment = ref(false)
 const isEditingCategory = ref<boolean>(false)
+const isEditingDate = ref(false)
 
 const assignedTo = computed(() => {
   if (assignedMember.value && groupMembers) {
@@ -55,6 +49,15 @@ const assignedTo = computed(() => {
 const assignedText = computed(() => {
   if (assignedTo.value) return `Assigned To:`
   return `Assign To`
+})
+
+const categoryLabel = computed(()=> {
+  const categoryId = editableTask.value.categoryId
+  if(!categoryId) return `Uncategorized`
+
+  const category =  categories?.find((category)=> category.id === categoryId)
+
+  return category?.title
 })
 
 const pointsLabel = computed(() => {
@@ -72,7 +75,21 @@ const descriptionLabel = computed(() => {
   return `No Description`
 })
 
+const resetValues = () => {
+  editableTask.value = {
+    ...task,
+    categoryId: task.categoryId || undefined,
+    assignedUserId: task.assignedUserId || undefined,
+  }
+  isEditingTitle.value = false
+  isEditingPoints.value = false
+  isEditingAssignment.value = false
+  isEditingDate.value = false
+  isEditingCategory.value = false
+}
+
 const closeModal = () => {
+  resetValues()
   emit('close')
 }
 
@@ -94,6 +111,14 @@ const startEditingPoints = () => {
       pointsInput.value.focus()
     }
   })
+}
+
+const editDate = () => {
+  isEditingDate.value = true
+}
+
+const stopEditingDate = () => {
+  isEditingDate.value = false
 }
 
 const toggle = (value: Ref<boolean>) => {
@@ -139,8 +164,8 @@ const validatePointsAndSave = () => {
 }
 
 const saveChanges = () => {
-  isEditingTitle.value = false
-  isEditingPoints.value = false
+  //save changes
+  resetValues()
 }
 </script>
 <template>
@@ -172,9 +197,9 @@ const saveChanges = () => {
             <CategorySelect
               v-if="categories && isEditingCategory"
               :categories="categories"
-              :selected-category="selectedCategory"
+              v-model:selected-category="selectedCategory"
             />
-            <span v-else>Uncategorized</span>
+            <span v-else>{{ categoryLabel }}</span>
           </div>
           <div
             class="flex w-full items-center justify-between space-x-3 pt-3"
@@ -218,13 +243,15 @@ const saveChanges = () => {
               </p>
             </div>
           </div>
-          <div class="flex space-x-3 pt-3 items-center">
+          <div class="flex cursor-pointer items-center space-x-3 pt-3" @click="editDate">
             <div>Date:</div>
             <div class="p-1 text-sm">
-              {{ formatDateToLocal(task.startDate) }}
-              <span v-if="task.endDate">--> {{ formatDateToLocal(task.endDate) }}</span>
+              {{ formatDateToLocal(editableTask.startDate) }}
+              <span v-if="editableTask.endDate"
+                >--> {{ formatDateToLocal(editableTask.endDate) }}</span
+              >
             </div>
-            <div v-if="task.startTime" class="p-1 text-sm flex space-x-1 items-center">
+            <div v-if="editableTask.startTime" class="flex items-center space-x-1 p-1 text-sm">
               <span
                 ><svg
                   class="h-6 w-6 text-gray-800 dark:text-white"
@@ -245,10 +272,18 @@ const saveChanges = () => {
                 </svg>
               </span>
               <div>
-                  {{ timeToLocalTime(task.startTime, task.startDate) }}
+                {{ timeToLocalTime(editableTask.startTime, editableTask.startDate) }}
               </div>
             </div>
           </div>
+          <TaskDateModal
+            :is-recurring="isRecurring"
+            :is-show-date-modal="isEditingDate"
+            v-model:start-date="editableTask.startDate"
+            v-model:end-date="editableTask.endDate"
+            v-model:start-time="editableTask.startTime"
+            @close-date="stopEditingDate"
+          />
           <div class="flex items-center space-x-3 pt-3">
             <div>{{ recurrenceLabel }}</div>
             <div v-if="task.recurrence">
@@ -264,7 +299,7 @@ const saveChanges = () => {
       <template #footer>
         <div class="flex justify-between">
           <FwbButton color="red" size="xs">delete</FwbButton>
-          <fwb-button @click="confirmAction(false)" color="green">Save changes </fwb-button>
+          <fwb-button @click="saveChanges" color="green">Save changes </fwb-button>
         </div>
       </template>
     </FwbModal>

@@ -30,6 +30,11 @@ const router = createRouter({
       component: HomeView,
     },
     {
+      path: '/callback',
+      name: 'callback',
+      component: () => import('../views/CallbackView.vue'),
+    },
+    {
       path: '/:username',
       component: UserLayout,
       beforeEnter: authenticate,
@@ -66,11 +71,7 @@ const router = createRouter({
           name: 'Profile',
           component: () => import('../views/ProfileView.vue'),
         },
-        {
-          path: '/callback',
-          name: 'callback',
-          component: () => import('../views/CallbackView.vue'),
-        },
+       
       ],
     },
   ],

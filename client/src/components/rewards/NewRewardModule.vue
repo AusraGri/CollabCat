@@ -89,7 +89,6 @@ const resetReactiveValues = () => {
 }
 
 const closeModal = () => {
-  console.log(reward.value)
   resetReactiveValues()
   emit('close')
 }

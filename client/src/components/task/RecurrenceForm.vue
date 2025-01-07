@@ -73,7 +73,7 @@ const recurringPattern = computed<Partial<RecurrencePattern>>(() => ({
   dayOfWeek: selectedDaysOfWeek.value.length ? selectedDaysOfWeek.value : null,
 }))
 
-const format = (date: Date) => {
+const formatDate = (date: Date) => {
   return date.toLocaleDateString('en-CA')
 }
 
@@ -121,7 +121,7 @@ watch(
           placeholder="Select Task Recurrence Start Date"
           v-model="startDate"
           :enable-time-picker="false"
-          :format="format"
+          :format="formatDate"
           name="Task Start Date"
           auto-apply
           required
@@ -135,7 +135,7 @@ watch(
           v-model="endDate"
           :enable-time-picker="false"
           placeholder="Select Task Recurrence End Date"
-          :format="format"
+          :format="formatDate"
           :min-date="endDateMin"
           name="Task End Date"
           auto-apply
