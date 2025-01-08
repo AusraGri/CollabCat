@@ -1,3 +1,5 @@
+import type {Ref} from 'vue'
+
 export function stringToUrl(string: string) {
   return string.replace(' ', '')
 }
@@ -32,4 +34,33 @@ export function formatDateToLocal(dateString: Date): string {
   const formattedDate = isoString.split('T')[0]
 
   return formattedDate
+}
+
+export function areObjectsEqual(obj1: any, obj2: any): boolean {
+  if (typeof obj1 !== typeof obj2) return false
+
+  if (typeof obj1 === 'object' && obj1 !== null && typeof obj2 === 'object' && obj2 !== null) {
+    if (obj1 instanceof Date && obj2 instanceof Date) {
+      return obj1.toISOString() === obj2.toISOString()
+    }
+    const keys1 = Object.keys(obj1)
+    const keys2 = Object.keys(obj2)
+    if (keys1.length !== keys2.length) {
+      return false
+    }
+    for (const key of keys1) {
+      if (!areObjectsEqual(obj1[key], obj2[key])) {
+        console.log(`Difference found at key: ${key}, obj1: ${obj1[key]}, obj2: ${obj2[key]}`);
+        return false
+      }
+    }
+
+    return true
+  } else {
+    return obj1 === obj2
+  }
+}
+
+export const toggle = (value: Ref<boolean>) => {
+  value.value = !value.value
 }

@@ -1,32 +1,30 @@
 <script setup lang="ts">
-import {type PropType } from 'vue';
+import { onMounted, type PropType } from 'vue'
 import { ref, watch, computed } from 'vue'
-import {
-  FwbInput,
-  FwbSelect,
-  FwbDropdown,
-  FwbListGroup,
-  FwbListGroupItem,
-} from 'flowbite-vue'
+import { FwbInput, FwbSelect, FwbDropdown, FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import {type RecurrencePattern } from '@server/shared/types';
+import { type RecurrencePattern } from '@server/shared/types'
+import { areObjectsEqual } from '@/utils/helpers'
 
-const { isRecurring } = defineProps<{
+const { isRecurring, pickDates } = defineProps<{
   isRecurring: boolean
+  pickDates: boolean
 }>()
 
-const emit = defineEmits<{
-  (event: 'recurrence:new', value: any): void
-}>()
 
-const startDate = defineModel('startDate', {type: [Date, String] as PropType<Date | string>})
-const endDate = defineModel('endDate', {type: [Date, String] as PropType<Date | string>})
+const recurrencePattern = defineModel('recurrencePattern', {
+  type: [Object, null] as PropType<Partial<RecurrencePattern> | null>,
+})
+const startDate = defineModel('startDate', { type: [Date, String] as PropType<Date | string> })
+const endDate = defineModel('endDate', { type: [Date, String] as PropType<Date | string> })
+const recurringType = ref<string>(recurrencePattern.value?.recurringType || 'daily')
+const selectedDaysOfWeek = ref<number[]>(recurrencePattern.value?.dayOfWeek || [])
+const everyXCount = ref(
+  recurrencePattern.value?.separationCount
+    ? String(recurrencePattern.value.separationCount + 1)
+    : '1'
+)
 
-// const startDate = ref<Date | string>('')
-// const endDate = ref<Date | string>('')
-const recurringType = ref<'daily' | 'weekly' >('daily')
-const selectedDaysOfWeek = ref<number[]>([])
-const everyXCount = ref('1')
 const countLabel = computed(() => {
   const type = recurringType.value === 'daily' ? 'day' : 'week'
   const value = String(everyXCount.value)
@@ -67,10 +65,13 @@ const weekdays = [
   { value: 7, name: 'Sunday' },
 ]
 
-const recurringPattern = computed<Partial<RecurrencePattern>>(() => ({
+const recurrencePatternNew = computed<Partial<RecurrencePattern>>(() => ({
   recurringType: recurringType.value,
   separationCount: everyXCount.value === '1' ? 0 : Number(everyXCount.value) - 1,
-  dayOfWeek: selectedDaysOfWeek.value.length ? selectedDaysOfWeek.value : null,
+  dayOfWeek:
+    selectedDaysOfWeek.value.length && recurringType.value === 'weekly'
+      ? selectedDaysOfWeek.value
+      : null,
 }))
 
 const formatDate = (date: Date) => {
@@ -91,12 +92,28 @@ const endDateMin = computed(() => {
 })
 
 watch(
-  () => recurringPattern.value,
+  () => recurrencePatternNew.value,
   (newPattern) => {
-    emit('recurrence:new', newPattern)
-    console.log('emitted pattern', newPattern)
+    if(!areObjectsEqual(newPattern, recurrencePattern.value)){
+      recurrencePattern.value = newPattern
+    }
   },
   { deep: true }
+)
+
+watch(
+  () => recurrencePattern.value,
+  (newValue) => {
+    if (newValue) {
+      recurringType.value = newValue.recurringType || 'daily'
+      selectedDaysOfWeek.value = newValue.dayOfWeek || []
+      everyXCount.value = newValue.separationCount ? String(newValue.separationCount + 1) : '1'
+    } else {
+      recurringType.value = 'daily'
+      selectedDaysOfWeek.value = []
+      everyXCount.value = '1'
+    }
+  }
 )
 
 watch(
@@ -109,13 +126,19 @@ watch(
     recurringType.value = 'daily'
   }
 )
+
+onMounted(() => {
+  if (!recurrencePattern.value) {
+    recurrencePattern.value = recurrencePatternNew.value
+  }
+})
 </script>
 
 <template>
-  <div v-if="isRecurring" class="w-full rounded-lg bg-white  space-y-3">
-    <div class="flex flex-col justify-between space-y-1 text-sm ">
+  <div v-if="isRecurring" class="w-full space-y-3 rounded-lg bg-white">
+    <div v-if="pickDates" class="flex flex-col justify-between space-y-1 text-sm">
       <!-- Recurring Start Date -->
-      <div class="flex space-x-2 items-center">
+      <div class="flex items-center space-x-2">
         <p class="w-10">start:</p>
         <VueDatePicker
           placeholder="Select Task Recurrence Start Date"
@@ -127,9 +150,9 @@ watch(
           required
         />
       </div>
-  
+
       <!-- Recurring End Date -->
-      <div class="flex space-x-2 items-center">
+      <div class="flex items-center space-x-2">
         <p class="w-10">end:</p>
         <VueDatePicker
           v-model="endDate"

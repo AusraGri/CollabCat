@@ -157,6 +157,7 @@ const resetForm = () => {
         <div>
           <RecurrenceForm
             :is-recurring="taskForm.isRecurring"
+            :pick-dates="true"
             @recurrence:new="handleRecurringPatternUpdate"
             v-model:start-date="startDate"
             v-model:end-date="endDate"

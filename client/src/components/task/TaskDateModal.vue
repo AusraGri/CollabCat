@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, type PropType } from 'vue'
+import { ref, computed, type PropType, watch } from 'vue'
 import { FwbButton, FwbCheckbox } from 'flowbite-vue'
-import { start } from 'repl';
+import { areObjectsEqual } from '@/utils/helpers';
 
 const { isShowDateModal } = defineProps<{
   isShowDateModal: boolean
@@ -15,26 +15,22 @@ const endDate = defineModel('endDate', {
 const startTime = defineModel('startTime', { type: [String, null] as PropType<string | null> })
 const isTime = ref(startTime.value ? true : false)
 
-const taskDateAndTime = ref({
+const originalDateValues = ref({
   startDate: startDate.value,
   endDate: endDate.value,
   startTime: extractTimeParts(startTime.value),
-  isTime: isTime.value
+  isTime: isTime.value,
 })
 
-const hasChanges = computed(()=> {
-    const originalValues = {
+const current = computed(() => ({
         startDate: startDate.value,
         endDate: endDate.value,
         startTime: extractTimeParts(startTime.value),
-    }
+        isTime: isTime.value,
+    }))
 
-    return (
-    originalValues.startDate !== taskDateAndTime.value.startDate ||
-    originalValues.endDate !== taskDateAndTime.value.endDate ||
-    JSON.stringify(originalValues.startTime) !== JSON.stringify(taskDateAndTime.value.startTime) ||
-    isTime.value !== taskDateAndTime.value.isTime
-  );
+const noChanges = computed(()=> {
+    return areObjectsEqual(current.value, originalDateValues.value)
 })
 
 const emit = defineEmits<{
@@ -57,9 +53,8 @@ const addOneDay = (date: Date) => {
 }
 
 const endDateMin = computed(() => {
-  const startDate = taskDateAndTime.value.startDate
-  if (startDate && startDate instanceof Date) {
-    return addOneDay(startDate)
+  if (startDate.value && startDate.value instanceof Date) {
+    return addOneDay(startDate.value)
   }
   return ''
 })
@@ -68,17 +63,20 @@ const saveChanges = () => {
   if (!startDate.value) {
     return
   }
-  const time = taskDateAndTime.value.startTime
+  const time = originalDateValues.value.startTime
   const taskTime = `${time.hours}:${time.minutes}`
 
   startTime.value = isTime.value ? taskTime : null
+
+  originalDateValues.value = current.value
+  isTime.value = startTime.value ? true : false
   emit('closeDate')
 }
 
 const resetChanges = () => {
-  startDate.value = taskDateAndTime.value.startDate
-  endDate.value = taskDateAndTime.value.endDate
-  taskDateAndTime.value.startTime = extractTimeParts(startTime.value)
+  startDate.value = originalDateValues.value.startDate
+  endDate.value = originalDateValues.value.endDate
+  originalDateValues.value.startTime = extractTimeParts(startTime.value)
   isTime.value = startTime.value ? true : false
 }
 
@@ -98,18 +96,29 @@ function extractTimeParts(timeString: string | null | undefined): {
 
   return { hours, minutes }
 }
+
+watch(() => isShowDateModal, (newVal) => {
+  if (newVal) {
+    originalDateValues.value = {
+      startDate: startDate.value,
+      endDate: endDate.value,
+      startTime: extractTimeParts(startTime.value),
+      isTime: isTime.value,
+    }
+  }
+}, { immediate: true })
 </script>
 
 <template>
-  <div class="z-100" v-if="isShowDateModal">
+  <div class="z-[100] relative " v-if="isShowDateModal" tabindex="-1">
     <div
       class="fixed inset-0 flex items-center  justify-center bg-black bg-opacity-50"
-      @click.self="closeDateModal"
+      @click.self.stop="closeDateModal"
     >
       <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
         <header class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">Edit Date</h2>
-          <button @click="closeDateModal" class="text-gray-500 hover:text-black">
+          <button @click.stop="closeDateModal" class="text-gray-500 hover:text-black">
             <svg
               class="h-[22px] w-[22px] text-gray-800 dark:text-white"
               aria-hidden="true"
@@ -140,7 +149,7 @@ function extractTimeParts(timeString: string | null | undefined): {
                 name="Task Date"
                 placeholder="Pick task date"
                 :format="formatDate"
-                :max-date="taskDateAndTime.endDate"
+                :max-date="endDate"
                 auto-apply
                 required
                 :enable-time-picker="false"
@@ -165,13 +174,13 @@ function extractTimeParts(timeString: string | null | undefined): {
               <FwbCheckbox v-model="isTime" label="Task Time" />
             </div>
             <div v-if="isTime">
-              <VueDatePicker v-model="taskDateAndTime.startTime" time-picker auto-apply />
+              <VueDatePicker v-model="originalDateValues.startTime" time-picker auto-apply />
             </div>
           </div>
         </div>
         <footer class="mt-4 flex justify-between space-x-2">
-          <fwb-button v-if="hasChanges" @click="resetChanges" color="yellow"> Reset Changes </fwb-button>
-          <fwb-button  v-if="hasChanges" @click="saveChanges" color="green"> Save Changes </fwb-button>
+          <fwb-button v-if="!noChanges" @click.stop="resetChanges" color="yellow"> Reset Changes </fwb-button>
+          <fwb-button  v-if="!noChanges" @click.stop="saveChanges" color="green"> Save Changes </fwb-button>
         </footer>
       </div>
     </div>
