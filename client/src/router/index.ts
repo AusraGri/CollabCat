@@ -71,7 +71,11 @@ const router = createRouter({
           name: 'Profile',
           component: () => import('../views/ProfileView.vue'),
         },
-       
+        {
+          path: 'tasks',
+          name: 'PersonalTasks',
+          component: TasksView
+        },
       ],
     },
   ],

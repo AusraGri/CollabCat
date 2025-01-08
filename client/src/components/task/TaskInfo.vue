@@ -8,10 +8,17 @@ import { timeToLocalTime, formatDateToLocal, areObjectsEqual } from '@/utils/hel
 import CategorySelect from '../categories/CategorySelect.vue'
 import MembersSelection from '../groups/MembersSelection.vue'
 import TaskDateModal from './TaskDateModal.vue'
+import RepeatIcon from '../svg/RepeatIcon.vue'
+import DeleteIcon from '../svg/DeleteIcon.vue'
+import ClockIcon from '../svg/ClockIcon.vue'
+import CalendarIcon from '../svg/CalendarIcon.vue'
+import ConfirmationModal from '../ConfirmationModal.vue'
 import RecurrenceChangeModal from './RecurrenceChangeModal.vue'
 
 const emit = defineEmits<{
   (event: 'close'): void
+  (event: 'delete:task'): void
+  (event: 'update:task', value: TaskData): void
 }>()
 
 const { task, categories, groupMembers, isShowModal } = defineProps<{
@@ -28,8 +35,6 @@ const assignedMember = computed(() => (selectedMember.value[0] ? selectedMember.
 const isEditingPoints = ref(false)
 const editableTask = ref({
   ...task,
-  categoryId: selectedCategory.value ? Number(selectedCategory.value) : null,
-  assignedUserId: assignedMember.value,
 })
 
 const isRecurring = computed(() => (editableTask.value.recurrence ? true : false))
@@ -39,15 +44,20 @@ const isEditingCategory = ref<boolean>(false)
 const isEditingDate = ref(false)
 const isEditingRecurrence = ref(false)
 const isEditingDescription = ref(false)
+const isDeleteConfirmation = ref(false)
 
 const noChanges = computed(() => {
-  return areObjectsEqual(task, editableTask.value)
+  const updatedTask = {
+    ...editableTask.value,
+    categoryId: selectedCategory.value ? Number(selectedCategory.value) : null,
+    assignedUserId: assignedMember.value,
+  }
+  return areObjectsEqual(task, updatedTask)
 })
+
 const noEditing = computed(() => {
   return ![
     isEditingTitle.value,
-    isEditingAssignment.value,
-    isEditingCategory.value,
     isEditingDate.value,
     isEditingRecurrence.value,
     isEditingDescription.value,
@@ -80,17 +90,12 @@ const pointsLabel = computed(() => {
   return `Add Points`
 })
 
-const recurrenceLabel = computed(() => {
-  if (editableTask.value.recurrence) return `Repeat:`
-  return `No Repeating`
-})
-
 const descriptionLabel = computed(() => {
   if (editableTask.value.description) return `Description:`
   return `No Description`
 })
 
-const resetEditingValues = () => {
+const resetAllEditingValues = () => {
   isEditingTitle.value = false
   isEditingPoints.value = false
   isEditingAssignment.value = false
@@ -101,7 +106,7 @@ const resetEditingValues = () => {
 }
 
 const closeModal = () => {
-  resetEditingValues()
+  resetAllEditingValues()
   editableTask.value = {
     ...task,
     categoryId: selectedCategory.value ? Number(selectedCategory.value) : null,
@@ -168,7 +173,7 @@ const validateTitleAndSave = () => {
   }
   editableTask.value.title = title
   errorMessage.value = ''
-  saveChanges()
+  isEditingTitle.value = false
 }
 
 const validateDescriptionAndSave = () => {
@@ -178,7 +183,8 @@ const validateDescriptionAndSave = () => {
   console.log(description)
   if (!description) {
     editableTask.value.description = null
-    saveChanges()
+    isEditingDescription.value = false
+
     return
   }
   const descriptionTrimmed = description.trim()
@@ -188,13 +194,14 @@ const validateDescriptionAndSave = () => {
   }
   editableTask.value.description = descriptionTrimmed
   errorMessage.value = ''
-  saveChanges()
+  isEditingDescription.value = false
 }
 
 const validatePointsAndSave = () => {
   const points = editableTask.value.points
-  if (!points) {
-    saveChanges()
+  if (!points || points === 0) {
+    editableTask.value.points = null
+    isEditingPoints.value = false
     return
   }
   if (points > 999) {
@@ -202,12 +209,31 @@ const validatePointsAndSave = () => {
     return
   }
   errorMessage.value = ''
-  saveChanges()
+  isEditingPoints.value = false
 }
 
+const handleConfirmation = (value: boolean) => {
+  if (!value) {
+    isDeleteConfirmation.value = false
+    return
+  }
+  isDeleteConfirmation.value = false
+  emit('delete:task')
+  emit('close')
+}
+
+const deleteTask = () => {
+  isDeleteConfirmation.value = true
+}
 const saveChanges = () => {
-  //save changes
-  resetEditingValues()
+  const updatedTask = {
+    ...editableTask.value,
+    categoryId: selectedCategory.value ? Number(selectedCategory.value) : null,
+    assignedUserId: assignedMember.value,
+    isRecurring: editableTask.value.recurrence ?  true : false
+  }
+  emit('update:task', updatedTask)
+  emit('close')
 }
 </script>
 <template>
@@ -284,33 +310,24 @@ const saveChanges = () => {
             </p>
           </div>
         </div>
-        <div class="flex cursor-pointer items-center space-x-3 pt-3" @click="editDate">
-          <div>Date:</div>
-          <div class="p-1 text-sm">
-            {{ formatDateToLocal(editableTask.startDate) }}
-            <span v-if="editableTask.endDate"
-              >--> {{ formatDateToLocal(editableTask.endDate) }}</span
-            >
+        <div class="flex cursor-pointer flex-col pt-3 sm:flex-row sm:space-x-3" @click="editDate">
+          <div class="flex items-center space-x-2">
+            <div>
+              <CalendarIcon />
+            </div>
+            <div class="flex flex-nowrap p-1 text-sm">
+              <div>
+                {{ formatDateToLocal(editableTask.startDate) }}
+              </div>
+              <div v-if="editableTask.endDate">
+                <span class="ml-2 mr-2">--></span>
+                <span>{{ formatDateToLocal(editableTask.endDate) }}</span>
+              </div>
+            </div>
           </div>
-          <div v-if="editableTask.startTime" class="flex items-center space-x-1 p-1 text-sm">
-            <span
-              ><svg
-                class="h-6 w-6 text-gray-800 dark:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
-              </svg>
+          <div v-if="editableTask.startTime" class="flex items-center space-x-3 text-sm">
+            <span>
+              <ClockIcon />
             </span>
             <div>
               {{ timeToLocalTime(editableTask.startTime, editableTask.startDate) }}
@@ -329,7 +346,10 @@ const saveChanges = () => {
           class="flex cursor-pointer items-center space-x-3 pt-3"
           @click="startEditingRecurrence"
         >
-          <div>{{ recurrenceLabel }}</div>
+          <div class="flex items-center space-x-2 text-sm">
+            <RepeatIcon />
+            <span v-if="!editableTask.recurrence">No Repeat</span>
+          </div>
           <div v-if="editableTask.recurrence">
             <RecurrenceCard :recurrence="editableTask.recurrence" />
           </div>
@@ -366,27 +386,17 @@ const saveChanges = () => {
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <FwbButton color="red" size="xs">
-          <svg
-            class="h-6 w-6 text-gray-800 dark:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke="white"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
-            />
-          </svg>
+        <ConfirmationModal
+          :is-show-modal="isDeleteConfirmation"
+          :action="'delete'"
+          :object="editableTask.title"
+          @delete="handleConfirmation"
+        />
+        <FwbButton @click="deleteTask" color="red" size="xs">
+          <DeleteIcon :color="'white'" />
         </FwbButton>
-        <fwb-button v-if="!noChanges && noEditing" @click="saveChanges" color="green"
-          >Save changes
+        <fwb-button v-if="!noChanges && noEditing" @click="saveChanges" color="green">
+          Save changes
         </fwb-button>
       </div>
     </template>

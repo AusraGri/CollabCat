@@ -158,15 +158,15 @@ const resetForm = () => {
           <RecurrenceForm
             :is-recurring="taskForm.isRecurring"
             :pick-dates="true"
-            @recurrence:new="handleRecurringPatternUpdate"
+           v-model:recurrence-pattern="recurringPattern"
             v-model:start-date="startDate"
             v-model:end-date="endDate"
           />
         </div>
         <!-- Date and Time Input -->
         <div v-if="!taskForm.isRecurring" class="flex flex-col">
-          <div class="flex items-center">
-            <label for="dueDate" class="mr-2 w-20 text-sm">Task Date</label>
+          <div class="flex items-center whitespace-nowrap">
+            <label for="dueDate" class="mr-2 w-20 text-sm ">Task Date</label>
             <VueDatePicker
               v-model="startDate"
               id="dueDate"

@@ -1,40 +1,90 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { FwbBadge, FwbCheckbox, FwbAvatar, FwbButton } from 'flowbite-vue'
+import { computed, ref, type PropType } from 'vue'
+import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
 import { type TaskData, type CategoriesPublic, type GroupMember } from '@server/shared/types'
 import UserBasicProfile from '../user/UserBasicProfile.vue'
 import RecurrenceCard from './RecurrenceCard.vue'
 import TaskInfo from './TaskInfo.vue'
+import { toggle } from '@/utils/helpers'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
+import { useTasksStore } from '@/stores/taskStore'
 
 const check = ref(false)
-const emit = defineEmits(['update:delete', 'update:done'])
 
-const { task, categories, groupMembers } = defineProps<{
-  categories?: CategoriesPublic[]
-  task: TaskData
-  groupMembers?: GroupMember[]
+const emit = defineEmits<{
+  (event: 'task:updated', value: TaskData): void
+  (event: 'task:deleted', value: number): void
 }>()
 
-const taskCategory = computed(() => {
-  if (!categories) return
+const taskStore = useTasksStore()
 
-  return categories.find((category) => category.id === task.categoryId)
+const props = defineProps({
+  categories: {
+    type: Array as PropType<CategoriesPublic[]>,
+    default: () => [],
+  },
+  task: {
+    type: Object as PropType<TaskData>,
+    required: true,
+  },
+  groupMembers: {
+    type: Array as PropType<GroupMember[]>,
+    default: () => [],
+  },
+  isCheckbox: {
+    type: Boolean,
+    default: true,
+  },
+  isTaskInfo: {
+    type: Boolean,
+    default: true,
+  },
 })
 
-const assignedUserProfile = computed(()=> {
-  if(task.assignedUserId && groupMembers){
-return groupMembers.find((member)=> member.id === task.assignedUserId)
+const taskCategory = computed(() => {
+  if (!props.categories) return
+
+  return props.categories.find((category) => category.id === props.task.categoryId)
+})
+
+const assignedUserProfile = computed(() => {
+  if (props.task.assignedUserId && props.groupMembers) {
+    return props.groupMembers.find((member) => member.id === props.task.assignedUserId)
   }
   return undefined
 })
 
-const isTaskInfo = ref(false)
+const showTaskInfo = ref(false)
 
 const toggleTaskInfo = () => {
-  isTaskInfo.value = !isTaskInfo.value
+  toggle(showTaskInfo)
 }
 
+const updateTask = async (updatedTask: TaskData) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { recurrence, completed, id, createdByUserId, ...task } = updatedTask
+
+  const updateTaskData = {
+    id,
+    task: { ...task },
+    recurrence,
+  }
+  emit('task:updated', updatedTask)
+  try {
+    await taskStore.updateTask(updateTaskData)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const deleteTask = async () => {
+  const taskId = props.task.id
+  const result = await taskStore.deleteTask(taskId)
+
+  if(result) {
+    emit('task:deleted', taskId )
+  }
+}
 </script>
 
 <template>
@@ -42,7 +92,7 @@ const toggleTaskInfo = () => {
     class="m-1 flex h-fit w-fit items-stretch space-x-1 rounded rounded-s-2xl bg-slate-400 p-1"
     aria-label="task item"
   >
-    <div class="h-6 self-center">
+    <div v-if="isCheckbox" class="h-6 self-center">
       <FwbCheckbox v-model="check" />
     </div>
     <div
@@ -73,31 +123,33 @@ const toggleTaskInfo = () => {
       <div v-if="task.recurrence">
         <RecurrenceCard :recurrence="task.recurrence" />
       </div>
-      <div v-if="assignedUserProfile" class="flex w-full">
-       <UserBasicProfile :user="assignedUserProfile" />
+      <div v-if="taskCategory" class="text-sm" aria-label="category">
+        <span>Category:</span>
+        <span>{{ taskCategory?.title }}</span>
       </div>
+      <div v-if="assignedUserProfile" class="flex w-full">
+        <UserBasicProfile :user="assignedUserProfile" />
+      </div>
+      
     </div>
     <div aria-label="task options">
       <div class="flex h-full w-fit flex-col space-y-1">
-        <div class=" " aria-label="points">
+        <div class="min-w-10" aria-label="points">
           <FwbBadge size="sm" class="w-full rounded-e-full p-0">{{ task.points }}</FwbBadge>
-        </div>
-        <div v-if="taskCategory" class=" " aria-label="category">
-          <FwbBadge size="sm" class="w-full rounded-e-full p-0">{{ taskCategory?.title }}</FwbBadge>
-        </div>
-        <div class="flex flex-col space-y-1" aria-label="task edit">
-          <FwbButton color="red" size="xs" class="rounded-e-full">delete</FwbButton>
-          <FwbButton color="yellow" size="xs" class="rounded-e-full">edit</FwbButton>
         </div>
       </div>
     </div>
   </div>
-  <TaskInfo
-    :is-show-modal="isTaskInfo"
-    :categories="categories"
-    :group-members="groupMembers"
-    :task="task"
-    @close="toggleTaskInfo"
-  />
+  <div v-if="isTaskInfo">
+    <TaskInfo
+      :is-show-modal="showTaskInfo"
+      :categories="categories"
+      :group-members="groupMembers"
+      :task="task"
+      @update:task="updateTask"
+      @delete:task="deleteTask"
+      @close="toggleTaskInfo"
+    />
+  </div>
 </template>
 <style scoped></style>

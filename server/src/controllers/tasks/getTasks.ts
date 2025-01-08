@@ -2,7 +2,6 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { getTasksSchema, taskDataSchema } from '@server/entities/tasks'
-import { TRPCError } from '@trpc/server'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
@@ -17,20 +16,12 @@ export default authenticatedProcedure
   })
   .input(getTasksSchema)
   .output(taskDataSchema.array())
-  .query(async ({ input: requiredTaskData, ctx: { authUser, repos } }) => {
+  .query(async ({ input: requiredTaskData, ctx: { repos } }) => {
     const taskSearchOptions = {
-      ...requiredTaskData,
-      createdByUserId: authUser.id,
+      ...requiredTaskData
     }
 
     const tasks = await repos.tasksRepository.getTasks(taskSearchOptions)
-
-    if (!tasks?.length) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Tasks were not found',
-      })
-    }
 
     return tasks
   })

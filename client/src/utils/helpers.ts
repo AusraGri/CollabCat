@@ -1,4 +1,4 @@
-import type {Ref} from 'vue'
+import type { Ref } from 'vue'
 
 export function stringToUrl(string: string) {
   return string.replace(' ', '')
@@ -50,7 +50,6 @@ export function areObjectsEqual(obj1: any, obj2: any): boolean {
     }
     for (const key of keys1) {
       if (!areObjectsEqual(obj1[key], obj2[key])) {
-        console.log(`Difference found at key: ${key}, obj1: ${obj1[key]}, obj2: ${obj2[key]}`);
         return false
       }
     }

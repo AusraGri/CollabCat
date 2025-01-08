@@ -112,10 +112,10 @@ watch(() => isShowDateModal, (newVal) => {
 <template>
   <div class="z-[100] relative " v-if="isShowDateModal" tabindex="-1">
     <div
-      class="fixed inset-0 flex items-center  justify-center bg-black bg-opacity-50"
+      class="fixed inset-0 flex items-center  justify-center bg-black bg-opacity-50 "
       @click.self.stop="closeDateModal"
     >
-      <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
+      <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg m-3">
         <header class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">Edit Date</h2>
           <button @click.stop="closeDateModal" class="text-gray-500 hover:text-black">

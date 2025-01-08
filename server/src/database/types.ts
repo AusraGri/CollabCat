@@ -72,12 +72,10 @@ export interface Tasks {
   createdByUserId: number
   description: string | null
   endDate: Timestamp | null
-  endTime: string | null
   groupId: number | null
   id: Generated<number>
   importance: string | null
   isCompleted: Generated<boolean>
-  isFullDayEvent: Generated<boolean | null>
   isRecurring: Generated<boolean | null>
   points: number | null
   startDate: Timestamp

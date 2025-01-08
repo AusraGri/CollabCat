@@ -1,18 +1,19 @@
 import { router } from '@server/trpc'
-import create from './create'
-import get from './getTasks'
+import getTasks from './getTasks'
 import getDueTasks from './dueTask'
 import taskCompletion from './taskCompletion'
 import update from './updateTask'
 import getAllTasks from './getAllTasks'
 import createTask from './createTask'
+import deleteTask from './deleteTask'
 
 export default router({
-  create,
-  get,
+
+  getTasks,
   getDueTasks,
   taskCompletion,
   update,
   getAllTasks,
   createTask,
+  deleteTask,
 })

@@ -1,7 +1,7 @@
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { inputRecurrenceSchema } from '@server/entities/recurrence'
+import { recurringPatternSchemaInput } from '@server/entities/recurrence'
 import { inputTaskSchema, taskSchemaOutput } from '@server/entities/tasks'
 import z from 'zod'
 
@@ -24,7 +24,7 @@ export default authenticatedProcedure
   })
   .input(z.object({
     task: inputTaskSchema,
-    recurrence: inputRecurrenceSchema.optional()
+    recurrence: recurringPatternSchemaInput.optional()
   }))
   .output(taskSchemaOutput)
   .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {

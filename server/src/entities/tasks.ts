@@ -3,7 +3,7 @@ import type { Selectable, Insertable} from 'kysely'
 import type { Tasks, RecurringPattern } from '@server/database/types'
 import type { RecurrencePatternInsertable } from './recurrence'
 import { idSchema, dateSchema } from './shared'
-import { recurringPatternSchema } from './recurrence'
+import { recurringPatternSchemaInput, recurringPatternSchema } from './recurrence';
 
 export const taskSchema = z.object({
   id: idSchema,
@@ -19,9 +19,7 @@ export const taskSchema = z.object({
   title: z.string().trim().min(3).max(100),
   startDate: dateSchema,
   endDate: dateSchema,
-  isFullDayEvent: z.boolean(),
   startTime: z.string().nullable(),
-  endTime: z.string().nullable(),
   isRecurring: z.boolean().nullable(),
 })
 export const taskSchemaOutput = z.object({
@@ -38,10 +36,8 @@ export const taskSchemaOutput = z.object({
   title: z.string().min(3).max(100),
   startDate: z.date(),
   endDate: z.date().nullable(),
-  isFullDayEvent: z.boolean().nullable(),
   isRecurring: z.boolean().nullable(),
   startTime: z.string().nullable(),
-  endTime: z.string().nullable(),
 })
 
 const newTaskSchema = z.object({
@@ -57,9 +53,7 @@ const newTaskSchema = z.object({
   title: z.string().trim().min(3).max(100),
   startDate: z.string(),
   endDate: z.string().optional(),
-  isFullDayEvent: z.boolean().optional(),
   startTime: z.string().nullable().optional(),
-  endTime: z.string().nullable().optional(),
   isRecurring: z.boolean().nullable().optional(),
 })
 
@@ -96,18 +90,17 @@ export const createTaskSchema = z.object({
   importance: z.string().optional(),
   points: z.number().positive().optional(),
   endDate: z.date().optional(),
-  isFullDayEvent: z.boolean().optional(),
   startTime: z.date().optional(),
-  endTime: z.date().optional(),
 })
 
-export const taskUpdateOptional = taskSchema
+export const taskUpdateOptional = taskSchemaOutput
   .omit({ id: true, createdByUserId: true })
   .partial()
 
 export const taskUpdateSchema = z.object({
   id: idSchema.describe('Task id to update'),
   task: taskUpdateOptional.describe('Task updated data to save/change'),
+  recurrence: recurringPatternSchemaInput.nullable()
 })
 
 export const taskCompletionSchema = z.object({
@@ -152,8 +145,8 @@ export type TasksPublic = Pick<
   (typeof tasksKeysPublic)[number]
 >
 
-export type TasksUpdateables = Omit<Tasks, 'createdByUserId' | 'id'>
-
+// export type TaskUpdate = Omit<Updateable<Tasks>, 'createdByUserId' | 'id'>
+export type TaskUpdateData = z.infer<typeof taskUpdateSchema>
 export type InsertableTask = Insertable<Tasks>
 export type NewTask = z.infer<typeof newTaskSchema>
 

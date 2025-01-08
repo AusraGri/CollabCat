@@ -3,7 +3,7 @@ import type { Tasks, CompletedTasks } from '@server/database/types'
 import type { RecurrencePatternInsertable } from '@server/entities/recurrence'
 import {
   type TasksPublic,
-  type TasksUpdateables,
+  type TaskUpdateData,
   type TasksDue,
   type TaskData,
   tasksKeysPublic,
@@ -25,7 +25,7 @@ export interface GetTasksOptions {
 
 export interface TaskUpdate {
   id: number
-  task: Updateable<TasksUpdateables>
+  task: Updateable<Tasks>
 }
 
 export interface TaskCompletion {
@@ -182,6 +182,41 @@ export function tasksRepository(db: Database) {
         .where('id', '=', taskData.id)
         .returning(tasksKeysPublic)
         .executeTakeFirstOrThrow()
+    },
+
+    async updateTask(taskData: TaskUpdateData): Promise<boolean> {
+      try {
+        return db.transaction().execute(async (trx) => {
+          const { id, task, recurrence } = taskData
+          if (task.isRecurring && !recurrence)
+            throw new Error('Missing task data')
+
+          await trx
+            .updateTable('tasks')
+            .set(task)
+            .where('id', '=', id)
+            .executeTakeFirstOrThrow()
+
+          if (recurrence && task.isRecurring) {
+            await trx
+              .insertInto('recurringPattern')
+              .values({ ...recurrence, taskId: id })
+              .onConflict((oc) => oc.column('taskId').doUpdateSet(recurrence))
+              .execute()
+          }
+
+          if (!task.isRecurring) {
+            await trx
+              .deleteFrom('recurringPattern')
+              .where('taskId', '=', id)
+              .executeTakeFirst()
+          }
+
+          return true
+        })
+      } catch (error) {
+        throw new Error('Failed to update task. Please try again.')
+      }
     },
 
     async addToCompletedTasks(

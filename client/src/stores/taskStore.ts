@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type {
   GroupsPublic,
-InsertTaskData
+InsertTaskData,
+TaskUpdateData,
 } from '@server/shared/types'
 
 export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
@@ -29,7 +30,7 @@ export const useTasksStore = defineStore('tasks', {
     },
     async getGroupTasks(groupId: number) {
       try {
-        this.tasks = await trpc.tasks.get.query({groupId})
+        this.tasks = await trpc.tasks.getTasks.query({groupId})
       } catch (error) {
         throw new Error('Failed to fetch group tasks')
       }
@@ -41,6 +42,24 @@ export const useTasksStore = defineStore('tasks', {
         return newTask
       } catch (error) {
         throw new Error(`Failed to save new task: ${error}`)
+      }
+    },
+    async updateTask(taskData: TaskUpdateData ) {
+      try {
+        const updatedTask = await trpc.tasks.update.mutate(taskData)
+
+        return updatedTask
+      } catch (error) {
+        throw new Error(`Failed to update task: ${error}`)
+      }
+    },
+    async deleteTask(taskId: number) {
+      try {
+      const result =  await trpc.tasks.deleteTask.mutate({taskId})
+
+      return result
+      } catch (error) {
+        throw new Error(`Failed to delete task: ${error}`)
       }
     },
   },

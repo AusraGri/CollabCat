@@ -42,14 +42,13 @@ function separation(count: number) {
     <div v-if="isDaily">
       <div>{{ separationLabel }}</div>
     </div>
-    <div v-if="isWeekly" class="flex space-x-3">
+    <div v-if="isWeekly" class="flex sm:space-x-3 flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0">
       <div v-if="recurrence.dayOfWeek" class="flex space-x-1">
-        <div v-for="day in weekdays" :key="day">
+        <div v-for="day in weekdays" :key="day" class="rounded min-w-8 w-fit p-1 bg-green-500 text-white text-center">
           {{ day }}
         </div>
       </div>
       <div>
-        <span v-if="recurrence.dayOfWeek" class="mr-2">|</span>
         {{ separationLabel }}
       </div>
     </div>

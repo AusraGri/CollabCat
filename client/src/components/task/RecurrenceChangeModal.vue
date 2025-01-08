@@ -68,7 +68,7 @@ const resetPatternChanges = () => {
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       @click.self.stop="closeRecurrenceModal"
     >
-      <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
+      <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg m-3">
         <header class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">Edit Recurrence</h2>
           <button @click.stop="closeRecurrenceModal" class="text-gray-500 hover:text-black">

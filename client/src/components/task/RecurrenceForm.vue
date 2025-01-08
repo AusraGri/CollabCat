@@ -98,7 +98,7 @@ watch(
       recurrencePattern.value = newPattern
     }
   },
-  { deep: true }
+  { deep: true, immediate: true }
 )
 
 watch(

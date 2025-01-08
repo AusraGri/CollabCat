@@ -5,7 +5,7 @@ export async function up(db: Kysely<any>) {
   await db.schema
     .createTable('recurring_pattern')
     .addColumn('task_id', 'integer', (c) =>
-      c.references('tasks.id').primaryKey()
+      c.references('tasks.id').onDelete('cascade').primaryKey()
     )
     .addColumn('recurring_type', 'varchar(50)', (c) => c.notNull())
     .addColumn('separation_count', 'integer', (c) => c.notNull().defaultTo(0))

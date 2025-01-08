@@ -36,11 +36,11 @@ export default function createApp(db: Database) {
 
  // log requests to the API
   app.use((req, res, next) => {
-    console.log("REQUEST START:")
-    console.log('Incoming Request Method:', req.method);
-    console.log('Incoming Request URL:',req.url);
-    console.log('Incoming Request Header:', req.headers);
-    console.log('Incoming Request Header:', req.body);
+    // console.log("REQUEST START:")
+    // console.log('Incoming Request Method:', req.method);
+    // console.log('Incoming Request URL:',req.url);
+    // console.log('Incoming Request Header:', req.headers);
+    // console.log('Incoming Request Header:', req.body);
     next();
   });
 

@@ -70,7 +70,7 @@ export const useUserGroupsStore = defineStore('group', {
 
         const data = await trpc.groups.getGroupData.query({ groupId })
         this.categories = await trpc.categories.getGroupCategories.query({groupId})
-        this.tasks = await trpc.tasks.get.query({groupId})
+        this.tasks = await trpc.tasks.getTasks.query({groupId})
 
         if (!data) return
         this.groupData = data
