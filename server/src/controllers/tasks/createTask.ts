@@ -4,6 +4,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { recurringPatternSchemaInput } from '@server/entities/recurrence'
 import { inputTaskSchema, taskSchemaOutput } from '@server/entities/tasks'
 import z from 'zod'
+import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
@@ -22,22 +23,29 @@ export default authenticatedProcedure
       },
     },
   })
-  .input(z.object({
-    task: inputTaskSchema,
-    recurrence: recurringPatternSchemaInput.optional()
-  }))
+  .input(
+    z.object({
+      task: inputTaskSchema,
+      recurrence: recurringPatternSchemaInput.optional(),
+    })
+  )
   .output(taskSchemaOutput)
   .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {
+    const { startDate, endDate } = taskData.task
 
     const task = {
       ...taskData.task,
+      startDate: startDate ? setDateToUTCmidnight(startDate) : undefined,
+      endDate: endDate ? setDateToUTCmidnight(endDate) : undefined,
       createdByUserId: authUser.id,
     }
 
     const newTaskData = {
       task,
-      recurrence: taskData.recurrence
+      recurrence: taskData.recurrence,
     }
+
+    console.log('DATA BEFORE DATABASE: ', newTaskData)
     const taskCreated = await repos.tasksRepository.createTask(newTaskData)
 
     return taskCreated

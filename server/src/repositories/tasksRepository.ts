@@ -257,7 +257,7 @@ export function tasksRepository(db: Database) {
               .selectAll()
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
-          jsonArrayFrom(
+          jsonObjectFrom(
             eb
               .selectFrom('completedTasks as ct')
               .selectAll()
@@ -280,8 +280,7 @@ export function tasksRepository(db: Database) {
         )
         .execute()
 
-      if (tasksToDate.length === 0) return []
-      return tasksToDate as TasksDue[]
+      return tasksToDate  as TasksDue[]
     },
   }
 }

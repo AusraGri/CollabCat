@@ -62,7 +62,7 @@ const weekdays = [
   { value: 4, name: 'Thursday' },
   { value: 5, name: 'Friday' },
   { value: 6, name: 'Saturday' },
-  { value: 7, name: 'Sunday' },
+  { value: 0, name: 'Sunday' },
 ]
 
 const recurrencePatternNew = computed<Partial<RecurrencePattern>>(() => ({

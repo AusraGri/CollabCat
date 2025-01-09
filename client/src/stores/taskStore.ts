@@ -23,9 +23,12 @@ export const useTasksStore = defineStore('tasks', {
   actions: {
     async getDueTasks(date: string) {
       try {
-        this.tasks = await trpc.tasks.getDueTasks.query({date})
+        const tasks = await trpc.tasks.getDueTasks.query({date})
+        this.tasks = tasks
+        
+        return tasks
       } catch (error) {
-        throw new Error('Failed to fetch tasks')
+        throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
     async getGroupTasks(groupId: number) {

@@ -78,7 +78,7 @@ export interface Tasks {
   isCompleted: Generated<boolean>
   isRecurring: Generated<boolean | null>
   points: number | null
-  startDate: Timestamp
+  startDate: Timestamp | null
   startTime: string | null
   title: string
 }

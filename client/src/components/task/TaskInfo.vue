@@ -316,7 +316,7 @@ const saveChanges = () => {
               <CalendarIcon />
             </div>
             <div class="flex flex-nowrap p-1 text-sm">
-              <div>
+              <div v-if="editableTask.startDate">
                 {{ formatDateToLocal(editableTask.startDate) }}
               </div>
               <div v-if="editableTask.endDate">
@@ -325,7 +325,7 @@ const saveChanges = () => {
               </div>
             </div>
           </div>
-          <div v-if="editableTask.startTime" class="flex items-center space-x-3 text-sm">
+          <div v-if="editableTask.startTime && editableTask.startDate" class="flex items-center space-x-3 text-sm">
             <span>
               <ClockIcon />
             </span>

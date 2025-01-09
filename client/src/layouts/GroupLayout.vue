@@ -46,7 +46,7 @@ const handlePaneClick = () => {
       <FwbTabs v-model="activeTab" @click:pane="handlePaneClick" variant="underline" class="p-5">
         <FwbTab name="Tasks" title="Tasks"> </FwbTab>
         <FwbTab name="Calendar" title="Calendar"> </FwbTab>
-        <FwbTab name="Grades" title="Grades"> </FwbTab>
+        <FwbTab name="Today" title="Today"> </FwbTab>
       </FwbTabs>
       <div>
         <GroupMembers />

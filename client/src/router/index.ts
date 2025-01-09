@@ -60,9 +60,9 @@ const router = createRouter({
               component: () => import('../views/CalendarView.vue'),
             },
             {
-              path: 'grades',
-              name: 'Grades',
-              component: () => import('../views/GradesView.vue'),
+              path: 'today',
+              name: 'Today',
+              component: () => import('../views/TodayView.vue')
             },
           ],
         },

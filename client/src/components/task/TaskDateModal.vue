@@ -8,7 +8,7 @@ const { isShowDateModal } = defineProps<{
   isRecurring: boolean
 }>()
 
-const startDate = defineModel('startDate', { type: [Date, String] as PropType<Date | string> })
+const startDate = defineModel('startDate', { type: [Date, String, null] as PropType<Date | string | null> })
 const endDate = defineModel('endDate', {
   type: [Date, String, null] as PropType<Date | string | null>,
 })
@@ -60,9 +60,7 @@ const endDateMin = computed(() => {
 })
 
 const saveChanges = () => {
-  if (!startDate.value) {
-    return
-  }
+ 
   const time = originalDateValues.value.startTime
   const taskTime = `${time.hours}:${time.minutes}`
 
@@ -143,7 +141,6 @@ watch(() => isShowDateModal, (newVal) => {
             <div>
               <label for="startDate" class="block text-sm font-medium">Start Date</label>
               <VueDatePicker
-              :clearable="false"
                 v-model="startDate"
                 id="startDate"
                 name="Task Date"
@@ -151,7 +148,6 @@ watch(() => isShowDateModal, (newVal) => {
                 :format="formatDate"
                 :max-date="endDate"
                 auto-apply
-                required
                 :enable-time-picker="false"
               ></VueDatePicker>
             </div>

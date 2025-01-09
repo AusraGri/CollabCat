@@ -81,8 +81,8 @@ const deleteTask = async () => {
   const taskId = props.task.id
   const result = await taskStore.deleteTask(taskId)
 
-  if(result) {
-    emit('task:deleted', taskId )
+  if (result) {
+    emit('task:deleted', taskId)
   }
 }
 </script>
@@ -105,6 +105,7 @@ const deleteTask = async () => {
         <div class="h-full rounded bg-green-400 p-1">{{ task.importance }}</div>
       </div>
       <div
+      v-if="task.startDate"
         :class="[
           'flex',
           'w-full',
@@ -114,11 +115,11 @@ const deleteTask = async () => {
           { 'rounded-b': !task.assignedUserId },
         ]"
       >
-        <div class="p-1 text-sm">
+        <div v-if="task.startDate" class="p-1 text-sm">
           {{ formatDateToLocal(task.startDate) }}
           <span v-if="task.endDate">--> {{ formatDateToLocal(task.endDate) }}</span>
         </div>
-        <div v-if="task.startTime">{{ timeToLocalTime(task.startTime, task.startDate) }}</div>
+        <div v-if="task.startTime && task.startDate">{{ timeToLocalTime(task.startTime, task.startDate) }}</div>
       </div>
       <div v-if="task.recurrence">
         <RecurrenceCard :recurrence="task.recurrence" />
@@ -130,7 +131,6 @@ const deleteTask = async () => {
       <div v-if="assignedUserProfile" class="flex w-full">
         <UserBasicProfile :user="assignedUserProfile" />
       </div>
-      
     </div>
     <div aria-label="task options">
       <div class="flex h-full w-fit flex-col space-y-1">

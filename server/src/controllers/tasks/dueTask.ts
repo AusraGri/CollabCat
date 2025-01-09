@@ -1,4 +1,4 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { dateSchema } from '@server/entities/shared'
@@ -25,7 +25,6 @@ export default authenticatedProcedure
   .input(z.object({ date: dateSchema }))
   .output(tasksDue.array())
   .query(async ({ input: { date }, ctx: { authUser, repos } }) => {
-    // should check and return tasks for that date for the user
 
     const tasks = await repos.tasksRepository.getTasksDue(date, authUser.id)
 

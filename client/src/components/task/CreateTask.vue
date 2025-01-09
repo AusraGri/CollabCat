@@ -32,12 +32,12 @@ const tasksStore = useTasksStore()
 const selectedCategory = ref<string | undefined>()
 const selectedMembers = ref<number[]>([])
 const recurringPattern = ref<RecurrencePatternInsertable>()
-const startDate = ref<Date | string>('')
-const endDate = ref<Date | string>('')
+const startDate = ref<Date | string >()
+const endDate = ref<Date | string >()
 const points = ref<string>('')
 
 const taskData = computed(() => {
-  if (!taskForm.value.title || !startDate.value) {
+  if (!taskForm.value.title) {
     return
   }
 
@@ -48,9 +48,9 @@ const taskData = computed(() => {
   const newTaskData = {
     title: taskForm.value.title,
     categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
-    description: taskForm.value.description,
+    description: taskForm.value.description ? taskForm.value.description: undefined,
     endDate: endDate.value ? endDate.value.toString() : undefined,
-    startDate: startDate.value.toString(),
+    startDate: startDate.value? startDate.value.toString() : undefined,
     isRecurring: taskForm.value.isRecurring,
     startTime: taskForm.value.isTime ? taskTime : undefined,
     groupId: groupId ? groupId : undefined,
@@ -94,7 +94,7 @@ async function confirmAction(confirmed: boolean) {
       recurrence: recurringPattern.value,
     }
     const newTask = await tasksStore.createTask(newTaskData)
-    console.log(newTask)
+    emit('task:new', newTask)
   } catch (error) {
     console.log('Error while saving task', error)
   }
@@ -109,8 +109,8 @@ const format = (date: Date) => {
 const resetForm = () => {
   recurringPattern.value = undefined
   selectedMembers.value = []
-  startDate.value = ''
-  endDate.value = ''
+  startDate.value = undefined
+  endDate.value = undefined
   points.value = ''
   taskForm.value = {
     title: '',
@@ -175,7 +175,6 @@ const resetForm = () => {
               :format="format"
               :min-date="new Date()"
               auto-apply
-              required
               :enable-time-picker="false"
             ></VueDatePicker>
           </div>

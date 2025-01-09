@@ -60,6 +60,11 @@ const updateTasksData = (updatedTask: TaskData) => {
   }
 }
 
+
+const handleNewTask = (task: TaskData) => {
+  userGroupStore.tasks?.push(task)
+}
+
 const handleTaskDeletion = (taskId: number) => {
   if (userGroupStore.tasks && isGroupTasks) {
     userGroupStore.tasks = userGroupStore.tasks.filter((task)=> task.id !== taskId)
@@ -67,10 +72,10 @@ const handleTaskDeletion = (taskId: number) => {
 }
 </script>
 <template>
-  <!-- <div v-for="task in groupTasks" :key="task.id">
+  <div v-for="task in groupTasks" :key="task.id">
     <br />
     <div>{{ task }}</div>
-  </div> -->
+  </div>
   <div class="flex justify-between">
     <div class="flex space-x-1">
       <div>
@@ -91,6 +96,7 @@ const handleTaskDeletion = (taskId: number) => {
       :group-members="members"
       :categories="categories"
       @close="toggleTaskModal"
+      @task:new="handleNewTask"
     />
     <CreateCategory
       :is-show-modal="isNewCategory"

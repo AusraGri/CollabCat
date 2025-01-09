@@ -34,6 +34,23 @@ export const taskSchemaOutput = z.object({
   importance: z.string().nullable(),
   points: z.number().positive().nullable(),
   title: z.string().min(3).max(100),
+  startDate: z.date().nullable(),
+  endDate: z.date().nullable(),
+  isRecurring: z.boolean().nullable(),
+  startTime: z.string().nullable(),
+})
+export const taskSchemaForDueTask = z.object({
+  id: idSchema,
+  assignedUserId: idSchema.nullable(),
+  categoryId: idSchema.nullable(),
+  isCompleted: z.boolean(),
+  completedAt: z.date().nullable(),
+  createdByUserId: idSchema,
+  description: z.string().max(300).nullable(),
+  groupId: idSchema.nullable(),
+  importance: z.string().nullable(),
+  points: z.number().positive().nullable(),
+  title: z.string().min(3).max(100),
   startDate: z.date(),
   endDate: z.date().nullable(),
   isRecurring: z.boolean().nullable(),
@@ -46,12 +63,12 @@ const newTaskSchema = z.object({
   isCompleted: z.boolean().optional(),
   completedAt: z.date().optional(),
   createdByUserId: idSchema.optional(),
-  description: z.string().trim().max(300),
+  description: z.string().trim().max(300).optional(),
   groupId: idSchema.optional(),
   importance: z.enum(['High', 'Medium', 'ASAP', 'On Fire!']).optional(),
   points: z.number().positive().optional(),
   title: z.string().trim().min(3).max(100),
-  startDate: z.string(),
+  startDate: z.string().optional(),
   endDate: z.string().optional(),
   startTime: z.string().nullable().optional(),
   isRecurring: z.boolean().nullable().optional(),
@@ -67,7 +84,6 @@ const taskCompletedSchema = z.object({
 const taskOptional = taskSchema
   .omit({
     title: true,
-    startDate: true,
     id: true,
     createdByUserId: true,
     isCompleted: true,
@@ -76,12 +92,11 @@ const taskOptional = taskSchema
   .partial()
 export const inputTaskSchemaAlter = taskSchema.pick({
   title: true,
-  startDate: true,
 })
 export const inputTaskSchema = inputTaskSchemaAlter.merge(taskOptional)
 
 export const createTaskSchema = z.object({
-  startDate: z.date(),
+  startDate: z.date().optional(),
   title: z.string().trim().min(3).max(100),
   assignedUserId: idSchema.optional(),
   categoryId: idSchema.optional(),
@@ -123,7 +138,7 @@ export const getTasksSchema = taskSchema
   })
   .partial()
 
-export const tasksDue = taskSchemaOutput.extend({
+export const tasksDue = taskSchemaForDueTask.extend({
   completed: taskCompletedSchema.nullable(),
   recurrence: recurringPatternSchema.nullable(),
 })
@@ -150,14 +165,16 @@ export type TaskUpdateData = z.infer<typeof taskUpdateSchema>
 export type InsertableTask = Insertable<Tasks>
 export type NewTask = z.infer<typeof newTaskSchema>
 
-export type BaseTaskDue = z.infer<typeof tasksDue>
+// export type BaseTaskDue = z.infer<typeof tasksDue>
 
 export type TasksCompleted = z.infer<typeof taskCompletedSchema>
 
-export interface TasksDue extends Selectable<Tasks> {
-  completed: TasksCompleted[] | null
-  recurrence: Selectable<RecurringPattern> | null
-}
+// export interface TasksDue extends Selectable<Tasks> {
+//   completed: TasksCompleted[] | null
+//   recurrence: Selectable<RecurringPattern> | null
+// }
+
+export type TasksDue = z.infer<typeof tasksDue>
 
 export type TaskData = z.infer<typeof taskDataSchema>
 // export interface TaskData extends Selectable<Tasks> {
