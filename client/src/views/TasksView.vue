@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { FwbButton, FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
-import { useUserGroupsStore } from '@/stores/userGroups'
-import { useUserStore } from '@/stores/userProfile'
+import { FwbButton} from 'flowbite-vue'
+import { useUserGroupsStore, useUserStore } from '@/stores'
 import CreateTask from '../components/task/CreateTask.vue'
 import CreateCategory from '@/components/categories/CreateCategory.vue'
 import type { CategoriesPublic, TaskData } from '@server/shared/types'
@@ -12,14 +11,9 @@ import { useRoute } from 'vue-router'
 
 const userGroupStore = useUserGroupsStore()
 const userStore = useUserStore()
-
 const route = useRoute()
 
-const isGroupTasks = computed(() => route.path.includes('/:username/:group/tasks'))
-const isPersonalTasks = computed(
-  () => route.path.includes('/:username/tasks') && !route.path.includes('/:username/:group/tasks')
-)
-
+const isGroupTasks = computed(() => route.meta.group)
 const isNewTask = ref(false)
 const isNewCategory = ref(false)
 const selectedCategory = ref(null)
@@ -33,6 +27,14 @@ const categories = computed(() => {
 })
 
 const groupTasks = computed(() => userGroupStore.tasks)
+
+const tasks = computed(()=> {
+  if(isGroupTasks.value){
+    return userGroupStore.tasks
+  }
+
+  return  userStore.tasks
+} )
 
 const handleNewCategory = (category: CategoriesPublic) => {
   if (category.groupId) {
@@ -60,22 +62,22 @@ const updateTasksData = (updatedTask: TaskData) => {
   }
 }
 
-
 const handleNewTask = (task: TaskData) => {
   userGroupStore.tasks?.push(task)
 }
 
 const handleTaskDeletion = (taskId: number) => {
   if (userGroupStore.tasks && isGroupTasks) {
-    userGroupStore.tasks = userGroupStore.tasks.filter((task)=> task.id !== taskId)
+    userGroupStore.tasks = userGroupStore.tasks.filter((task) => task.id !== taskId)
   }
 }
 </script>
 <template>
-  <div v-for="task in groupTasks" :key="task.id">
+  <!-- <div v-for="task in groupTasks" :key="task.id">
     <br />
     <div>{{ task }}</div>
-  </div>
+  </div> -->
+  <!-- <div>is group: {{ isGroupTasks }}</div> -->
   <div class="flex justify-between">
     <div class="flex space-x-1">
       <div>
@@ -105,8 +107,8 @@ const handleTaskDeletion = (taskId: number) => {
       @close="toggleCategoryModal"
     />
   </div>
-  <div v-if="groupId">
-    <div v-for="task in groupTasks" :key="task.id">
+  <div v-if="tasks">
+    <div v-for="task in tasks" :key="task.id">
       <TaskCard
         :task="task"
         :categories="categories"

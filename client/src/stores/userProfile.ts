@@ -1,30 +1,33 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type { PublicInvitation, CategoriesPublic } from '@server/shared/types'
-
-interface UserPublic {
-  username: string | null
-  email: string
-  picture: string | null
-  id: number
-}
+import type {
+  PublicInvitation,
+  CategoriesPublic,
+  TaskData,
+  UserPublic
+} from '@server/shared/types'
 
 interface UserUpdate {
   picture?: string
   username?: string
 }
 interface UserState {
-  user: UserPublic | null // Stores user information
+  user: UserPublic | null
   invitations: PublicInvitation[] | null
-  categories: CategoriesPublic [] | null
+  categories: CategoriesPublic[] | null
+  tasks: TaskData[] | null
+  points: number | null
+  isPointsEnabled: boolean
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     user: null,
     invitations: null,
-    categories: null
-
+    categories: null,
+    tasks: null,
+    points: null,
+    isPointsEnabled: false,
   }),
 
   getters: {
@@ -35,8 +38,13 @@ export const useUserStore = defineStore('user', {
     async fetchUserData() {
       try {
         const data = await trpc.user.getUserProfile.query()
-        this.user = data
+        const points = await trpc.points.getUserPoints.query({})
 
+        if(points){
+          this.isPointsEnabled = true
+          this.points = points.points
+        }
+        this.user = data
         this.categories = await trpc.categories.getUserCategories.query()
 
         return data
@@ -66,6 +74,18 @@ export const useUserStore = defineStore('user', {
       }
     },
 
+    async fetchUserTasks() {
+      try {
+        const userId = this.user?.id
+
+        if (!userId) throw new Error('Missing user info')
+
+        this.tasks = await trpc.tasks.getTasks.query({ id: userId })
+      } catch (error) {
+        console.log(`Failed to fetch user tasks: ${error}`)
+      }
+    },
+
     updateUserName(newName: string) {
       if (!this.user) return
       this.user.username = newName
@@ -87,7 +107,8 @@ export const useUserStore = defineStore('user', {
 
     async saveUserChanges(changes: UserUpdate) {
       try {
-        this.user = await trpc.user.updateUser.mutate(changes)
+        const updatedUser = await trpc.user.updateUser.mutate(changes)
+        this.user = updatedUser
       } catch (error) {
         console.error('Failed to save user changes:', error)
       }

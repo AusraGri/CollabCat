@@ -11,7 +11,7 @@ export default authenticatedProcedure
   .meta({
     openapi: {
       method: 'GET',
-      path: '/tasks/daily',
+      path: '/tasks/dailyPersonal',
       tags: ['tasks'],
       summary: 'Get tasks for the given date',
       protect: true,

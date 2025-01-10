@@ -5,19 +5,22 @@ import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
 import { useUserStore } from '@/stores/userProfile'
 import { useUserGroupsStore } from '@/stores/userGroups'
+import { usePathStore } from '@/stores/userPath'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
-import GroupLayout from './GroupLayout.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { stringToUrl } from '@/utils/helpers'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
+const pathStore = usePathStore()
 const userGroupStore = useUserGroupsStore()
 const invitations = computed(() => userStore.invitations)
 
 onMounted(async () => {
+  pathStore.setPath(route.path)
   if (userGroupStore.activeGroup) {
     await userGroupStore.fetchGroupData()
   }
@@ -41,7 +44,7 @@ watch(
     if(userGroupStore.activeGroup === null){
       router.push({ name: 'Profile' })
     }
-   
+    pathStore.setPath(route.path)
   }
 )
 </script>
@@ -49,8 +52,9 @@ watch(
 <template>
   <div
     v-if="userStore.user"
-    class="mb-1 mt-1 flex items-center justify-between border-b border-t border-gray-200 bg-gray-50 p-3"
+    class=" mb-1 mt-1 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50 p-3"
   >
+  <div class="flex max-w-screen-lg grow justify-between items-center ">
     <UserAvatarMenu :user="userStore.user" />
     <GroupSelection />
     <Notifications :has-notifications="!!invitations?.length">
@@ -65,8 +69,9 @@ watch(
       </template>
     </Notifications>
   </div>
+  </div>
   <main>
-    <div class="container">
+    <div class="container w-full  mx-auto">
       <RouterView />
     </div>
   </main>

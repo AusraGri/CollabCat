@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type {
-  GroupsPublic,
 InsertTaskData,
 TaskUpdateData,
 } from '@server/shared/types'
 
-export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
 interface TasksState {
   tasks: any | null
 
@@ -25,7 +23,24 @@ export const useTasksStore = defineStore('tasks', {
       try {
         const tasks = await trpc.tasks.getDueTasks.query({date})
         this.tasks = tasks
-        
+        return tasks
+      } catch (error) {
+        throw new Error(`Failed to fetch tasks: ${error}`)
+      }
+    },
+    async getDuePersonalTasks(date: string) {
+      try {
+        const tasks = await trpc.tasks.getDuePersonalTasks.query({date})
+        this.tasks = tasks
+        return tasks
+      } catch (error) {
+        throw new Error(`Failed to fetch tasks: ${error}`)
+      }
+    },
+    async getDueGroupTasks(date: string, groupId:number) {
+      try {
+        const tasks = await trpc.tasks.getDueGroupTasks.query({groupId, date})
+        this.tasks = tasks
         return tasks
       } catch (error) {
         throw new Error(`Failed to fetch tasks: ${error}`)

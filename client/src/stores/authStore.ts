@@ -1,5 +1,3 @@
-import { useAuth0 } from '@auth0/auth0-vue'
-import { trpc } from '@/trpc'
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {

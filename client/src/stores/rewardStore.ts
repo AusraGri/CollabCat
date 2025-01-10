@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type {
-  GroupsPublic,
   PublicReward,
   GroupMember,
   InsertableReward,
@@ -9,7 +8,6 @@ import type {
   RewardUpdateable,
 } from '@server/shared/types'
 
-export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
 interface RewardState {
   rewards: PublicReward[] | null
 
@@ -31,7 +29,9 @@ export const useRewardStore = defineStore('reward', {
     hasClaimers: (state: RewardState): boolean =>
       state.claimers ? state.claimers.length > 0 : false,
     isGroup: (state: RewardState): boolean => !!state.groupId,
+    isPersonal: (state: RewardState) :boolean => (state.groupId ? false : true),
     hasRewards: (state: RewardState): boolean => (state.rewards ? state.rewards.length > 0 : false),
+    isGroupAdmin: (state: RewardState): boolean => (state.activeUser ? state.activeUser.role === 'Admin' : false)
   },
   actions: {
     async manageGroupRewards(groupId: number) {
@@ -47,21 +47,14 @@ export const useRewardStore = defineStore('reward', {
         throw new Error('Failed to initialize group rewards')
       }
     },
-    async managePersonalRewards(user: UserPublic) {
+    async managePersonalRewards() {
       try {
         this.groupId = null
         this.claimers = null
-        this.rewards = await trpc.rewards.getRewards.query()
+        const rewards: PublicReward[] = await trpc.rewards.getRewards.query({})
+        this.rewards = rewards
 
-        if (!this.activeUser && !this.groupId) {
-          const userPoints = await trpc.points.getUserPoints.query()
-
-          this.activeUser = {
-            ...user,
-            role: 'Admin',
-            points: userPoints.points,
-          }
-        }
+        return rewards
       } catch (error) {
         throw new Error('Failed to initialize user rewards')
       }
@@ -71,7 +64,8 @@ export const useRewardStore = defineStore('reward', {
       try {
         const updatedReward = await trpc.rewards.update.mutate(reward)
 
-        this.rewards = this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
+        this.rewards =
+          this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
       } catch (error) {
         throw new Error('Failed to edit reward')
       }
@@ -92,6 +86,14 @@ export const useRewardStore = defineStore('reward', {
       try {
         const reward = await trpc.rewards.create.mutate(newReward)
         this.rewards?.push(reward)
+      } catch (error) {
+        console.error('Failed to create new reward:', error)
+      }
+    },
+    async claimReward(reward: PublicReward) {
+      // claim reward
+      try {
+        // do claim
       } catch (error) {
         console.error('Failed to create new reward:', error)
       }

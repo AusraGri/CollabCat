@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { Selectable, Insertable} from 'kysely'
-import type { Tasks, RecurringPattern } from '@server/database/types'
+import type { Tasks} from '@server/database/types'
 import type { RecurrencePatternInsertable } from './recurrence'
 import { idSchema, dateSchema } from './shared'
 import { recurringPatternSchemaInput, recurringPatternSchema } from './recurrence';

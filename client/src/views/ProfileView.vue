@@ -1,6 +1,10 @@
 <template>
     <div>
-profile page
+<div>
+    todays all tasks
+</div>
+<div>Calendar</div>
+<div>rewards</div>
     </div>
 </template>
 

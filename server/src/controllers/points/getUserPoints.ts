@@ -2,6 +2,7 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 import { pointsRepository } from '@server/repositories/pointsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { pointsSchemaOutput } from '@server/entities/points'
+import { idSchema } from '@server/entities/shared'
 import z from 'zod'
 
 export default authenticatedProcedure
@@ -15,11 +16,15 @@ export default authenticatedProcedure
       summary: 'Get points of the user',
     },
   })
-  .input(z.void())
-  .output(pointsSchemaOutput)
-  .query(async ({ ctx: { authUser, repos } }) => {
+  .input(z.object({
+    groupId: idSchema.optional()
+  }))
+  .output(pointsSchemaOutput.optional())
+  .query(async ({ input: {groupId}, ctx: { authUser, repos } }) => {
 
-    const points = await repos.pointsRepository.getPoints(authUser.id)
+    const queryOptions = groupId ? {userId: authUser.id, groupId} : {userId: authUser.id}
+
+    const points = await repos.pointsRepository.getPoints(queryOptions)
 
     return points
   })

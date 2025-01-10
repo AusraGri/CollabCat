@@ -30,22 +30,24 @@ type GroupsUpdate = Omit<GroupsPublic, 'createdByUserId'>
 export function groupsRepository(db: Database) {
   return {
     async create(group: Insertable<Groups>): Promise<GroupsPublic> {
-      const newGroup = await db
-        .insertInto('groups')
-        .values(group)
-        .returning(groupsKeysPublic)
-        .executeTakeFirstOrThrow()
-
-      await db
-        .insertInto('userGroups')
-        .values({
-          groupId: newGroup.id,
-          role: 'Admin',
-          userId: group.createdByUserId,
-        })
-        .executeTakeFirstOrThrow()
-
-      return newGroup
+      return db.transaction().execute(async(trx) => {
+        const newGroup = await trx
+          .insertInto('groups')
+          .values(group)
+          .returning(groupsKeysPublic)
+          .executeTakeFirstOrThrow()
+  
+        await trx
+          .insertInto('userGroups')
+          .values({
+            groupId: newGroup.id,
+            role: 'Admin',
+            userId: group.createdByUserId,
+          })
+          .executeTakeFirstOrThrow()
+  
+        return newGroup
+      })
     },
     // getGroups- better name. Need to evaluate what is really needed, do I really need all those query options?
     async getGroup(options: GetGroupsOptions): Promise<GroupsPublic[]> {

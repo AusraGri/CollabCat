@@ -6,7 +6,7 @@ import type {
   InsertableReward,
   GroupMember,
   CategoriesPublic, 
-  TaskData
+  TaskData, ActiveGroup
 } from '@server/shared/types'
 type GroupsPublic = {
   id: number
@@ -20,8 +20,6 @@ export interface UserGroups {
   userId: number
 }
 
-
-export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
 interface GroupsState {
   userGroups: GroupsPublic[] | null
   activeGroup: ActiveGroup | null
@@ -31,12 +29,14 @@ interface GroupsState {
   groupData: GroupData | null
   categories: CategoriesPublic[] | null
   tasks: TaskData[] | null
+  isUserGroupPointsEnabled: boolean
 }
 
 export const useUserGroupsStore = defineStore('group', {
   state: (): GroupsState => ({
     userGroups: null,
     userMembership: null,
+    isUserGroupPointsEnabled: false,
     activeGroup: null,
     groupMembers: null,
     rewards: null,
@@ -135,8 +135,10 @@ export const useUserGroupsStore = defineStore('group', {
         const groupId = this.activeGroup?.id
 
         if (groupId) {
-          const data = await trpc.groups.getMembershipInfo.query({ userId, groupId }) // Fetch from your API
+          const data = await trpc.groups.getMembershipInfo.query({ userId, groupId })
           this.userMembership = data
+          const points = await trpc.points.getUserPoints.query({groupId})
+          this.isUserGroupPointsEnabled = !!points
         }
       } catch (error) {
         console.error('Failed to fetch user membership data:', error)

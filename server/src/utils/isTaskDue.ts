@@ -1,8 +1,8 @@
-import type { TasksDue } from '@server/entities/tasks'
+import type {TaskData } from '@server/entities/tasks'
 import moment from 'moment'
 import 'moment-recur-ts'
 
-export default function isTaskDue(task: TasksDue, date: Date): boolean {
+export default function isTaskDue(task: TaskData, date: Date): boolean {
   try {
     const givenDate = moment(date)
     const startDate = moment(task.startDate)

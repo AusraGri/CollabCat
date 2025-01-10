@@ -11,7 +11,6 @@ const rewardStore = useRewardStore()
 const isNewReward = ref(false)
 const rewardToUpdate = ref()
 const rewards = computed(() => rewardStore.rewards)
-
 const getRewardClaimers = (reward: PublicReward) => {
 
   return rewardStore.claimers?.filter((user) => 
@@ -21,9 +20,7 @@ const getRewardClaimers = (reward: PublicReward) => {
 
 const isShowRewards = computed(() => {
   const isRewards = rewardStore.hasRewards
-  const isAdmin = rewardStore.activeUser?.role ? rewardStore.activeUser?.role === 'Admin' : false
-
-  return isAdmin || isRewards
+  return isRewards
 })
 
 const toggleAddReward = () => {
@@ -75,7 +72,7 @@ const handleRewardChange = async ({ reward, action }: { reward: PublicReward; ac
         <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover>
           <RewardItem v-if="currentUser" :reward="reward" :member="currentUser" :claimers="getRewardClaimers(reward)" @reward:change="handleRewardChange" />
         </FwbListGroupItem>
-        <FwbListGroupItem>
+        <FwbListGroupItem v-if="rewardStore.isGroupAdmin || rewardStore.isPersonal">
           <button
             class="w-full px-4 py-2 whitespace-nowrap font-medium text-green-600 hover:bg-green-50"
             @click="toggleAddReward"

@@ -2,6 +2,7 @@ import type { Database } from '@server/database'
 import type { User } from '@server/database/types'
 import {
   userKeysAll,
+  type UserBaseInfo,
 } from '@server/entities/user'
 import type { DeleteResult, Insertable, Selectable } from 'kysely'
 
@@ -69,6 +70,21 @@ export function userRepository(db: Database) {
         .executeTakeFirstOrThrow()
 
       return user
+    },
+    async findUserInfoById(id: number): Promise<UserBaseInfo> {
+      return db
+      .selectFrom('user')
+      .leftJoin('points', 'points.userId', 'user.id')
+      .select([
+        'user.id',
+        'user.username',
+        'user.picture',
+        'user.email',
+        'points.points',
+      ])
+      .where('user.id', '=', id)
+      .where('points.groupId', '=', null)
+      .executeTakeFirstOrThrow()
     },
 
     async deleteUser(userId: number): Promise<DeleteResult> {

@@ -22,12 +22,18 @@ export function pointsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async getPoints(userId: number): Promise<PointsPublic> {
-      return db
+    async getPoints(queryData: {userId: number, groupId?: number}): Promise<PointsPublic | undefined> {
+      let query =  db
         .selectFrom('points')
         .select(pointsKeysPublic)
-        .where('userId', '=', userId)
-        .executeTakeFirstOrThrow()
+        .where('userId', '=', queryData.userId)
+
+        if(queryData.groupId){
+          query = query.where('points.groupId', '=', queryData.groupId)
+        }
+
+
+        return query.executeTakeFirst()
     },
 
     async deletePoints(options: DeletePoints): Promise<DeleteResult> {

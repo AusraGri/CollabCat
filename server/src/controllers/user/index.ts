@@ -1,6 +1,5 @@
 import { router } from '@server/trpc'
 import login from './login'
-import signup from './signup'
 import signupAuth from './signupAuth'
 import getUser from './getUser'
 import getAssignedUsers from './assignedUsers'
@@ -10,7 +9,6 @@ import deleteUser from './deleteUser'
 
 export default router({
   login,
-  signup,
   signupAuth,
   getUser,
   getAssignedUsers,

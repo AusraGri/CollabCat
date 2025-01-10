@@ -3,6 +3,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import z from 'zod'
 import { TRPCError } from '@trpc/server'
+import { userPublicSchema } from '@server/entities/user'
 
 
 export default authenticatedProcedure
@@ -13,6 +14,7 @@ export default authenticatedProcedure
   )
   .input(z.void()
   )
+  .output(userPublicSchema)
   .query(async ({ ctx: { repos, authUser } }) => {
     const user = await repos.userRepository.findById(authUser.id)
 

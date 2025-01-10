@@ -44,7 +44,7 @@ const handleAuthRedirect = async () => {
     
       const newUser = await getUserData()
         const signedUser = await trpc.user.signupAuth.mutate(newUser)
-        userStore.user = signedUser
+        userStore.user = {...signedUser}
     } catch (error) {
       console.log(error)
     }

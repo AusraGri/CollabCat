@@ -54,8 +54,8 @@ export type GroupsPublic = Pick<
   Selectable<Groups>,
   (typeof groupsKeysPublic)[number]
 >
-
 export type GroupData = z.infer<typeof groupDataSchema>
+export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
 export type InsertableGroups = Insertable<Groups>
 export type GroupMember = z.infer<typeof memberSchema>;
 
