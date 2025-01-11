@@ -66,14 +66,23 @@ const router = createRouter({
         {
           path: '',
           name: 'Profile',
-          component: () => import('../views/ProfileView.vue'),
-          meta: { personal: true }
-        },
-        {
-          path: 'tasks',
-          name: 'PersonalTasks',
-          component: TasksView,
-          meta: { personal: true }
+          component: () => import('../layouts/GroupLayout.vue'),
+          meta: { personal: true }, 
+          children: [
+            {
+              path: 'tasks',
+              name: 'PersonalTasks',
+              component: TasksView,
+              meta: { personal: true }
+            },
+            {
+              path: 'calendar',
+              name: 'PersonalCalendar',
+              component: () => import('../views/CalendarView.vue'),
+              meta: { personal: true }
+            },
+
+          ]
         },
       ],
     },

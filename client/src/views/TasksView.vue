@@ -26,7 +26,7 @@ const categories = computed(() => {
   return userStore.categories || undefined
 })
 
-const groupTasks = computed(() => userGroupStore.tasks)
+// const groupTasks = computed(() => userGroupStore.tasks)
 
 const tasks = computed(()=> {
   if(isGroupTasks.value){
@@ -73,10 +73,10 @@ const handleTaskDeletion = (taskId: number) => {
 }
 </script>
 <template>
-  <!-- <div v-for="task in groupTasks" :key="task.id">
+   <div v-for="task in tasks" :key="task.id">
     <br />
     <div>{{ task }}</div>
-  </div> -->
+  </div> 
   <!-- <div>is group: {{ isGroupTasks }}</div> -->
   <div class="flex justify-between">
     <div class="flex space-x-1">

@@ -5,9 +5,10 @@ import { FwbBadge, FwbButton } from 'flowbite-vue'
 import UserBasicProfile from '../user/UserBasicProfile.vue';
 import ConfirmationModal from '../ConfirmationModal.vue';
 
-const { reward, member } = defineProps<{
+
+const { reward, userInfo, claimers } = defineProps<{
   reward: PublicReward
-  member: GroupMember
+  userInfo: GroupMember
   claimers?: GroupMember[]
 }>()
 
@@ -16,10 +17,10 @@ const emit = defineEmits<{
 }>()
 
 const isDeletion = ref(false)
-const isAdmin = computed(() => member.role === 'Admin')
+const isAdmin = computed(() => userInfo.role === 'Admin')
 
 const isEnoughPoints = computed(() => {
-  const userPoints = member.points ? Number(member.points) : 0
+  const userPoints = userInfo.points ? Number(userInfo.points) : 0
 
   return reward.cost < userPoints
 })

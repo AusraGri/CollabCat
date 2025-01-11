@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, type PropType } from 'vue'
+import { computed, ref, watch, type PropType } from 'vue'
 import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
 import { type TaskData, type CategoriesPublic, type GroupMember } from '@server/shared/types'
 import UserBasicProfile from '../user/UserBasicProfile.vue'
@@ -9,7 +9,7 @@ import { toggle } from '@/utils/helpers'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
 import { useTasksStore } from '@/stores/taskStore'
 
-const check = ref(false)
+
 
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
@@ -39,6 +39,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isCheckboxEnabled: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const taskCategory = computed(() => {
@@ -56,8 +60,19 @@ const assignedUserProfile = computed(() => {
 
 const showTaskInfo = ref(false)
 
+const check = ref(isTaskCompleted(props.task))
+
 const toggleTaskInfo = () => {
   toggle(showTaskInfo)
+}
+
+function isTaskCompleted (task: TaskData) {
+  if(!task.isRecurring && !task.recurrence) return task.isCompleted
+
+  if(task.isRecurring){
+    return !!task.completed?.length
+  }
+
 }
 
 const updateTask = async (updatedTask: TaskData) => {
@@ -85,6 +100,14 @@ const deleteTask = async () => {
     emit('task:deleted', taskId)
   }
 }
+
+const updateTaskStatus = (value: boolean) => {
+  console.log(value)
+}
+
+watch(()=> props.task, (newTask)=>{
+ check.value = isTaskCompleted(newTask)
+})
 </script>
 
 <template>
@@ -93,7 +116,7 @@ const deleteTask = async () => {
     aria-label="task item"
   >
     <div v-if="isCheckbox" class="h-6 self-center">
-      <FwbCheckbox v-model="check" />
+      <FwbCheckbox v-model="check" :disabled="!isCheckboxEnabled" @update:model-value="updateTaskStatus" />
     </div>
     <div
       @click="toggleTaskInfo"

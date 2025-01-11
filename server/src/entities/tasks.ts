@@ -76,6 +76,7 @@ const newTaskSchema = z.object({
 
 const taskCompletedSchema = z.object({
   completedAt: z.date(),
+  completedBy: idSchema.nullable(),
   id: idSchema,
   instanceDate: z.date(),
   taskId: idSchema,

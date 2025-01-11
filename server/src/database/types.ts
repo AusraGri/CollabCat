@@ -17,6 +17,7 @@ export interface Categories {
 
 export interface CompletedTasks {
   completedAt: Generated<Timestamp>
+  completedBy: number | null
   id: Generated<number>
   instanceDate: Timestamp
   taskId: number

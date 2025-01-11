@@ -13,12 +13,13 @@ interface RewardState {
 
   activeUser: GroupMember | null
   claimers: GroupMember[] | null
-
+  isRewardsEnabled: boolean
   groupId: number | null
 }
 
 export const useRewardStore = defineStore('reward', {
   state: (): RewardState => ({
+    isRewardsEnabled: true,
     rewards: null,
     claimers: null,
     activeUser: null,
@@ -29,9 +30,10 @@ export const useRewardStore = defineStore('reward', {
     hasClaimers: (state: RewardState): boolean =>
       state.claimers ? state.claimers.length > 0 : false,
     isGroup: (state: RewardState): boolean => !!state.groupId,
-    isPersonal: (state: RewardState) :boolean => (state.groupId ? false : true),
+    isPersonal: (state: RewardState): boolean => (state.groupId ? false : true),
     hasRewards: (state: RewardState): boolean => (state.rewards ? state.rewards.length > 0 : false),
-    isGroupAdmin: (state: RewardState): boolean => (state.activeUser ? state.activeUser.role === 'Admin' : false)
+    isGroupAdmin: (state: RewardState): boolean =>
+      state.activeUser ? state.activeUser.role === 'Admin' : false,
   },
   actions: {
     async manageGroupRewards(groupId: number) {
@@ -47,12 +49,13 @@ export const useRewardStore = defineStore('reward', {
         throw new Error('Failed to initialize group rewards')
       }
     },
-    async managePersonalRewards() {
+    async managePersonalRewards(user: GroupMember) {
       try {
         this.groupId = null
         this.claimers = null
         const rewards: PublicReward[] = await trpc.rewards.getRewards.query({})
         this.rewards = rewards
+        this.activeUser = user
 
         return rewards
       } catch (error) {

@@ -3,7 +3,7 @@ import { ref, onMounted, watch, computed, watchEffect } from 'vue'
 import { FwbButton, FwbListGroupItem } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
-import { useUserStore } from '@/stores/userProfile'
+import { useUserStore, useTasksStore } from '@/stores'
 import { useUserGroupsStore } from '@/stores/userGroups'
 import { usePathStore } from '@/stores/userPath'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
@@ -14,6 +14,7 @@ import { stringToUrl } from '@/utils/helpers'
 
 const router = useRouter()
 const route = useRoute()
+const taskStore = useTasksStore()
 const userStore = useUserStore()
 const pathStore = usePathStore()
 const userGroupStore = useUserGroupsStore()
@@ -35,8 +36,9 @@ watch(
   async (newGroupName, oldGroupName) => {
     if (newGroupName !== oldGroupName && newGroupName) {
       const groupName = stringToUrl(newGroupName)
+      const currentTab = route.name || 'Calendar'
 
-      router.push({ name: 'Group', params: { group: groupName } })
+      router.push({ name: currentTab, params: { group: groupName } })
 
       await userGroupStore.fetchGroupData()
       await userGroupStore.fetchUserMembershipInfo()

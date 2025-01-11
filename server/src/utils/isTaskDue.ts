@@ -4,11 +4,9 @@ import 'moment-recur-ts'
 
 export default function isTaskDue(task: TaskData, date: Date): boolean {
   try {
-    const givenDate = moment(date)
+    const givenDate = moment(date).startOf('day')
     const startDate = moment(task.startDate)
-    const endDate = task.endDate
-      ? moment(task.endDate)
-      : moment(task.startDate).endOf('day')
+    const endDate =  moment(task.endDate).endOf('day')
     const recurrType = task.recurrence?.recurringType
     const separation = task.recurrence?.separationCount
       ? task.recurrence.separationCount + 1
@@ -24,15 +22,16 @@ export default function isTaskDue(task: TaskData, date: Date): boolean {
     if (!recurrType) {
       recurrenceRule = moment.recur({
         start: startDate,
-        end: endDate,
+        end: startDate.endOf('day'),
       })
     } else if (recurrType && recurrType === 'daily') {
+
       recurrenceRule = moment()
         .recur({
           start: startDate,
           end: endDate,
         })
-        .every(separation + 1)
+        .every(separation)
         .days()
     } else if (recurrType && recurrType === 'weekly') {
       if (daysOfWeek) {

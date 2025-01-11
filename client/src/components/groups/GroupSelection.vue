@@ -5,14 +5,6 @@ import { useUserGroupsStore } from '@/stores/userGroups'
 import { type GroupsPublic } from '@server/shared/types'
 import CreateNewGroupModal from './CreateNewGroupModal.vue'
 
-// const { groups } = defineProps<{
-//   groups: GroupsPublic[]
-// }>()
-
-const emit = defineEmits<{
-  (event: 'selected:group', value: GroupsPublic): void
-}>()
-
 const userGroupStore = useUserGroupsStore()
 
 const groups = computed(() => {
@@ -23,14 +15,11 @@ const isCreateNewGroup = ref(false)
 const selected = computed(() => userGroupStore.activeGroup?.name)
 const dropdownRef = ref<HTMLElement | null>(null)
 
-const selectItem = async (group: GroupsPublic) => {
+const selectItem = async (group: GroupsPublic):Promise<void> => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdByUserId, ...activeGroup } = group
   userGroupStore.activeGroup = activeGroup
-  // await userGroupStore.fetchGroupData()
-  // await userGroupStore.fetchUserGroups()
   isOpen.value = false
-  // emit('selected:group', group)
 }
 
 const toggleDropdown = () => {
@@ -89,7 +78,6 @@ const handleNoGroup = () => {
         />
       </svg>
     </button>
-    <!-- Drop down menu items -->
     <div
       v-if="isOpen"
       class="absolute right-0 z-10 mt-2 w-fit rounded-md border border-gray-300 bg-white shadow-lg"

@@ -1,12 +1,11 @@
 
 <script setup lang="ts">
 import {ref} from 'vue'
+import { FwbHeading } from 'flowbite-vue';
 import { useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/userProfile';
-import { useAuthService } from '@/services/auth0';
 import { useUserGroupsStore } from '../stores/userGroups';
 
-const {isAuth} = useAuthService()
 const route = useRoute()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
@@ -19,6 +18,9 @@ const getGroupData = async() => {
 </script>
 <template>
     <div>
+        <div>
+            <FwbHeading> Today</FwbHeading>
+        </div>
 this is Group page
 <br>
 <button @click="getGroupData" class=" bg-red-400">get data</button>
