@@ -1,9 +1,10 @@
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/indexOld'
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { taskCompletionSchema } from '@server/entities/tasks'
+import { taskCompletionSchema} from '@server/entities/tasks'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
+import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
@@ -18,8 +19,11 @@ export default authenticatedProcedure
   })
   .input(taskCompletionSchema)
   .output(z.boolean())
-  .mutation(async ({ input: taskData, ctx: { repos } }) => {
+  .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {
     const [isTask] = await repos.tasksRepository.getTasks({ id: taskData.id })
+    const isTaskRecurring = isTask.isRecurring ? isTask.isRecurring : false
+
+    const instanceDate = setDateToUTCmidnight(taskData.instanceDate)
 
     if (!isTask) {
       throw new TRPCError({
@@ -28,28 +32,34 @@ export default authenticatedProcedure
       })
     }
 
-    let taskCompletion
 
-    if (taskData.isCompleted === true) {
-      taskCompletion = await repos.tasksRepository.addToCompletedTasks({
-        taskId: taskData.id,
-        instanceDate: taskData.instanceDate,
-      })
+    if (isTaskRecurring) {
+      if (taskData.isCompleted === true) {
+       await repos.tasksRepository.addToCompletedTasks({
+          taskId: taskData.id,
+          instanceDate,
+          completedBy: authUser.id,
+        })
+
+        return true
+      }
+
+      if (taskData.isCompleted === false) {
+        const taskCompletion = await repos.tasksRepository.removeCompletedTasks({
+          taskId: taskData.id,
+          instanceDate
+        })
+
+        return !!taskCompletion.numDeletedRows
+      }
     }
 
-    if (taskData.isCompleted === false) {
-      taskCompletion = await repos.tasksRepository.removeCompletedTasks({
-        taskId: taskData.id,
-        instanceDate: taskData.instanceDate,
-      })
-    }
+    if (isTask.isCompleted === taskData.isCompleted) return true
 
-    if (!taskCompletion) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Task was not found',
-      })
-    }
+    await repos.tasksRepository.updateTaskCompletion({
+      id: taskData.id,
+      isCompleted: taskData.isCompleted,
+    })
 
-    return !!taskCompletion
+    return true
   })

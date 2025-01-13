@@ -38,6 +38,14 @@ export interface Invitations {
   invitationToken: string
 }
 
+export interface PointClaims {
+  claimedAt: Generated<Timestamp>
+  id: Generated<number>
+  taskId: number
+  taskInstanceDate: Timestamp
+  userId: number
+}
+
 export interface Points {
   createdAt: Generated<Timestamp>
   groupId: number | null
@@ -106,6 +114,7 @@ export interface DB {
   completedTasks: CompletedTasks
   groups: Groups
   invitations: Invitations
+  pointClaims: PointClaims
   points: Points
   recurringPattern: RecurringPattern
   rewards: Rewards

@@ -6,6 +6,7 @@ import isTaskDue from '@server/utils/isTaskDue'
 import { taskDataSchema, type TaskData } from '@server/entities/tasks'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
+import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default groupAuthProcedure
   .use(provideRepos({ tasksRepository }))
@@ -34,8 +35,10 @@ export default groupAuthProcedure
       })
     }
 
+     const dateUTC = setDateToUTCmidnight(date)
+
     const tasks: TaskData[] = await repos.tasksRepository.getGroupTasksDue({
-      date,
+      date: dateUTC,
       userId: authUser.id,
       groupId: userGroup?.groupId,
     })

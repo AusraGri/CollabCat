@@ -1,7 +1,7 @@
 import type { Database } from '@server/database'
-import type { Points } from '@server/database/types'
+import type { PointClaims, Points } from '@server/database/types'
 import type { DeleteResult, Insertable } from 'kysely'
-import { pointsKeysPublic, type PointsPublic } from '@server/entities/points'
+import { pointsKeysPublic, type PointsClaimed, type PointsPublic } from '@server/entities/points'
 
 export interface PointAlterObject {
   groupId?: number
@@ -34,6 +34,30 @@ export function pointsRepository(db: Database) {
 
 
         return query.executeTakeFirst()
+    },
+
+    async addPointClaims(claimData: Insertable<PointClaims>): Promise<PointsClaimed> {
+      return db
+        .insertInto('pointClaims')
+        .values(claimData)
+        .returningAll()
+        .executeTakeFirstOrThrow()
+    },
+
+    async getPointClaims(claimData: {userId: number, taskId: number, taskInstanceDate: Date}): Promise<PointsClaimed | undefined> {
+      return db
+        .selectFrom('pointClaims')
+        .select([
+          'pointClaims.claimedAt',
+          'pointClaims.id',
+          'pointClaims.taskId',
+          'pointClaims.taskInstanceDate',
+          'pointClaims.userId'
+        ])
+        .where('pointClaims.taskId', '=', claimData.taskId)
+        .where('pointClaims.userId', '=', claimData.userId)
+        .where('pointClaims.taskInstanceDate', '=', claimData.taskInstanceDate)
+        .executeTakeFirst()
     },
 
     async deletePoints(options: DeletePoints): Promise<DeleteResult> {

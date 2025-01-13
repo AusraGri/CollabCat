@@ -27,10 +27,13 @@ export interface TaskUpdate {
   task: Updateable<Tasks>
 }
 
-export interface TaskCompletion {
+export interface TaskCompletionAdd {
   taskId: number
   instanceDate: Date
+  completedBy: number
 }
+
+export type TaskCompletionRemove = Omit<TaskCompletionAdd, 'completedBy'>
 
 export interface CreateTaskData {
   task: Insertable<Tasks>
@@ -92,6 +95,7 @@ export function tasksRepository(db: Database) {
                 'completedTasks.instanceDate',
                 'completedTasks.id',
                 'completedTasks.taskId',
+                'completedTasks.completedBy',
               ])
               .whereRef('tasks.id', '=', 'completedTasks.taskId')
               .where('tasks.isRecurring', '=', true)
@@ -135,10 +139,15 @@ export function tasksRepository(db: Database) {
       return query.execute()
     },
 
-    async update(taskData: TaskUpdate): Promise<TasksPublic> {
+    async updateTaskCompletion(taskData: {
+      id: number
+      isCompleted: boolean
+    }): Promise<TasksPublic> {
       return db
         .updateTable('tasks')
-        .set(taskData.task)
+        .set({
+          isCompleted: taskData.isCompleted,
+        })
         .where('id', '=', taskData.id)
         .returning(tasksKeysPublic)
         .executeTakeFirstOrThrow()
@@ -180,7 +189,7 @@ export function tasksRepository(db: Database) {
     },
 
     async addToCompletedTasks(
-      taskData: TaskCompletion
+      taskData: TaskCompletionAdd
     ): Promise<SelectableCompletedTask> {
       return db
         .insertInto('completedTasks')
@@ -190,7 +199,7 @@ export function tasksRepository(db: Database) {
     },
 
     async removeCompletedTasks(
-      taskData: TaskCompletion
+      taskData: TaskCompletionRemove
     ): Promise<DeleteResult> {
       return db
         .deleteFrom('completedTasks')
@@ -214,13 +223,28 @@ export function tasksRepository(db: Database) {
           jsonObjectFrom(
             eb
               .selectFrom('recurringPattern as rp')
-              .selectAll()
+              .select([
+                'rp.dayOfMonth',
+                'rp.dayOfWeek',
+                'rp.maxNumOfOccurrences',
+                'rp.monthOfYear',
+                'rp.recurringType',
+                'rp.separationCount',
+                'rp.taskId',
+                'rp.weekOfMonth'
+              ])
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
-          jsonObjectFrom(
+          jsonArrayFrom(
             eb
               .selectFrom('completedTasks as ct')
-              .selectAll()
+              .select([
+                'ct.completedAt',
+                'ct.completedBy',
+                'ct.id',
+                'ct.instanceDate',
+                'ct.taskId'
+              ])
               .whereRef('ct.taskId', '=', 't.id')
               .where('ct.instanceDate', '=', date)
           ).as('completed'),
@@ -240,7 +264,7 @@ export function tasksRepository(db: Database) {
         )
         .execute()
 
-      return tasksToDate  as TaskData[]
+      return tasksToDate
     },
     async getPersonalTasksDue(date: Date, userId: number): Promise<TaskData[]> {
       const tasksToDate = await db
@@ -250,13 +274,28 @@ export function tasksRepository(db: Database) {
           jsonObjectFrom(
             eb
               .selectFrom('recurringPattern as rp')
-              .selectAll()
+              .select([
+                'rp.dayOfMonth',
+                'rp.dayOfWeek',
+                'rp.maxNumOfOccurrences',
+                'rp.monthOfYear',
+                'rp.recurringType',
+                'rp.separationCount',
+                'rp.taskId',
+                'rp.weekOfMonth'
+              ])
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
-          jsonObjectFrom(
+          jsonArrayFrom(
             eb
               .selectFrom('completedTasks as ct')
-              .selectAll()
+              .select([
+                'ct.completedAt',
+                'ct.completedBy',
+                'ct.id',
+                'ct.instanceDate',
+                'ct.taskId'
+              ])
               .whereRef('ct.taskId', '=', 't.id')
               .where('ct.instanceDate', '=', date)
           ).as('completed'),
@@ -271,9 +310,13 @@ export function tasksRepository(db: Database) {
         )
         .execute()
 
-      return tasksToDate  as TaskData[]
+      return tasksToDate
     },
-    async getGroupTasksDue(data: {date: Date, userId: number, groupId: number}): Promise<TaskData[]> {
+    async getGroupTasksDue(data: {
+      date: Date
+      userId: number
+      groupId: number
+    }): Promise<TaskData[]> {
       const tasksToDate = await db
         .selectFrom('tasks as t')
         .select((eb) => [
@@ -281,13 +324,28 @@ export function tasksRepository(db: Database) {
           jsonObjectFrom(
             eb
               .selectFrom('recurringPattern as rp')
-              .selectAll()
+              .select([
+                'rp.dayOfMonth',
+                'rp.dayOfWeek',
+                'rp.maxNumOfOccurrences',
+                'rp.monthOfYear',
+                'rp.recurringType',
+                'rp.separationCount',
+                'rp.taskId',
+                'rp.weekOfMonth'
+              ])
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
-          jsonObjectFrom(
+          jsonArrayFrom(
             eb
               .selectFrom('completedTasks as ct')
-              .selectAll()
+              .select([
+                'ct.completedAt',
+                'ct.completedBy',
+                'ct.id',
+                'ct.instanceDate',
+                'ct.taskId'
+              ])
               .whereRef('ct.taskId', '=', 't.id')
               .where('ct.instanceDate', '=', data.date)
           ).as('completed'),
@@ -302,13 +360,16 @@ export function tasksRepository(db: Database) {
         .where((eb) =>
           eb.or([
             eb('t.startDate', '<=', data.date).and(
-              eb.or([eb('t.endDate', '>=', data.date), eb('t.endDate', 'is', null)])
+              eb.or([
+                eb('t.endDate', '>=', data.date),
+                eb('t.endDate', 'is', null),
+              ])
             ),
           ])
         )
         .execute()
 
-      return tasksToDate  as TaskData[]
+      return tasksToDate
     },
   }
 }

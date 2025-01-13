@@ -1,13 +1,9 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type {
-InsertTaskData,
-TaskUpdateData,
-} from '@server/shared/types'
+import type { InsertTaskData, TaskUpdateData, TaskData } from '@server/shared/types'
 
 interface TasksState {
-  tasks: any | null
-
+  tasks: TaskData[] | null
 }
 export const useTasksStore = defineStore('tasks', {
   state: (): TasksState => ({
@@ -15,13 +11,12 @@ export const useTasksStore = defineStore('tasks', {
   }),
 
   getters: {
-    isTasks: (state: TasksState): boolean =>
-      !!state.tasks
+    isTasks: (state: TasksState): boolean => !!state.tasks,
   },
   actions: {
     async getDueTasks(date: string) {
       try {
-        const tasks = await trpc.tasks.getDueTasks.query({date})
+        const tasks = await trpc.tasks.getDueTasks.query({ date })
         this.tasks = tasks
         return tasks
       } catch (error) {
@@ -30,16 +25,16 @@ export const useTasksStore = defineStore('tasks', {
     },
     async getDuePersonalTasks(date: string) {
       try {
-        const tasks = await trpc.tasks.getDuePersonalTasks.query({date})
+        const tasks = await trpc.tasks.getDuePersonalTasks.query({ date })
         this.tasks = tasks
         return tasks
       } catch (error) {
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
-    async getDueGroupTasks(date: string, groupId:number) {
+    async getDueGroupTasks(date: string, groupId: number) {
       try {
-        const tasks = await trpc.tasks.getDueGroupTasks.query({groupId, date})
+        const tasks = await trpc.tasks.getDueGroupTasks.query({ groupId, date })
         this.tasks = tasks
         return tasks
       } catch (error) {
@@ -48,7 +43,7 @@ export const useTasksStore = defineStore('tasks', {
     },
     async getGroupTasks(groupId: number) {
       try {
-        this.tasks = await trpc.tasks.getTasks.query({groupId})
+        this.tasks = await trpc.tasks.getTasks.query({ groupId })
       } catch (error) {
         throw new Error('Failed to fetch group tasks')
       }
@@ -62,7 +57,7 @@ export const useTasksStore = defineStore('tasks', {
         throw new Error(`Failed to save new task: ${error}`)
       }
     },
-    async updateTask(taskData: TaskUpdateData ) {
+    async updateTask(taskData: TaskUpdateData) {
       try {
         const updatedTask = await trpc.tasks.update.mutate(taskData)
 
@@ -73,11 +68,24 @@ export const useTasksStore = defineStore('tasks', {
     },
     async deleteTask(taskId: number) {
       try {
-      const result =  await trpc.tasks.deleteTask.mutate({taskId})
+        const result = await trpc.tasks.deleteTask.mutate({ taskId })
 
-      return result
+        return result
       } catch (error) {
         throw new Error(`Failed to delete task: ${error}`)
+      }
+    },
+    async updateTaskCompletion(taskData: { id: number; isCompleted: boolean; instanceDate: Date }) {
+      try {
+        await trpc.tasks.taskCompletion.mutate(taskData)
+        const [updatedTask] = await trpc.tasks.getTasks.query({ id: taskData.id })
+
+        if (this.tasks) {
+          this.tasks =
+            this.tasks.map((task :TaskData) :TaskData => (task.id === updatedTask.id ? updatedTask : task))
+        }
+      } catch (error) {
+        throw new Error(`Failed to update task completion: ${error}`)
       }
     },
   },

@@ -57,7 +57,7 @@ export const taskSchemaForDueTask = z.object({
   startTime: z.string().nullable(),
 })
 
-const newTaskSchema = z.object({
+export const newTaskSchema = z.object({
   assignedUserId: idSchema.optional(),
   categoryId: idSchema.optional(),
   isCompleted: z.boolean().optional(),
@@ -74,11 +74,18 @@ const newTaskSchema = z.object({
   isRecurring: z.boolean().nullable().optional(),
 })
 
-const taskCompletedSchema = z.object({
-  completedAt: z.date(),
+export const taskCompletedSchema = z.object({
+  completedAt:  z.preprocess((val) => (typeof val === "string" ? new Date(val) : val), z.date()),
   completedBy: idSchema.nullable(),
   id: idSchema,
-  instanceDate: z.date(),
+  instanceDate:  z.preprocess((val) => (typeof val === "string" ? new Date(val) : val), z.date()),
+  taskId: idSchema,
+})
+export const taskCompletedOutputSchema = z.object({
+  completedAt: z.string(),
+  completedBy: idSchema.nullable(),
+  id: idSchema,
+  instanceDate: z.string(),
   taskId: idSchema,
 })
 
@@ -121,7 +128,7 @@ export const taskUpdateSchema = z.object({
 
 export const taskCompletionSchema = z.object({
   id: idSchema.describe('Task id'),
-  instanceDate: dateSchema.describe('Task instance date'),
+  instanceDate: z.date().describe('Task instance date'),
   isCompleted: z
     .boolean()
     .describe('If you want to mark as completed - true, opposite - false'),
@@ -145,7 +152,7 @@ export const tasksDue = taskSchemaForDueTask.extend({
 })
 
 export const taskDataSchema = taskSchemaOutput.extend({
-  completed: z.array(taskCompletedSchema).nullable(),
+  completed: z.array(taskCompletedSchema.nullable()),
   recurrence: recurringPatternSchema.nullable(),
 })
 

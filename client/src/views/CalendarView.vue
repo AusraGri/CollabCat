@@ -46,6 +46,25 @@ async function fetchDueTasks (date: Date) {
     tasks.value = await taskStore.getDuePersonalTasks(date.toString())
   }
 
+const handleTaskStatusChange = async(taskData: {id: number, isCompleted: boolean, points: number | null}) => {
+
+  const {id, isCompleted, points} = taskData
+  const taskCompletionData = {
+    id,
+    isCompleted,
+    instanceDate: date.value
+  }
+
+  try {
+    await taskStore.updateTaskCompletion(taskCompletionData)
+    if(points){
+      console.log('task points', points)
+    }
+  } catch (error) {
+    console.log(error)
+  }
+
+}
 
 watch(()=> route.path, () => {
   date.value = new Date()
@@ -67,13 +86,24 @@ await fetchDueTasks(date.value)
 </script>
 
 <template>
-  <div>{{ isCheckboxEnabled }}</div>
+  <div v-for="task in tasks" :key="task.id">
+    <br>
+    {{ task }}
+    <br>
+    <span> Completion: {{ task.completed }}</span>
+  </div>
+  <!-- <div>{{ isCheckboxEnabled }}</div> -->
   <div class="mx-auto flex max-w-screen-md flex-col justify-between p-3 sm:flex-row">
     <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-80">
       <div class="w-full border-b-2 text-center">{{ formatDate(date) }}</div>
       <div v-if="tasks">
         <div v-for="task in tasks" :key="task.id">
-          <TaskCard :task="task" :is-task-info="false" :is-checkbox-enabled="isCheckboxEnabled" />
+          <TaskCard
+            :task="task"
+            :is-task-info="false"
+            :is-checkbox-enabled="isCheckboxEnabled"
+            @task:status="handleTaskStatusChange"
+          />
         </div>
       </div>
       <div v-if="!tasks.length" class="p-3 text-center">No tasks for this day</div>

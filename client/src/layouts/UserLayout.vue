@@ -36,7 +36,7 @@ watch(
   async (newGroupName, oldGroupName) => {
     if (newGroupName !== oldGroupName && newGroupName) {
       const groupName = stringToUrl(newGroupName)
-      const currentTab = route.name || 'Calendar'
+      const currentTab = 'Calendar'
 
       router.push({ name: currentTab, params: { group: groupName } })
 
@@ -52,6 +52,7 @@ watch(
 </script>
 
 <template>
+  
   <div
     v-if="userStore.user"
     class=" mb-1 mt-1 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50 p-3"

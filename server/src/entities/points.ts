@@ -9,6 +9,13 @@ export const pointsSchema = z.object({
   groupId: idSchema.describe('Group id to which points are related'),
   points: z.number().int().positive(),
 })
+export const pointsClaimedSchema = z.object({
+  userId: idSchema.describe('Owner of the points'),
+  id: idSchema,
+  taskId: idSchema.describe('Task for what points were given'),
+  claimedAt: z.date(),
+  taskInstanceDate: z.date(),
+})
 
 export const deletePointsSchema = z.object({
   userId: idSchema,
@@ -42,3 +49,5 @@ export type PointsPublic = Pick<
   Selectable<Points>,
   (typeof pointsKeysPublic)[number]
 >
+
+export type PointsClaimed = z.infer<typeof pointsClaimedSchema>

@@ -4,6 +4,7 @@ import alter from './alterPoints'
 import deletePoints from './deletePersonal'
 import createGroupPoints from './createGroupPoints'
 import getUserPoints from './getUserPoints'
+import isUserClaimedPoints from './userClaimedPoints'
 
 export default router({
   // routes for points
@@ -11,5 +12,6 @@ export default router({
   alter,
   deletePoints,
   createGroupPoints,
-  getUserPoints
+  getUserPoints,
+  isUserClaimedPoints
 })
