@@ -6,8 +6,8 @@ import { idSchema } from './shared'
 export const pointsSchema = z.object({
   userId: idSchema.describe('Owner of the points'),
   createdAt: z.date(),
-  groupId: idSchema.describe('Group id to which points are related'),
-  points: z.number().int().positive(),
+  groupId: idSchema.optional().describe('Group id to which points are related'),
+  points: z.number().int().min(0),
 })
 export const pointsClaimedSchema = z.object({
   userId: idSchema.describe('Owner of the points'),
@@ -24,7 +24,7 @@ export const deletePointsSchema = z.object({
 export const pointsSchemaOutput = z.object({
   userId: idSchema,
   groupId: idSchema.nullable(),
-  points: z.number().int().positive(),
+  points: z.number().int().min(0),
 })
 
 export const createPointsSchema = pointsSchema
@@ -34,7 +34,7 @@ export const createPointsSchema = pointsSchema
     points: pointsSchema.shape.points.optional(),
   })
 
-export const alterPointsSchema = pointsSchema.omit({ createdAt: true }).extend({
+export const alterPointsSchema = pointsSchema.omit({ createdAt: true, userId: true }).extend({
   action: z
     .enum(['+', '-', '='])
     .describe(

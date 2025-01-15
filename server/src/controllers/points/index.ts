@@ -1,17 +1,19 @@
 import { router } from '@server/trpc'
-import create from './createPersonal'
-import alter from './alterPoints'
+import createPersonalPoints from './createPersonal'
+import alterPoints from './alterPoints'
 import deletePoints from './deletePersonal'
 import createGroupPoints from './createGroupPoints'
 import getUserPoints from './getUserPoints'
 import isUserClaimedPoints from './userClaimedPoints'
+import addClaimedPoints from './addClaimedPoints'
 
 export default router({
   // routes for points
-  create,
-  alter,
+  createPersonalPoints,
+  alterPoints,
   deletePoints,
   createGroupPoints,
   getUserPoints,
-  isUserClaimedPoints
+  isUserClaimedPoints,
+  addClaimedPoints
 })

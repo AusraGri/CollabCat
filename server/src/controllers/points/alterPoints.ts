@@ -4,9 +4,10 @@ import {
 } from '@server/repositories/pointsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { alterPointsSchema, pointsSchemaOutput } from '@server/entities/points'
-import { publicProcedure } from '@server/trpc'
+import { TRPCError } from '@trpc/server'
+import { authenticatedProcedure } from '../../trpc/authenticatedProcedure/index'
 
-export default publicProcedure
+export default authenticatedProcedure
   .use(provideRepos({ pointsRepository }))
   .meta({
     openapi: {
@@ -19,22 +20,35 @@ export default publicProcedure
   })
   .input(alterPointsSchema)
   .output(pointsSchemaOutput)
-  .mutation(async ({ input: pointsData, ctx: { repos } }) => {
-    const currentPoints = await repos.pointsRepository.getPoints(
-      pointsData.userId
-    )
+  .mutation(async ({ input: pointsData, ctx: { authUser, repos } }) => {
+    const currentPoints = pointsData.groupId
+      ? await repos.pointsRepository.getPoints({
+          userId: authUser.id,
+          groupId: pointsData.groupId,
+        })
+      : await repos.pointsRepository.getPoints({ userId: authUser.id })
+
+    if(!currentPoints){
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message:
+          'User does not have points enabled',
+      })
+    }
 
     let points: PointAlterObject
 
     if (pointsData.action === '-' && currentPoints.points < pointsData.points) {
       points = {
         ...pointsData,
+        userId: authUser.id,
         points: 0,
         action: '=',
       }
     } else {
       points = {
         ...pointsData,
+        userId: authUser.id,
       }
     }
 

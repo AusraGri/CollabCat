@@ -80,7 +80,7 @@ export const useUserStore = defineStore('user', {
 
         if (!userId) throw new Error('Missing user info')
 
-        this.tasks = await trpc.tasks.getTasks.query({ id: userId })
+        this.tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
       } catch (error) {
         console.log(`Failed to fetch user tasks: ${error}`)
       }
@@ -98,6 +98,10 @@ export const useUserStore = defineStore('user', {
       this.user.picture = newPicture
 
       this.saveUserChanges({ picture: newPicture })
+    },
+
+    updateUserPoints(points: number) {
+      this.points = points
     },
 
     async deleteUser() {

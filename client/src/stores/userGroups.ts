@@ -5,8 +5,9 @@ import type {
   GroupData,
   InsertableReward,
   GroupMember,
-  CategoriesPublic, 
-  TaskData, ActiveGroup
+  CategoriesPublic,
+  TaskData,
+  ActiveGroup,
 } from '@server/shared/types'
 type GroupsPublic = {
   id: number
@@ -42,13 +43,13 @@ export const useUserGroupsStore = defineStore('group', {
     rewards: null,
     groupData: null,
     categories: null,
-    tasks: null
+    tasks: null,
   }),
 
   getters: {
     isInGroup: (state) => !!state.activeGroup,
     isAdmin: (state) => state.userMembership?.role === 'Admin',
-    hasPoints: (state)=> state.userMembership?.points !== null,
+    hasPoints: (state) => state.userMembership?.points !== null,
   },
 
   actions: {
@@ -69,8 +70,8 @@ export const useUserGroupsStore = defineStore('group', {
         if (!groupId) throw new Error('Missing group id')
 
         const data = await trpc.groups.getGroupData.query({ groupId })
-        this.categories = await trpc.categories.getGroupCategories.query({groupId})
-        this.tasks = await trpc.tasks.getTasks.query({groupId})
+        this.categories = await trpc.categories.getGroupCategories.query({ groupId })
+        this.tasks = await trpc.tasks.getTasks.query({ groupId })
 
         if (!data) return
         this.groupData = data
@@ -92,7 +93,7 @@ export const useUserGroupsStore = defineStore('group', {
       }
     },
     async createNewReward(rewardData: InsertableReward) {
-      if(!this.activeGroup) throw new Error('Group id not provided')
+      if (!this.activeGroup) throw new Error('Group id not provided')
 
       const newReward = {
         groupId: this.activeGroup.id,
@@ -137,9 +138,18 @@ export const useUserGroupsStore = defineStore('group', {
         if (groupId) {
           const data = await trpc.groups.getMembershipInfo.query({ userId, groupId })
           this.userMembership = data
-          const points = await trpc.points.getUserPoints.query({groupId})
+          const points = await trpc.points.getUserPoints.query({ groupId })
           this.isUserGroupPointsEnabled = !!points
         }
+      } catch (error) {
+        console.error('Failed to fetch user membership data:', error)
+      }
+    },
+    async setMemberPoints(points: number) {
+      try {
+        if (this.userMembership) {
+            this.userMembership.points = points
+          }
       } catch (error) {
         console.error('Failed to fetch user membership data:', error)
       }

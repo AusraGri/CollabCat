@@ -14,7 +14,7 @@ import { useTasksStore } from '@/stores/taskStore'
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
   (event: 'task:deleted', value: number): void
-  (event: 'task:status', value: {id: number, isCompleted: boolean, points: number | null}): void
+  (event: 'task:status', value: {id: number, isCompleted: boolean, points: number | null, groupId: number|null}): void
 }>()
 
 const taskStore = useTasksStore()
@@ -106,7 +106,8 @@ const updateTaskStatus = (value: boolean) => {
   const taskData = {
     isCompleted: value,
     id: props.task.id,
-    points: props.task.points
+    points: props.task.points,
+    groupId: props.task.groupId
   }
   emit('task:status', taskData)
 }
@@ -117,7 +118,6 @@ watch(()=> props.task, (newTask)=>{
 </script>
 
 <template>
-  <div>{{ check }}</div>
   <div
     class="m-1 flex h-fit w-fit items-stretch space-x-1 rounded rounded-s-2xl bg-slate-400 p-1"
     aria-label="task item"

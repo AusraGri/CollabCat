@@ -5,7 +5,7 @@ import type { GroupMember } from '@server/shared/types'
 
 const { groupMembers, maxSelections } = defineProps<{
   groupMembers: GroupMember[]
-  maxSelections?: number 
+  maxSelections?: number
 }>()
 
 const selectedMembers = defineModel('selectedMembers', {

@@ -1,13 +1,26 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type { InsertTaskData, TaskUpdateData, TaskData } from '@server/shared/types'
+import type {
+  InsertTaskData,
+  TaskUpdateData,
+  TaskData,
+  CategoriesPublic,
+  GroupMember,
+  GroupsPublic
+} from '@server/shared/types'
 
 interface TasksState {
   tasks: TaskData[] | null
+  // categories: CategoriesPublic[] | null
+  // groupMembers: GroupMember[] | null
+  // groups: GroupsPublic [] | null
 }
 export const useTasksStore = defineStore('tasks', {
   state: (): TasksState => ({
     tasks: null,
+    // categories: null,
+    // groupMembers: null,
+    // groups: null
   }),
 
   getters: {
@@ -81,8 +94,9 @@ export const useTasksStore = defineStore('tasks', {
         const [updatedTask] = await trpc.tasks.getTasks.query({ id: taskData.id })
 
         if (this.tasks) {
-          this.tasks =
-            this.tasks.map((task :TaskData) :TaskData => (task.id === updatedTask.id ? updatedTask : task))
+          this.tasks = this.tasks.map(
+            (task: TaskData): TaskData => (task.id === updatedTask.id ? updatedTask : task)
+          )
         }
       } catch (error) {
         throw new Error(`Failed to update task completion: ${error}`)

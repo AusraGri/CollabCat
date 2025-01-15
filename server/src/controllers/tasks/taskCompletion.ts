@@ -20,18 +20,20 @@ export default authenticatedProcedure
   .input(taskCompletionSchema)
   .output(z.boolean())
   .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {
+    console.log('TASK DATA RECEIVED', taskData)
     const [isTask] = await repos.tasksRepository.getTasks({ id: taskData.id })
-    const isTaskRecurring = isTask.isRecurring ? isTask.isRecurring : false
-
-    const instanceDate = setDateToUTCmidnight(taskData.instanceDate)
-
+    console.log('TASK FOUND BY ID', isTask)
+    
     if (!isTask) {
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: 'Task was not found',
       })
     }
+    
+    const isTaskRecurring = isTask.isRecurring ? isTask.isRecurring : false
 
+    const instanceDate = setDateToUTCmidnight(taskData.instanceDate)
 
     if (isTaskRecurring) {
       if (taskData.isCompleted === true) {

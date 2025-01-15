@@ -5,7 +5,6 @@ import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
 import { useUserStore, useTasksStore } from '@/stores'
 import { useUserGroupsStore } from '@/stores/userGroups'
-import { usePathStore } from '@/stores/userPath'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
@@ -16,16 +15,15 @@ const router = useRouter()
 const route = useRoute()
 const taskStore = useTasksStore()
 const userStore = useUserStore()
-const pathStore = usePathStore()
 const userGroupStore = useUserGroupsStore()
 const invitations = computed(() => userStore.invitations)
 
 onMounted(async () => {
-  pathStore.setPath(route.path)
   if (userGroupStore.activeGroup) {
     await userGroupStore.fetchGroupData()
   }
   await refreshInvitations()
+  await userStore.fetchUserTasks()
 })
 
 const refreshInvitations = async () => {
@@ -46,7 +44,6 @@ watch(
     if(userGroupStore.activeGroup === null){
       router.push({ name: 'Profile' })
     }
-    pathStore.setPath(route.path)
   }
 )
 </script>

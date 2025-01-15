@@ -17,8 +17,14 @@ const rewardStore = useRewardStore()
 const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
-const points = computed(() => userGroupStore.userMembership?.points || 0)
-const activeTab = ref<any>(route.name)
+const points = computed(() => {
+  if(isUserInGroupPage.value){
+    return userGroupStore.userMembership?.points || 0
+  }
+
+  return userStore.points
+})
+const activeTab = ref<any>(route.name?.toString().replace(/^Personal/, ''))
 const isUserInGroupPage = computed(() => route.meta.group)
 const isAdmin = computed(() => {
   if (isUserInGroupPage.value) {
@@ -45,7 +51,8 @@ watchEffect(async () => {
 })
 
 watch(()=> route.name, (newName)=>{
-  activeTab.value = newName
+  const tab  = newName?.toString().replace(/^Personal/, '')
+  activeTab.value = tab
 })
 
 // onMounted(async () => {

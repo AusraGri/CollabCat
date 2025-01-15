@@ -109,7 +109,7 @@ export const createTaskSchema = z.object({
   assignedUserId: idSchema.optional(),
   categoryId: idSchema.optional(),
   description: z.string().trim().max(300).optional(),
-  groupId: idSchema.optional(),
+  groupId: idSchema.nullable().optional(),
   importance: z.string().optional(),
   points: z.number().positive().optional(),
   endDate: z.date().optional(),

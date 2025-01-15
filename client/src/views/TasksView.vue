@@ -52,31 +52,50 @@ const toggleCategoryModal = () => {
 }
 
 const updateTasksData = (updatedTask: TaskData) => {
-  if (userGroupStore.tasks && isGroupTasks) {
+  if (userGroupStore.tasks && isGroupTasks.value) {
     const index = userGroupStore.tasks?.findIndex((task) => task.id === updatedTask.id)
 
     if (index !== -1) {
       userGroupStore.tasks[index] = updatedTask
     }
-    console.log(userGroupStore.tasks)
+
+    return
   }
+  if (userStore.tasks && !isGroupTasks.value) {
+    const index = userStore.tasks?.findIndex((task) => task.id === updatedTask.id)
+
+    if (index !== -1) {
+      userStore.tasks[index] = updatedTask
+    }
+
+    return
+  }
+  
+
 }
 
 const handleNewTask = (task: TaskData) => {
-  userGroupStore.tasks?.push(task)
+  if(isGroupTasks.value){
+    userGroupStore.tasks?.push(task)
+    return
+  }
+  userStore.tasks?.push(task)
 }
 
 const handleTaskDeletion = (taskId: number) => {
-  if (userGroupStore.tasks && isGroupTasks) {
+  if (userGroupStore.tasks && isGroupTasks.value) {
     userGroupStore.tasks = userGroupStore.tasks.filter((task) => task.id !== taskId)
+  }
+  if (userStore.tasks && !isGroupTasks.value) {
+    userStore.tasks = userStore.tasks.filter((task) => task.id !== taskId)
   }
 }
 </script>
 <template>
-   <div v-for="task in tasks" :key="task.id">
+   <!-- <div v-for="task in tasks" :key="task.id">
     <br />
     <div>{{ task }}</div>
-  </div> 
+  </div> -->
   <!-- <div>is group: {{ isGroupTasks }}</div> -->
   <div class="flex justify-between">
     <div class="flex space-x-1">

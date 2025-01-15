@@ -135,6 +135,9 @@ export function tasksRepository(db: Database) {
       if (options.limit !== undefined) {
         query = query.limit(options.limit)
       }
+      // if (options.groupId === undefined) {
+      //   query = query.where('groupId', 'is', null)
+      // }
 
       return query.execute()
     },
