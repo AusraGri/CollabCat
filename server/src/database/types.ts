@@ -64,6 +64,13 @@ export interface RecurringPattern {
   weekOfMonth: number[] | null
 }
 
+export interface RewardClaims {
+  claimedAt: Generated<Timestamp>
+  id: Generated<number>
+  rewardId: number
+  userId: number
+}
+
 export interface Rewards {
   amount: number | null
   cost: number
@@ -117,6 +124,7 @@ export interface DB {
   pointClaims: PointClaims
   points: Points
   recurringPattern: RecurringPattern
+  rewardClaims: RewardClaims
   rewards: Rewards
   tasks: Tasks
   user: User

@@ -1,12 +1,12 @@
 import { z } from 'zod'
-import type { Rewards } from '@server/database/types'
+import type { RewardClaims, Rewards } from '@server/database/types'
 import { idSchema } from './shared'
 
 export const rewardsSchema = z.object({
   amount: z
     .number()
     .int()
-    .positive()
+    .min(0)
     .optional()
     .describe('Amount of reward claims'),
   cost: z
@@ -29,13 +29,19 @@ export const rewardsSchema = z.object({
   title: z.string().min(3).max(100),
 })
 export const rewardsSchemaOutput = z.object({
-  amount: z.number().int().positive().nullable(),
+  amount: z.number().int().min(0).nullable(),
   cost: z.number().int().positive(),
   createdByUserId: idSchema,
   groupId: z.number().int().positive().nullable(),
   id: idSchema,
   targetUserIds: z.array(idSchema).nullable(),
   title: z.string().min(3).max(100),
+})
+export const rewardClaimsSchema = z.object({
+  userId: idSchema,
+  id: idSchema,
+  rewardId: idSchema,
+  claimedAt: z.date()
 })
 
 export const createRewardSchema = rewardsSchema.omit({
@@ -72,6 +78,8 @@ export const updateRewardSchema = z.object({
 export const rewardsKeysAll = Object.keys(
   rewardsSchema.shape
 ) as (keyof Rewards)[]
+
+export const rewardClaimsKeysAll = Object.keys(rewardClaimsSchema.shape) as (keyof RewardClaims)[]
 
 export type InsertableReward = z.infer<typeof createRewardSchema>
 export type PublicReward = z.infer<typeof rewardsSchemaOutput>

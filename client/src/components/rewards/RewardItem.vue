@@ -2,9 +2,8 @@
 import { ref, computed } from 'vue'
 import type { GroupMember, PublicReward } from '@server/shared/types'
 import { FwbBadge, FwbButton } from 'flowbite-vue'
-import UserBasicProfile from '../user/UserBasicProfile.vue';
-import ConfirmationModal from '../ConfirmationModal.vue';
-
+import UserBasicProfile from '../user/UserBasicProfile.vue'
+import ConfirmationModal from '../ConfirmationModal.vue'
 
 const { reward, userInfo, claimers } = defineProps<{
   reward: PublicReward
@@ -13,11 +12,23 @@ const { reward, userInfo, claimers } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (event: 'reward:change', value: {reward: PublicReward, action: 'delete' | 'edit' | 'claim'}): void
+  (
+    event: 'reward:change',
+    value: { reward: PublicReward; action: 'delete' | 'edit' | 'claim' }
+  ): void
 }>()
 
 const isDeletion = ref(false)
+const isClaim = ref(false)
 const isAdmin = computed(() => userInfo.role === 'Admin')
+
+const isEnoughRewardAmount = computed(() => {
+  return reward.amount === null || reward.amount > 0
+})
+
+const isShowAmount = computed(()=> {
+  return reward.amount !== null
+})
 
 const isEnoughPoints = computed(() => {
   const userPoints = userInfo.points ? Number(userInfo.points) : 0
@@ -27,20 +38,30 @@ const isEnoughPoints = computed(() => {
 
 const pointsBadgeColor = computed(() => (isEnoughPoints.value ? 'green' : 'red'))
 
-
 const handleRewardEvents = (action: 'delete' | 'edit' | 'claim') => {
-  emit('reward:change', { reward, action });
-};
-
-const confirmDeletion = () => {
-isDeletion.value = true
+  emit('reward:change', { reward, action })
 }
 
-const handleConfirmation = (event: boolean) => {
-  if(event){
+const confirmDeletion = () => {
+  isDeletion.value = true
+}
+
+const confirmClaim = () => {
+  isClaim.value = true
+}
+
+const handleDeleteConfirmation = (event: boolean) => {
+  if (event) {
     handleRewardEvents('delete')
   }
   isDeletion.value = false
+}
+
+const handleClaimConfirmation = (event: boolean) => {
+  if (event) {
+    handleRewardEvents('claim')
+  }
+  isClaim.value = false
 }
 </script>
 <template>
@@ -48,6 +69,11 @@ const handleConfirmation = (event: boolean) => {
     <div class="flex w-full flex-nowrap items-center whitespace-nowrap">
       <div class="mr-3 w-fit">
         {{ reward.title }}
+      </div>
+      <div v-if="isShowAmount" aria-label="reward-amount">
+        <FwbBadge type="yellow">
+          {{ reward.amount }}
+        </FwbBadge>
       </div>
       <div class="flex w-full items-center justify-end" aria-label="reward-cost">
         <fwb-badge size="sm" :type="pointsBadgeColor">
@@ -70,29 +96,37 @@ const handleConfirmation = (event: boolean) => {
           {{ reward.cost }}
         </fwb-badge>
       </div>
-      <div v-if="!!reward.amount" aria-label="reward-amount">
-        <FwbBadge type="yellow">
-          {{ reward.amount }}
-        </FwbBadge>
-      </div>
     </div>
-    <div v-if="claimers" class=flex >
-        <UserBasicProfile v-for="claimer in claimers" :key="claimer.id" :user="claimer"/>
+    <div v-if="claimers" class="flex">
+      <UserBasicProfile v-for="claimer in claimers" :key="claimer.id" :user="claimer" />
     </div>
 
-    <div class="mt-3 flex justify-end">
-      <div v-if="isEnoughPoints" @click="handleRewardEvents('claim')" class="mr-3 bg-slate-400">
-        claim
+    <div class="mt-3 flex items-baseline justify-between space-x-1">
+      <div class="flex space-x-1">
+        <div v-if="isAdmin">
+          <FwbButton color="red" size="xs" @click="confirmDeletion">delete</FwbButton>
+        </div>
+        <div v-if="isAdmin">
+          <FwbButton color="yellow" size="xs" @click="handleRewardEvents('edit')">Edit</FwbButton>
+        </div>
       </div>
-      <div v-if="isAdmin" class="mr-3">
-        <FwbButton color="yellow" size="xs" @click="handleRewardEvents('edit')">Edit</FwbButton>
-      </div>
-      <div v-if="isAdmin">
-        <FwbButton color="red" size="xs" @click="confirmDeletion">delete</FwbButton>
+      <div v-if="isEnoughPoints && isEnoughRewardAmount">
+        <FwbButton color="green" size="sm" @click="confirmClaim">Claim</FwbButton>
       </div>
     </div>
   </div>
-  <ConfirmationModal :is-show-modal="isDeletion" :action="'delete'" :object="reward.title" @delete="handleConfirmation"/>
+  <ConfirmationModal
+    :is-show-modal="isDeletion"
+    :action="'delete'"
+    :object="reward.title"
+    @delete="handleDeleteConfirmation"
+  />
+  <ConfirmationModal
+    :is-show-modal="isClaim"
+    :action="'claim'"
+    :object="reward.title"
+    @delete="handleClaimConfirmation"
+  />
 </template>
 
 <style scoped></style>

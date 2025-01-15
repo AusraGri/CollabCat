@@ -59,7 +59,7 @@ export const useRewardStore = defineStore('reward', {
 
         return rewards
       } catch (error) {
-        throw new Error('Failed to initialize user rewards')
+        throw new Error(`Failed to initialize user rewards: ${error}`)
       }
     },
 
@@ -94,11 +94,21 @@ export const useRewardStore = defineStore('reward', {
       }
     },
     async claimReward(reward: PublicReward) {
-      // claim reward
+      const rewardId = reward.id
+      const groupId = reward.groupId ? reward.groupId : undefined
       try {
-        // do claim
+        await trpc.rewards.claimReward.mutate({ rewardId, groupId })
+
+        if(reward.amount && reward.amount > 0){
+          const updateAmount = reward.amount -1 
+
+          const updatedReward = {...reward, amount: updateAmount}
+
+          this.rewards =
+          this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
+        }
       } catch (error) {
-        console.error('Failed to create new reward:', error)
+        console.error('Failed to claim reward:', error)
       }
     },
   },

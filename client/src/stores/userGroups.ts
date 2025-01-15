@@ -151,7 +151,7 @@ export const useUserGroupsStore = defineStore('group', {
             this.userMembership.points = points
           }
       } catch (error) {
-        console.error('Failed to fetch user membership data:', error)
+        console.error('Failed to set user points:', error)
       }
     },
   },

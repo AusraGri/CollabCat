@@ -1,0 +1,68 @@
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
+import provideRepos from '@server/trpc/provideRepos'
+import { rewardsRepository } from '@server/repositories/rewardsRepository'
+import { idSchema } from '@server/entities/shared'
+import { pointsRepository } from '@server/repositories/pointsRepository'
+import { TRPCError } from '@trpc/server'
+import z from 'zod'
+
+export default authenticatedProcedure
+  .use(provideRepos({ rewardsRepository, pointsRepository }))
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/rewards/claim',
+      tags: ['rewards'],
+      summary: 'Delete reward',
+      protect: true,
+    },
+  })
+  .input(
+    z.object({
+      rewardId: idSchema,
+      groupId: idSchema.optional()
+    })
+  )
+  .output(z.boolean())
+  .mutation(async ({ input: { rewardId, groupId }, ctx: { authUser, repos } }) => {
+    const [reward] = await repos.rewardsRepository.getRewards({ id: rewardId })
+
+    if (!reward) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Reward was not found in the database',
+      })
+    }
+
+    let updatedRewardAmount: number | undefined
+
+    if (reward.amount && reward.amount > 0) {
+      updatedRewardAmount = reward.amount - 1
+    }
+
+    const {id, ...rewardData} = reward
+
+    const updatedReward = {
+      ...rewardData,
+      amount: updatedRewardAmount,
+    }
+    const userPoints = await repos.pointsRepository.getPoints({userId: authUser.id, groupId})
+
+    if(!userPoints || userPoints.points < reward.cost ){
+        throw new TRPCError({
+            code: 'PRECONDITION_FAILED',
+            message: 'User has insufficient points to claim the reward',
+          })
+    }
+
+    await repos.pointsRepository.alterPoints({userId: authUser.id, action: '-', points: reward.cost, groupId})
+
+    await repos.rewardsRepository.updateReward({
+      id,
+      reward: updatedReward,
+    })
+
+    await repos.rewardsRepository.addRewardClaim({rewardId, userId: authUser.id})
+
+    return true
+  })

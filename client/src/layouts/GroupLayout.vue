@@ -22,7 +22,7 @@ const points = computed(() => {
     return userGroupStore.userMembership?.points || 0
   }
 
-  return userStore.points
+  return userStore.points || 0
 })
 const activeTab = ref<any>(route.name?.toString().replace(/^Personal/, ''))
 const isUserInGroupPage = computed(() => route.meta.group)
@@ -35,12 +35,12 @@ const isAdmin = computed(() => {
 })
 
 watchEffect(async () => {
-  if (userGroupStore.activeGroup?.name) {
+  if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
     await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)
     return
   }
 
-  if (userStore.user) {
+  if (userStore.user && !isUserInGroupPage.value) {
     const userInfo = {
       ...userStore.user,
       points: userStore.points || 0,
@@ -55,6 +55,16 @@ watch(()=> route.name, (newName)=>{
   activeTab.value = tab
 })
 
+const handleRewardClaim = (data: {cost: number, groupId: number | undefined}) => {
+  const groupMemberPoints = userGroupStore.userMembership?.points
+
+  if(data.groupId && groupMemberPoints){
+    const updatedPoints = groupMemberPoints - data.cost
+    userGroupStore.setMemberPoints(updatedPoints)
+  }else{
+    userStore.points = userStore.points ? userStore.points - data.cost : null
+  }
+}
 // onMounted(async () => {
 //   await userGroupStore.fetchUserGroups()
 // })
@@ -89,7 +99,7 @@ const handlePaneClick = () => {
         <GroupMembers />
       </div>
       <div>
-        <Rewards />
+        <Rewards @reward:claimed="handleRewardClaim"/>
       </div>
       <div v-if="isAdmin">
         <FwbButton>Settings</FwbButton>

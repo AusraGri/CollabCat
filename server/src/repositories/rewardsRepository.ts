@@ -1,8 +1,9 @@
 import type { Database } from '@server/database'
-import type { Rewards } from '@server/database/types'
+import type { RewardClaims, Rewards } from '@server/database/types'
 import type { DeleteResult, Insertable, Selectable, Updateable } from 'kysely'
 import {
   rewardsKeysAll,
+  rewardClaimsKeysAll
 } from '@server/entities/rewards'
 
 export interface RewardUpdate {
@@ -47,7 +48,9 @@ export function rewardsRepository(db: Database) {
       }
 
       if (getOptions.createdByUserId !== undefined) {
-        query = query.where('createdByUserId', '=', getOptions.createdByUserId)
+        query = query
+        .where('createdByUserId', '=', getOptions.createdByUserId)
+        .where('groupId', 'is', null)
       }
 
       if (getOptions.groupId !== undefined) {
@@ -77,6 +80,13 @@ export function rewardsRepository(db: Database) {
         .set(reward.reward)
         .where('id', '=', reward.id)
         .returning(rewardsKeysAll)
+        .executeTakeFirstOrThrow()
+    },
+    async addRewardClaim(data:{rewardId: number, userId: number}): Promise<Selectable<RewardClaims>> {
+      return db
+        .insertInto('rewardClaims')
+        .values(data)
+        .returning(rewardClaimsKeysAll)
         .executeTakeFirstOrThrow()
     },
   }

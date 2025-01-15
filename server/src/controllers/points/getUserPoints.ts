@@ -23,10 +23,9 @@ export default authenticatedProcedure
   .query(async ({ input: {groupId}, ctx: { authUser, repos } }) => {
 
     const queryOptions = groupId ? {userId: authUser.id, groupId} : {userId: authUser.id}
-console.log('QUERY OPTIONS', queryOptions)
+
     const points = await repos.pointsRepository.getPoints(queryOptions)
 
-    console.log('POINTS RESULT', points)
 
     return points
   })

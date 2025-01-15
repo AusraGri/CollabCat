@@ -22,7 +22,7 @@ function confirmAction(confirmed: boolean) {
 <template>
   <FwbModal v-if="isShowModal" persistent >
       <template #header>
-      <div class="flex items-center text-lg">Please Confirm the Action</div>
+      <div class="flex items-center text-lg text-black">Please Confirm the Action</div>
     </template>
     <template #body>
     <p>Do you really want to <span class=" text-red-600">{{ action }}</span> <span class=" font-extrabold text-base">{{ object }}</span> ?</p>
