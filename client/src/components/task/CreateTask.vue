@@ -8,6 +8,7 @@ import {
   type CategoriesPublic,
   type GroupMember,
   type RecurrencePatternInsertable,
+  type TaskData,
 } from '@server/shared/types'
 import MembersSelection from '../groups/MembersSelection.vue'
 
@@ -69,13 +70,10 @@ const taskForm = ref({
   isPoints: false,
 })
 
+
 function closeModal() {
   taskForm.value.isRecurring = false
   emit('close')
-}
-
-function handleRecurringPatternUpdate(newPattern: any) {
-  recurringPattern.value = newPattern
 }
 
 async function confirmAction(confirmed: boolean) {

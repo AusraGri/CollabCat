@@ -22,7 +22,10 @@ export function categoriesRepository(db: Database) {
       return db
         .selectFrom('categories')
         .select(categoriesKeysAll)
-        .where('groupId', '=', groupId)
+        .where((eb) => eb.or([
+          eb('categories.groupId', '=', groupId),
+          eb('categories.isDefault', 'is', true)
+        ]))
         .execute()
     },
     async getCategoriesByUserId(userId: number): Promise<CategoriesPublic[]> {
@@ -30,6 +33,18 @@ export function categoriesRepository(db: Database) {
         .selectFrom('categories')
         .select(categoriesKeysAll)
         .where('createdByUserId', '=', userId)
+        .execute()
+    },
+    async getPersonalCategoriesByUserId(userId: number): Promise<CategoriesPublic[]> {
+      return db
+        .selectFrom('categories')
+        .select(categoriesKeysAll)
+        .where('categories.groupId', 'is', null)
+        .where('categories.isGroupDefault', 'is', false)
+        .where((eb) => eb.or([
+          eb('categories.createdByUserId', '=', userId),
+          eb('categories.isDefault', 'is', true)
+        ]))
         .execute()
     },
 

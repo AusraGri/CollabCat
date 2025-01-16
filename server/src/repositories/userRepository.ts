@@ -2,9 +2,7 @@ import type { Database } from '@server/database'
 import type { User } from '@server/database/types'
 import {
   userKeysAll,
-  userKeysPublic,
   type UserBaseInfo,
-  type UserPublic,
 } from '@server/entities/user'
 import type { DeleteResult, Insertable, Selectable } from 'kysely'
 
@@ -64,10 +62,10 @@ export function userRepository(db: Database) {
       return user
     },
 
-    async findById(id: number): Promise<UserPublic> {
+    async findById(id: number): Promise<Selectable<User>> {
       const user = await db
         .selectFrom('user')
-        .select(userKeysPublic)
+        .select(userKeysAll)
         .where('id', '=', id)
         .executeTakeFirstOrThrow()
 

@@ -63,7 +63,7 @@ export default publicProcedure
 
       // Check if a user already exists by email
       const existingUser = await repos.userRepository.findByEmail(email)
-      if (existingUser) {
+      if (existingUser && existingUser.auth0Id === auth0Id) {
         // res.setHeader('Set-Cookie', `authToken=${auth0Token}; HttpOnly; Secure; SameSite=Strict; Path=/;`);
         return existingUser
       }

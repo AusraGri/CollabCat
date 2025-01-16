@@ -19,6 +19,8 @@ const title = ref<string>('')
 async function confirmAction(confirmed: boolean) {
   if (!confirmed) {
     emit('close')
+
+    return
   }
 
   try {

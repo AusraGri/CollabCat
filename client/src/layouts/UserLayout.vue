@@ -21,6 +21,7 @@ const invitations = computed(() => userStore.invitations)
 onMounted(async () => {
   if (userGroupStore.activeGroup) {
     await userGroupStore.fetchGroupData()
+    await userGroupStore.fetchUserMembershipInfo()
   }
   await refreshInvitations()
   await userStore.fetchUserTasks()
@@ -42,7 +43,7 @@ watch(
       await userGroupStore.fetchUserMembershipInfo()
     }
     if(userGroupStore.activeGroup === null){
-      router.push({ name: 'Profile' })
+      router.push({ name: 'PersonalCalendar' })
     }
   }
 )

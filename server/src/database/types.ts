@@ -12,6 +12,7 @@ export interface Categories {
   groupId: number | null
   id: Generated<number>
   isDefault: Generated<boolean>
+  isGroupDefault: Generated<boolean>
   title: string
 }
 

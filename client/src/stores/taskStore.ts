@@ -36,18 +36,22 @@ export const useTasksStore = defineStore('tasks', {
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
-    async getDuePersonalTasks(date: string) {
+    async getDuePersonalTasks(date: string, noGroup?: boolean) {
       try {
         const tasks = await trpc.tasks.getDuePersonalTasks.query({ date })
-        this.tasks = tasks
-        return tasks
+        if(noGroup){
+          this.tasks = tasks.filter((task)=> task.groupId === null)
+        }else{
+          this.tasks = tasks
+        }
+        return this.tasks
       } catch (error) {
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
-    async getDueGroupTasks(date: string, groupId: number) {
+    async getDueGroupTasks(date: string, groupId: number, userId?: number) {
       try {
-        const tasks = await trpc.tasks.getDueGroupTasks.query({ groupId, date })
+        const tasks = await trpc.tasks.getDueGroupTasks.query({ groupId, date, userId })
         this.tasks = tasks
         return tasks
       } catch (error) {

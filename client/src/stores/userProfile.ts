@@ -80,7 +80,9 @@ export const useUserStore = defineStore('user', {
 
         if (!userId) throw new Error('Missing user info')
 
-        this.tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
+        const tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
+
+        this.tasks = tasks.filter((task) => task.groupId === null)
       } catch (error) {
         console.log(`Failed to fetch user tasks: ${error}`)
       }

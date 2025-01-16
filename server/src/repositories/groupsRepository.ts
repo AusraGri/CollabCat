@@ -6,7 +6,7 @@ import {
   userGroupsKeysPublic,
   type UserGroupsPublic,
 } from '@server/entities/userGroups'
-import { jsonArrayFrom } from 'kysely/helpers/postgres'
+import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres'
 import { type DeleteResult, type Insertable } from 'kysely'
 
 export interface GetGroupsOptions {
@@ -30,13 +30,13 @@ type GroupsUpdate = Omit<GroupsPublic, 'createdByUserId'>
 export function groupsRepository(db: Database) {
   return {
     async create(group: Insertable<Groups>): Promise<GroupsPublic> {
-      return db.transaction().execute(async(trx) => {
+      return db.transaction().execute(async (trx) => {
         const newGroup = await trx
           .insertInto('groups')
           .values(group)
           .returning(groupsKeysPublic)
           .executeTakeFirstOrThrow()
-  
+
         await trx
           .insertInto('userGroups')
           .values({
@@ -45,7 +45,7 @@ export function groupsRepository(db: Database) {
             userId: group.createdByUserId,
           })
           .executeTakeFirstOrThrow()
-  
+
         return newGroup
       })
     },
@@ -149,7 +149,11 @@ export function groupsRepository(db: Database) {
       return db
         .selectFrom('userGroups')
         .innerJoin('user', 'userGroups.userId', 'user.id')
-        .leftJoin('points', 'userGroups.groupId', 'points.groupId')
+        .leftJoin('points', (join) =>
+          join
+            .onRef('points.groupId', '=', 'userGroups.groupId') 
+            .onRef('points.userId', '=', 'userGroups.userId')
+        )
         .select([
           'user.id',
           'user.username',
@@ -157,6 +161,28 @@ export function groupsRepository(db: Database) {
           'user.email',
           'userGroups.role',
           'points.points',
+        ])
+        .where('userGroups.groupId', '=', data.groupId)
+        .where('userGroups.userId', '=', data.userId)
+        .executeTakeFirstOrThrow()
+    },
+    async getUserGroupMembershipInfoNEW(data: GroupUserData) {
+      return db
+        .selectFrom('userGroups')
+        .innerJoin('user', 'userGroups.userId', 'user.id')
+        .select((eb) => [
+          'user.id',
+          'user.username',
+          'user.picture',
+          'user.email',
+          'userGroups.role',
+          jsonObjectFrom(
+            eb
+              .selectFrom('points')
+              .select(['points.points'])
+              .whereRef('userGroups.groupId', '=', 'points.groupId')
+              .where('points.userId', '=', data.userId)
+          ).as('points'),
         ])
         .where('userGroups.groupId', '=', data.groupId)
         .where('userGroups.userId', '=', data.userId)
@@ -186,7 +212,11 @@ export function groupsRepository(db: Database) {
             eb
               .selectFrom('userGroups')
               .innerJoin('user', 'user.id', 'userGroups.userId')
-              .leftJoin('points', 'points.groupId', 'userGroups.groupId')
+              .leftJoin('points', (join) =>
+                join
+                  .onRef('points.groupId', '=', 'userGroups.groupId')
+                  .onRef('points.userId', '=', 'userGroups.userId')
+              )
               .select([
                 'user.email',
                 'user.id',

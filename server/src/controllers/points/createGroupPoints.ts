@@ -20,21 +20,18 @@ export default groupAuthProcedure
   .input(createPointsSchema.omit({ groupId: true, points: true }))
   .output(pointsSchemaOutput)
   .mutation(async ({ input: pointsData, ctx: { userGroup, repos } }) => {
-    if (
-      pointsData.groupId !== userGroup?.groupId ||
-      userGroup?.role !== 'Admin'
-    ) {
+    if (pointsData.groupId !== userGroup?.groupId) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message:
-          'User does not have permission to add points for this group users',
+          'User does not have permission to add points for this group',
       })
     }
 
     const points = {
       userId: pointsData.userId,
       groupId: userGroup?.groupId,
-      points: 0
+      points: 0,
     }
 
     const pointsCreated = await repos.pointsRepository.createPoints(points)

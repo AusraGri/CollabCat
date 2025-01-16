@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
-import { FwbButton, FwbCheckbox, FwbSelect } from 'flowbite-vue'
+import { FwbButton, FwbSelect } from 'flowbite-vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import { useTasksStore, useUserGroupsStore, useUserStore } from '@/stores'
 import TaskCard from '@/components/task/TaskCard.vue'
@@ -23,6 +23,11 @@ const memberOptions = computed(() => {
 
   return [{ value: 'all', name: 'All Members' }, ...options]
 })
+
+const personalOptions = ref([
+  { value: 'all', name: 'All Groups' },
+  {value: 'personal', name: 'My Personal'}
+])
 
 const isGroupTasks = computed(() => route.meta.group || false)
 const groupId = computed(() => userGroupStore.activeGroup?.id)
@@ -58,10 +63,12 @@ const formatDate = (date: Date) => {
 async function fetchDueTasks(date: Date) {
   if (isGroupTasks.value) {
     if (!groupId.value) return
-    tasks.value = await taskStore.getDueGroupTasks(date.toString(), groupId.value)
+    const userId = tasksFor.value === 'all' ? undefined : Number(tasksFor.value)
+    tasks.value = await taskStore.getDueGroupTasks(date.toString(), groupId.value, userId)
     return
   }
-  tasks.value = await taskStore.getDuePersonalTasks(date.toString())
+  const noGroup = tasksFor.value === 'all' ? false : true
+  tasks.value = await taskStore.getDuePersonalTasks(date.toString(), noGroup)
 }
 
 const handleTaskStatusChange = async (taskData: {
@@ -132,6 +139,12 @@ watch(
     await fetchDueTasks(newDate)
   }
 )
+watch(
+  () => tasksFor.value,
+  async () => {
+      await fetchDueTasks(date.value)
+  }
+)
 
 onMounted(async () => {
   await fetchDueTasks(date.value)
@@ -146,9 +159,13 @@ onMounted(async () => {
     <span> Completion: {{ task.completed }}</span>
   </div> -->
   <!-- <div>{{ isCheckboxEnabled }}</div> -->
-  <div class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
+  <div v-if="isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
     <span> Show Tasks for:</span>
     <FwbSelect v-model="tasksFor" :options="memberOptions" class="whitespace-nowrap" />
+  </div>
+  <div v-if="!isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
+    <span> Show Tasks for:</span>
+    <FwbSelect v-model="tasksFor" :options="personalOptions" class="whitespace-nowrap" />
   </div>
   <div class="mx-auto flex max-w-screen-md flex-col justify-between p-3 sm:flex-row">
     <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-80">

@@ -3,7 +3,7 @@ import { ref, computed, type PropType, watch } from 'vue'
 import { FwbButton, FwbCheckbox } from 'flowbite-vue'
 import { areObjectsEqual } from '@/utils/helpers';
 
-const { isShowDateModal } = defineProps<{
+const { isShowDateModal, isRecurring } = defineProps<{
   isShowDateModal: boolean
   isRecurring: boolean
 }>()
@@ -105,6 +105,14 @@ watch(() => isShowDateModal, (newVal) => {
     }
   }
 }, { immediate: true })
+
+watch(()=> isRecurring, (newValue)=>{
+  if(newValue && startDate.value === null){
+    startDate.value = new Date()
+  }
+
+})
+
 </script>
 
 <template>

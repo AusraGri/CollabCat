@@ -19,7 +19,7 @@ const categoryOptions = computed(() => {
 </script>
 
 <template>
-  <div>
+  <div class="w-fit">
     <FwbSelect
       v-model="selectedCategory"
       :options="categoryOptions"

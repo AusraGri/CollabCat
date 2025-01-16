@@ -1,7 +1,7 @@
 import { router } from '@server/trpc'
 import createPersonalPoints from './createPersonal'
 import alterPoints from './alterPoints'
-import deletePoints from './deletePersonal'
+import deletePoints from './deletePoints'
 import createGroupPoints from './createGroupPoints'
 import getUserPoints from './getUserPoints'
 import isUserClaimedPoints from './userClaimedPoints'

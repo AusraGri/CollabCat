@@ -9,9 +9,10 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useInvitationStore } from '@/stores/invitationStore'
 import { useUserStore } from '@/stores/userProfile'
+import { stringToUrl } from '@/utils/helpers'
 
-const {getToken, getUserData, signup, isAuth} = useAuthService()
-const { loginWithRedirect, isAuthenticated, user } = useAuth0()
+const { getToken, getUserData, signup, isAuth } = useAuthService()
+const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } = useAuth0()
 const isTokenValid = ref(true)
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -23,17 +24,17 @@ const groupInfo = ref<GroupsPublic>()
 const groupOwner = ref<UserPublic>()
 
 const signupUser = async () => {
-  await signup('/invite')
+  // await signup('/invite')
 
-  // loginWithRedirect({
-  //   appState: {
-  //     target: '/invite',
-  //   },
-  //   authorizationParams: {
-  //     prompt: 'login',
-  //     screen_hint: 'signup',
-  //   },
-  // })
+  loginWithRedirect({
+    appState: {
+      target: '/invite',
+    },
+    authorizationParams: {
+      prompt: 'login',
+      screen_hint: 'signup',
+    },
+  })
 }
 
 async function validateInvitation() {
@@ -42,6 +43,7 @@ async function validateInvitation() {
   if (!token) {
     error.value = 'Invalid or missing token.'
     loading.value = false
+    isTokenValid.value = false
     return
   }
 
@@ -49,6 +51,7 @@ async function validateInvitation() {
 
   try {
     await invitationStore.validateInvitationToken()
+    isTokenValid.value = true
   } catch (err) {
     error.value = `Error occurred: ${err}`
     isTokenValid.value = false
@@ -56,8 +59,6 @@ async function validateInvitation() {
     loading.value = false
   }
 }
-
-
 
 async function getInvitationDetails() {
   try {
@@ -94,12 +95,15 @@ onMounted(async () => {
     await getInvitationDetails()
 
     if (isAuth && !userStore.user) {
-      console.log("after authentication")
+      isTokenValid.value = true
+      console.log('after authentication')
       const userData = await getUserData()
+
       const newUser = await trpc.user.signupAuth.mutate(userData)
       authStore.authToken = await getToken()
       userStore.user = newUser
       await addUserToGroup()
+      await invitationStore.deleteInvitation()
     }
   } catch (err) {
     error.value = `An error occurred: ${(err as Error).message}`
@@ -110,56 +114,71 @@ onMounted(async () => {
 
 const redirectToProfilePage = async () => {
   try {
-    await invitationStore.deleteInvitation()
-    router.push({ name: 'Profile', params: { username: userStore.user?.username } })
+    if (userStore.user && userStore.user.username) {
+      router.push({ name: 'Profile', params: { username: stringToUrl(userStore.user?.username) } })
+    }
   } catch (err) {
     error.value = `Failed to redirect: ${(err as Error).message}`
   }
 }
 
-const redirectToHomePage = ()=> {
+const redirectToHomePage = () => {
   router.push({ name: 'Home' })
 }
 </script>
 <template>
-  <div>{{ isAuthenticated }}</div>
-  <div>isAuth: {{ isAuth }}</div>
-  <div v-if="!isAuth">
-    <h1>Welcome to the CollabCat!</h1>
+  <div class="p-6 bg-white rounded-lg shadow-md">
     <div>
-      <p>
-        Owr dear member
-        <span>
-          <FwbAvatar :img="groupOwner?.picture || undefined" rounded />
-          {{ groupOwner?.username }}
-        </span>
-        invited you
-      </p>
-      <p>
-        to join group: <span>{{ groupInfo?.name }}</span>
-      </p>
-      <p>and start sharing tasks together!</p>
-      <br />
-      <p>If you want to join, please sign up to CollabCat</p>
-      <div>
-        <FwbButton @click="signupUser">Signup</FwbButton>
+      <div v-if="!isAuth" class="text-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to CollabCat!</h1>
+        <div class="text-lg text-gray-600 text-center">
+          <div v-if="isTokenValid">
+            <div class="flex flex-col sm:flex-row mb-1 items-center space-x-3 justify-center">
+              <span class="inline-flex items-center">
+                <FwbAvatar :img="groupOwner?.picture || undefined" rounded class="w-10 h-10 mr-2" />
+                <span class="font-semibold">{{ groupOwner?.username }}</span>
+              </span>
+              <span>invited you</span>
+            </div>
+            <p class="mb-2">
+              to join <span class="font-semibold text-gray-700">{{ groupInfo?.name }}</span>
+            </p>
+            <p class="mb-4">and start sharing tasks together!</p>
+          </div>
+          <p class="text-sm text-gray-500">If you want to join, please sign up to CollabCat</p>
+          <div class="mt-6">
+            <FwbButton @click="signupUser" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+              Signup
+            </FwbButton>
+          </div>
+        </div>
+        <p v-if="loading" class="mt-4 text-gray-500">Validating invitation...</p>
+        <p v-else-if="error" class="mt-4 text-red-500">{{ error }}</p>
+      </div>
+  
+      <div v-if="authStore.isLoggedIn" class="text-center">
+        <h1 class="text-2xl font-bold text-green-600 mb-4">Welcome aboard!</h1>
+        <p class="text-lg text-gray-600 mb-4">You have successfully joined the group!</p>
+        <div class="mb-6">You can now go to your profile page</div>
+        <div>
+          <FwbButton @click="redirectToProfilePage" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+            To Profile Page
+          </FwbButton>
+        </div>
       </div>
     </div>
-    <p v-if="loading">Validating invitation...</p>
-    <p v-else-if="error">{{ error }}</p>
-  </div>
-  <div v-if="authStore.isLoggedIn">
-    <h1>Welcome aboard!</h1>
-    <p>You have successfully joined the group!</p>
-    <div>You can now go to your profile page</div>
-    <div>
-      <FwbButton @click="redirectToProfilePage">To Profile Page</FwbButton>
+
+    <div v-if="!isTokenValid" class="text-center text-red-600">
+      <p>We are very sorry, but it looks like your invitation token has expired or is invalid.</p>
+      <div class="mt-6">
+        <FwbButton @click="redirectToHomePage" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+          Go to home page
+        </FwbButton>
+      </div>
     </div>
   </div>
-  <div v-else>
-We are very sorry, but looks like your invitation token has expired or is invalid.
-<FwbButton @click="redirectToHomePage">Go to home page</FwbButton>
-  </div>
 </template>
+
+
 
 <style scoped></style>

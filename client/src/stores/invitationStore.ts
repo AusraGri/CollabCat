@@ -40,6 +40,7 @@ export const useInvitationStore = defineStore('invitations', {
         const tokenData = await trpc.invitations.validateInvitationToken.query({
           invitationToken: token,
         })
+        console.log('hello validation')
         this.tokenData = tokenData
 
         return tokenData

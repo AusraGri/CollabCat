@@ -118,7 +118,6 @@ export const useUserGroupsStore = defineStore('group', {
     //   }
     // },
     async inviteUser(email: string) {
-      console.log('store trying to invite')
       try {
         const groupId = this.activeGroup?.id
         if (!groupId) throw new Error('No group id')
@@ -150,6 +149,31 @@ export const useUserGroupsStore = defineStore('group', {
         if (this.userMembership) {
             this.userMembership.points = points
           }
+      } catch (error) {
+        console.error('Failed to set user points:', error)
+      }
+    },
+    async toggleMemberPointsStatus(status: boolean) :Promise<void> {
+      const groupId = this.activeGroup?.id
+      const userId = this.userMembership?.id
+      try {
+        if(groupId && userId){
+          if(status){
+            await trpc.points.createGroupPoints.mutate({
+              groupId,
+              userId
+            })
+
+            this.isUserGroupPointsEnabled = true
+            this.setMemberPoints(0)
+          }else{
+            await trpc.points.deletePoints.mutate({
+              groupId
+            })
+
+            this.isUserGroupPointsEnabled = false
+          }
+        }
       } catch (error) {
         console.error('Failed to set user points:', error)
       }

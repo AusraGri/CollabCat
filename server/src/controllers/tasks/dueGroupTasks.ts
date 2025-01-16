@@ -1,7 +1,7 @@
 import { groupAuthProcedure } from '@server/trpc/groupAuthProcedure'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { dateSchema } from '@server/entities/shared'
+import { dateSchema, idSchema } from '@server/entities/shared'
 import isTaskDue from '@server/utils/isTaskDue'
 import { taskDataSchema, type TaskData } from '@server/entities/tasks'
 import { TRPCError } from '@trpc/server'
@@ -25,9 +25,12 @@ export default groupAuthProcedure
       },
     },
   })
-  .input(z.object({ date: dateSchema }))
+  .input(z.object({ 
+    date: dateSchema, 
+    userId: idSchema.optional()
+  }))
   .output(taskDataSchema.array())
-  .query(async ({ input: { date }, ctx: { authUser, userGroup, repos } }) => {
+  .query(async ({ input: { date, userId }, ctx: { userGroup, repos } }) => {
     if (!userGroup) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
@@ -39,7 +42,7 @@ export default groupAuthProcedure
 
     const tasks: TaskData[] = await repos.tasksRepository.getGroupTasksDue({
       date: dateUTC,
-      userId: authUser.id,
+      userId,
       groupId: userGroup?.groupId,
     })
 

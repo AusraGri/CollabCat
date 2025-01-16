@@ -62,10 +62,13 @@ export function pointsRepository(db: Database) {
 
     async deletePoints(options: DeletePoints): Promise<DeleteResult> {
       let query = db.deleteFrom('points').where('userId', '=', options.userId)
-
+          console.log('OPTIONS', options)
       if (options.groupId !== undefined) {
         query = query.where('groupId', '=', options.groupId)
+      }else{
+        query = query.where('groupId', 'is', null)
       }
+
 
       return query.executeTakeFirstOrThrow()
     },

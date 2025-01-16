@@ -59,7 +59,7 @@ const closeModal = () => {
 
 const saveUserSettings = async () => {
   await changeName()
- await handlePointsChange()
+  await handlePointsChange()
 }
 
 const handlePointsChange = async () => {
@@ -72,7 +72,7 @@ const handlePointsChange = async () => {
       userStore.isPointsEnabled = true
       return
     }
-    await trpc.points.deletePoints.mutate()
+    await trpc.points.deletePoints.mutate({})
     userStore.isPointsEnabled = false
   } catch (error) {
     console.log('Failed to change point status', error)
@@ -106,6 +106,25 @@ onMounted(() => {
             <FwbCheckbox label="Task Points" v-model="isPoints" />
           </div>
         </form>
+        <div class="flex mt-3 border-t-2 items-center pt-3">
+          <FwbButton color="default" outline pill square>
+            Manage Your Groups
+            <template #suffix>
+              <svg
+                class="h-5 w-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  clip-rule="evenodd"
+                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </template>
+          </FwbButton>
+        </div>
       </template>
       <template #footer>
         <div class="flex justify-between">

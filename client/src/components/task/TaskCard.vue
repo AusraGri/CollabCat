@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from 'vue'
 import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
-import { type TaskData, type CategoriesPublic, type GroupMember } from '@server/shared/types'
+import { type TaskData, type CategoriesPublic, type GroupMember, type GroupsPublic } from '@server/shared/types'
 import UserBasicProfile from '../user/UserBasicProfile.vue'
 import RecurrenceCard from './RecurrenceCard.vue'
 import TaskInfo from './TaskInfo.vue'
@@ -22,6 +22,10 @@ const taskStore = useTasksStore()
 const props = defineProps({
   categories: {
     type: Array as PropType<CategoriesPublic[]>,
+    default: () => [],
+  },
+  groups: {
+    type: Array as PropType<GroupsPublic[]>,
     default: () => [],
   },
   task: {
@@ -46,10 +50,21 @@ const props = defineProps({
   },
 })
 
+const isCheckboxDisabled = computed(()=> {
+if(props.task.startDate === null) return false
+
+return props.isCheckboxEnabled
+})
+
 const taskCategory = computed(() => {
   if (!props.categories) return
 
   return props.categories.find((category) => category.id === props.task.categoryId)
+})
+const taskGroup = computed(() => {
+  if (!props.groups) return
+
+  return props.groups.find((group) => group.id === props.task.groupId)
 })
 
 const assignedUserProfile = computed(() => {
@@ -157,6 +172,10 @@ watch(()=> props.task, (newTask)=>{
       <div v-if="taskCategory" class="text-sm" aria-label="category">
         <span>Category:</span>
         <span>{{ taskCategory?.title }}</span>
+      </div>
+      <div v-if="taskGroup" class="text-sm" aria-label="category">
+        <span>Group:</span>
+        <span>{{ taskGroup.name }}</span>
       </div>
       <div v-if="assignedUserProfile" class="flex w-full">
         <UserBasicProfile :user="assignedUserProfile" />

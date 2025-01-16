@@ -35,9 +35,7 @@ const handleAuthRedirect = async () => {
     }
 
     const idToken = await getAccessTokenSilently()
-    // The ID token (JWT)
 
-    // Optionally store the token in localStorage or a state management library (like Vuex or Pinia)
     authStore.setAuthToken(idToken)
     let routeUsername: string
     try {
@@ -48,13 +46,13 @@ const handleAuthRedirect = async () => {
     } catch (error) {
       console.log(error)
     }
-    // Send the user data to your backend to store the user in the database
+
     if (userStore.user?.username) {
       routeUsername = userStore.user?.username?.replace(' ', '')
 
-      router.push({ name: 'Profile', params: { username: routeUsername } }) // Redirect to the profile page after signup
+      router.push({ name: 'PersonalCalendar', params: { username: routeUsername } })
     }
-    // After saving the user, redirect to the profile page or another page
+  
   } catch (error) {
     console.error('Error handling Auth0 redirect callback:', error)
   }

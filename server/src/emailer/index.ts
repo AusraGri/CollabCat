@@ -14,17 +14,14 @@ export async function sentInvitationMail(
 ) {
   const inviteLink = `${config.auth0.clientOriginUrl}/invite?token=${emailData.inviteToken}`
   const info = {
-    from: '"Family App" <invitations@myapp.email>',
+    from: '"CollabCat App" <invitations@myapp.email>',
     to: emailData.email,
     subject: "You've been invited to join a group! ✔",
-    text: `Hello! \n Click the link to join the group: ${inviteLink}`,
+    html: `Hello! <br> Your friend has invited you to join his group and start sharing the tasks! <br> Click the link to <a href="${inviteLink}">join the group</a>.`,
   }
 
   try {
     const email = await transporter.sendMail(info)
-
-    // eslint-disable-next-line no-console
-    console.log('Message sent: %s', email.messageId)
 
     return email
   } catch (error) {

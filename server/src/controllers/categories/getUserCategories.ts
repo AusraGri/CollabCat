@@ -20,7 +20,7 @@ export default authenticatedProcedure
   .output(z.array(categoriesSchema))
   .query(async ({ ctx: { authUser, repos } }) => {
     const userCategories =
-      await repos.categoriesRepository.getCategoriesByUserId(authUser.id)
+      await repos.categoriesRepository.getPersonalCategoriesByUserId(authUser.id)
 
     return userCategories
   })

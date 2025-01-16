@@ -9,6 +9,7 @@ import { RouterView } from 'vue-router'
 import { useRewardStore } from '@/stores/rewardStore'
 import Rewards from '@/components/rewards/Rewards.vue'
 import Points from '@/components/points/Points.vue'
+import GroupSettings from '@/components/groups/GroupSettings.vue'
 
 // type TabName = 'Tasks' | 'Calendar'
 
@@ -17,6 +18,7 @@ const rewardStore = useRewardStore()
 const userStore = useUserStore()
 const router = useRouter()
 const route = useRoute()
+const isShowGroupSettings = ref(false)
 const points = computed(() => {
   if(isUserInGroupPage.value){
     return userGroupStore.userMembership?.points || 0
@@ -87,6 +89,10 @@ const handlePaneClick = () => {
       })
 
 }
+
+const openGroupSettings = () => {
+  isShowGroupSettings.value = true
+}
 </script>
 <template>
   <div class="mb-1 flex w-full flex-col divide-x-2">
@@ -101,8 +107,9 @@ const handlePaneClick = () => {
       <div>
         <Rewards @reward:claimed="handleRewardClaim"/>
       </div>
-      <div v-if="isAdmin">
-        <FwbButton>Settings</FwbButton>
+      <div v-if="isUserInGroupPage">
+        <FwbButton @click="openGroupSettings">Settings</FwbButton>
+        <GroupSettings :is-show-modal="isShowGroupSettings" @close="isShowGroupSettings = false" />
       </div>
       <div v-if="userGroupStore.hasPoints">
         <Points :points="points" />
