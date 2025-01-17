@@ -16,8 +16,6 @@ interface UserState {
   invitations: PublicInvitation[] | null
   categories: CategoriesPublic[] | null
   tasks: TaskData[] | null
-  points: number | null
-  isPointsEnabled: boolean
 }
 
 export const useUserStore = defineStore('user', {
@@ -26,8 +24,6 @@ export const useUserStore = defineStore('user', {
     invitations: null,
     categories: null,
     tasks: null,
-    points: null,
-    isPointsEnabled: false,
   }),
 
   getters: {
@@ -38,12 +34,6 @@ export const useUserStore = defineStore('user', {
     async fetchUserData() {
       try {
         const data = await trpc.user.getUserProfile.query()
-        const points = await trpc.points.getUserPoints.query({})
-
-        if(points){
-          this.isPointsEnabled = true
-          this.points = points.points
-        }
         this.user = data
         this.categories = await trpc.categories.getUserCategories.query()
 
@@ -101,11 +91,6 @@ export const useUserStore = defineStore('user', {
 
       this.saveUserChanges({ picture: newPicture })
     },
-
-    updateUserPoints(points: number) {
-      this.points = points
-    },
-
     async deleteUser() {
       await trpc.user.deleteUser.mutate()
       this.clearUser()

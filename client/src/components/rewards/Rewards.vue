@@ -7,7 +7,7 @@ import NewRewardModule from './NewRewardModule.vue'
 import RewardItem from './RewardItem.vue'
 
 const emit = defineEmits<{
-  (event: 'reward:claimed', value: {cost: number, groupId: number | undefined}): void
+  (event: 'reward:claimed', value: {cost: number}): void
 }>()
 
 const rewardStore = useRewardStore()
@@ -57,7 +57,7 @@ const handleRewardChange = async ({
       break
     case 'claim':
       await rewardStore.claimReward(reward)
-      emit('reward:claimed', {cost: reward.cost, groupId: reward.groupId || undefined})
+      emit('reward:claimed', {cost: reward.cost})
       break
     default:
       isNewReward.value = false

@@ -30,14 +30,12 @@ interface GroupsState {
   groupData: GroupData | null
   categories: CategoriesPublic[] | null
   tasks: TaskData[] | null
-  isUserGroupPointsEnabled: boolean
 }
 
 export const useUserGroupsStore = defineStore('group', {
   state: (): GroupsState => ({
     userGroups: null,
     userMembership: null,
-    isUserGroupPointsEnabled: false,
     activeGroup: null,
     groupMembers: null,
     rewards: null,
@@ -137,45 +135,9 @@ export const useUserGroupsStore = defineStore('group', {
         if (groupId) {
           const data = await trpc.groups.getMembershipInfo.query({ userId, groupId })
           this.userMembership = data
-          const points = await trpc.points.getUserPoints.query({ groupId })
-          this.isUserGroupPointsEnabled = !!points
         }
       } catch (error) {
         console.error('Failed to fetch user membership data:', error)
-      }
-    },
-    async setMemberPoints(points: number) {
-      try {
-        if (this.userMembership) {
-            this.userMembership.points = points
-          }
-      } catch (error) {
-        console.error('Failed to set user points:', error)
-      }
-    },
-    async toggleMemberPointsStatus(status: boolean) :Promise<void> {
-      const groupId = this.activeGroup?.id
-      const userId = this.userMembership?.id
-      try {
-        if(groupId && userId){
-          if(status){
-            await trpc.points.createGroupPoints.mutate({
-              groupId,
-              userId
-            })
-
-            this.isUserGroupPointsEnabled = true
-            this.setMemberPoints(0)
-          }else{
-            await trpc.points.deletePoints.mutate({
-              groupId
-            })
-
-            this.isUserGroupPointsEnabled = false
-          }
-        }
-      } catch (error) {
-        console.error('Failed to set user points:', error)
       }
     },
   },

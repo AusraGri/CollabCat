@@ -3,20 +3,24 @@ import { ref, onMounted, watch, computed, watchEffect } from 'vue'
 import { FwbButton, FwbListGroupItem } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
-import { useUserStore, useTasksStore } from '@/stores'
-import { useUserGroupsStore } from '@/stores/userGroups'
+import { useUserStore, useTasksStore, useUserGroupsStore, usePointsStore } from '@/stores'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { stringToUrl } from '@/utils/helpers'
+import Points from '@/components/points/Points.vue'
 
 const router = useRouter()
 const route = useRoute()
 const taskStore = useTasksStore()
+const pointStore = usePointsStore()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
+const activeGroupId = computed(()=> userGroupStore.activeGroup ? userGroupStore.activeGroup.id : undefined)
 const invitations = computed(() => userStore.invitations)
+const isUserInGroupPage = computed(() => route.meta.group)
+
 
 onMounted(async () => {
   if (userGroupStore.activeGroup) {
@@ -25,6 +29,7 @@ onMounted(async () => {
   }
   await refreshInvitations()
   await userStore.fetchUserTasks()
+  await pointStore.managePoints(activeGroupId.value)
 })
 
 const refreshInvitations = async () => {
@@ -45,12 +50,13 @@ watch(
     if(userGroupStore.activeGroup === null){
       router.push({ name: 'PersonalCalendar' })
     }
+
+    await pointStore.managePoints(activeGroupId.value)
   }
 )
 </script>
 
 <template>
-  
   <div
     v-if="userStore.user"
     class=" mb-1 mt-1 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50 p-3"

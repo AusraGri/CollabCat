@@ -108,7 +108,7 @@ onMounted(() => {
         </form>
         <div class="flex mt-3 border-t-2 items-center pt-3">
           <FwbButton color="default" outline pill square>
-            Manage Your Groups
+            Manage Your Categories
             <template #suffix>
               <svg
                 class="h-5 w-5"

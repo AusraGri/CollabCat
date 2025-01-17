@@ -6,10 +6,12 @@ import createGroupPoints from './createGroupPoints'
 import getUserPoints from './getUserPoints'
 import isUserClaimedPoints from './userClaimedPoints'
 import addClaimedPoints from './addClaimedPoints'
+import createPoints from './createPoints'
 
 export default router({
   // routes for points
   createPersonalPoints,
+  createPoints,
   alterPoints,
   deletePoints,
   createGroupPoints,

@@ -8,6 +8,7 @@ import type { CategoriesPublic, TaskData } from '@server/shared/types'
 import CategoryList from '@/components/categories/CategoryList.vue'
 import TaskCard from '@/components/task/TaskCard.vue'
 import { useRoute } from 'vue-router'
+import { filterTasksByCategoryId, filterTasksByDefaultType, countTasksOfDefaultType } from '@/utils/tasks'
 
 const userGroupStore = useUserGroupsStore()
 const userStore = useUserStore()
@@ -55,56 +56,35 @@ const groups = computed(() => {
 })
 
 // const groupTasks = computed(() => userGroupStore.tasks)
-
-const tasks = computed(() => {
-  const selectedCategoryId = selectedCategory.value ? selectedCategory.value : undefined
+const allTasks = computed(()=> {
   if (isGroupTasks.value && userGroupStore.tasks) {
-    const filteredTasks = filterTasksByCategory({
-      tasks: userGroupStore.tasks,
-      categoryId: selectedCategoryId,
-    })
-    return filterTasksByDefault({tasks:filteredTasks, title: filterTitle.value})
+    return userGroupStore.tasks
   }
-
   if (userStore.tasks) {
-    return filterTasksByCategory({ tasks: userStore.tasks, categoryId: selectedCategoryId })
+    return userStore.tasks
   }
 
   return []
 })
 
-function filterTasksByCategory(filter: { categoryId?: number; tasks: TaskData[] }): TaskData[] {
-  if (filter.categoryId) {
-    return filter.tasks.filter((task) => task.categoryId === filter.categoryId)
-  }
-  return filter.tasks
-}
-
-function filterTasksByDefault(filter: { title?: string; tasks: TaskData[] }): TaskData[] {
-  if(!filter.title){
-
-    return filter.tasks
-  }
-  else if (filter.title === 'Routine') {
-
-    return filter.tasks.filter((task) => task.isRecurring === true)
-  } else if (filter.title === 'Someday') {
-
-    return filter.tasks.filter((task) => task.startDate === null)
-  } else if (filter.title === 'Scheduled') {
-
-    return filter.tasks.filter((task) => task.isRecurring === false && task.startDate !== null)
-  }else if(filter.title === 'For Adoption'){
-
-    return filter.tasks.filter((task)=> task.assignedUserId === null)
+const tasks = computed(() => {
+  const selectedCategoryId = selectedCategory.value ? selectedCategory.value : undefined
+  if (isGroupTasks.value && userGroupStore.tasks) {
+    const filteredTasks = filterTasksByCategoryId({
+      tasks: userGroupStore.tasks,
+      categoryId: selectedCategoryId,
+    })
+    return filterTasksByDefaultType({tasks:filteredTasks, title: filterTitle.value})
   }
 
-  return filter.tasks
-}
+  if (userStore.tasks) {
+    const filteredTasks =  filterTasksByCategoryId({ tasks: userStore.tasks, categoryId: selectedCategoryId })
+    return filterTasksByDefaultType({tasks:filteredTasks, title: filterTitle.value})
+  }
 
-function countTasksByFilter (tasks: TaskData[], count: 'Routine' | 'Someday' | 'Scheduled' | 'For Adoption'): number {
-    return filterTasksByDefault({tasks, title: count}).length
-}
+  return []
+})
+
 
 const handleNewCategory = (category: CategoriesPublic) => {
   if (category.groupId) {
@@ -165,8 +145,7 @@ const handleTaskDeletion = (taskId: number) => {
     <div>{{ task }}</div>
   </div> -->
   <!-- <div>is group: {{ isGroupTasks }}</div> -->
-   <div>{{ countTasksByFilter(tasks, 'Routine') }}</div>
-   <div>{{ countTasksByFilter(tasks, 'For Adoption') }}</div>
+   <div>{{ countTasksOfDefaultType(allTasks, 'Routine') }}</div>
   <div class="flex justify-between">
     <div class="flex space-x-1">
       <div>

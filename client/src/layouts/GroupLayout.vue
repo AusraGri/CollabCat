@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watchEffect, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useUserGroupsStore, useUserStore } from '@/stores'
+import { useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import { FwbButton, FwbTabs, FwbTab } from 'flowbite-vue'
 import GroupMembers from '@/components/groups/GroupMembers.vue'
 import { RouterView } from 'vue-router'
 import { useRewardStore } from '@/stores/rewardStore'
 import Rewards from '@/components/rewards/Rewards.vue'
-import Points from '@/components/points/Points.vue'
 import GroupSettings from '@/components/groups/GroupSettings.vue'
 
 // type TabName = 'Tasks' | 'Calendar'
@@ -16,16 +15,10 @@ import GroupSettings from '@/components/groups/GroupSettings.vue'
 const userGroupStore = useUserGroupsStore()
 const rewardStore = useRewardStore()
 const userStore = useUserStore()
+const pointsStore = usePointsStore()
 const router = useRouter()
 const route = useRoute()
 const isShowGroupSettings = ref(false)
-const points = computed(() => {
-  if(isUserInGroupPage.value){
-    return userGroupStore.userMembership?.points || 0
-  }
-
-  return userStore.points || 0
-})
 const activeTab = ref<any>(route.name?.toString().replace(/^Personal/, ''))
 const isUserInGroupPage = computed(() => route.meta.group)
 const isAdmin = computed(() => {
@@ -45,7 +38,7 @@ watchEffect(async () => {
   if (userStore.user && !isUserInGroupPage.value) {
     const userInfo = {
       ...userStore.user,
-      points: userStore.points || 0,
+      points: pointsStore.userPoints || 0,
       role: 'Admin',
     }
     await rewardStore.managePersonalRewards(userInfo)
@@ -57,15 +50,13 @@ watch(()=> route.name, (newName)=>{
   activeTab.value = tab
 })
 
-const handleRewardClaim = (data: {cost: number, groupId: number | undefined}) => {
-  const groupMemberPoints = userGroupStore.userMembership?.points
+const handleRewardClaim = (data: {cost: number}) => {
+  const userPoints = pointsStore.userPoints
+if(userPoints > data.cost){
+  const updatedPoints = userPoints - data.cost
+  pointsStore.setPoints(updatedPoints)
 
-  if(data.groupId && groupMemberPoints){
-    const updatedPoints = groupMemberPoints - data.cost
-    userGroupStore.setMemberPoints(updatedPoints)
-  }else{
-    userStore.points = userStore.points ? userStore.points - data.cost : null
-  }
+}
 }
 // onMounted(async () => {
 //   await userGroupStore.fetchUserGroups()
@@ -110,9 +101,6 @@ const openGroupSettings = () => {
       <div v-if="isUserInGroupPage">
         <FwbButton @click="openGroupSettings">Settings</FwbButton>
         <GroupSettings :is-show-modal="isShowGroupSettings" @close="isShowGroupSettings = false" />
-      </div>
-      <div v-if="userGroupStore.hasPoints">
-        <Points :points="points" />
       </div>
     </div>
   </div>
