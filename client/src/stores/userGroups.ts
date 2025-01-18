@@ -104,17 +104,28 @@ export const useUserGroupsStore = defineStore('group', {
         console.error('Failed to create new group:', error)
       }
     },
-    // async createCategory(title:string) {
-    //   try {
-    //     const groupId = this.activeGroup?.id
-    //     if (groupId) {
-    //       const members = await trpc.groups.getGroupMembers.query({ groupId })
-    //       this.groupMembers = members
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to create new group:', error)
-    //   }
-    // },
+    async removeUserFromGroup(userId?:number) {
+      try {
+        const userIdToRemove = userId || this.userMembership?.id
+        const groupId = this.activeGroup?.id
+        if (userIdToRemove && groupId) {
+          await trpc.groups.removeUser.mutate({userId: userIdToRemove, groupId})
+          await trpc.points.deletePoints.mutate({groupId})
+        }
+      } catch (error) {
+        console.error('Failed to create new group:', error)
+      }
+    },
+    async deleteGroup() {
+      try {
+        const groupId = this.activeGroup?.id
+        if (groupId) {
+          await trpc.groups.deleteGroup.mutate({groupId})
+        }
+      } catch (error) {
+        console.error('Failed to create new group:', error)
+      }
+    },
     async inviteUser(email: string) {
       try {
         const groupId = this.activeGroup?.id

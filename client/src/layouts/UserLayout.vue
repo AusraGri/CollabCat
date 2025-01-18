@@ -17,10 +17,11 @@ const taskStore = useTasksStore()
 const pointStore = usePointsStore()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
-const activeGroupId = computed(()=> userGroupStore.activeGroup ? userGroupStore.activeGroup.id : undefined)
+const activeGroupId = computed(() =>
+  userGroupStore.activeGroup ? userGroupStore.activeGroup.id : undefined
+)
 const invitations = computed(() => userStore.invitations)
 const isUserInGroupPage = computed(() => route.meta.group)
-
 
 onMounted(async () => {
   if (userGroupStore.activeGroup) {
@@ -34,10 +35,15 @@ onMounted(async () => {
 
 const refreshInvitations = async () => {
   await userStore.fetchInvitations()
+  await userGroupStore.fetchUserGroups()
 }
 watch(
   () => userGroupStore.activeGroup?.name,
   async (newGroupName, oldGroupName) => {
+    if (userGroupStore.activeGroup === null) {
+      router.push({ name: 'PersonalCalendar' })
+    }
+
     if (newGroupName !== oldGroupName && newGroupName) {
       const groupName = stringToUrl(newGroupName)
       const currentTab = 'Calendar'
@@ -46,9 +52,6 @@ watch(
 
       await userGroupStore.fetchGroupData()
       await userGroupStore.fetchUserMembershipInfo()
-    }
-    if(userGroupStore.activeGroup === null){
-      router.push({ name: 'PersonalCalendar' })
     }
 
     await pointStore.managePoints(activeGroupId.value)
@@ -59,26 +62,26 @@ watch(
 <template>
   <div
     v-if="userStore.user"
-    class=" mb-1 mt-1 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50 p-3"
+    class="mt-1 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50 p-3"
   >
-  <div class="flex max-w-screen-lg grow justify-between items-center ">
-    <UserAvatarMenu :user="userStore.user" />
-    <GroupSelection />
-    <Notifications :has-notifications="!!invitations?.length">
-      <template #notifications>
-        <FwbListGroupItem
-          class="flex flex-col space-y-2 bg-gray-100 p-4 dark:bg-gray-700"
-          v-for="invitation in invitations"
-          :key="invitation.id"
-        >
-          <Invitations :invitation="invitation" @invitation:action="refreshInvitations" />
-        </FwbListGroupItem>
-      </template>
-    </Notifications>
-  </div>
+    <div class="flex max-w-screen-lg grow items-center justify-between">
+      <UserAvatarMenu :user="userStore.user" />
+      <GroupSelection />
+      <Notifications :has-notifications="!!invitations?.length">
+        <template #notifications>
+          <FwbListGroupItem
+            class="flex flex-col space-y-2 bg-gray-100 p-4 dark:bg-gray-700"
+            v-for="invitation in invitations"
+            :key="invitation.id"
+          >
+            <Invitations :invitation="invitation" @invitation:action="refreshInvitations" />
+          </FwbListGroupItem>
+        </template>
+      </Notifications>
+    </div>
   </div>
   <main>
-    <div class="container w-full  mx-auto">
+    <div class="container mx-auto w-full">
       <RouterView />
     </div>
   </main>

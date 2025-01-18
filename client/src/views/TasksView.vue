@@ -7,8 +7,15 @@ import CreateCategory from '@/components/categories/CreateCategory.vue'
 import type { CategoriesPublic, TaskData } from '@server/shared/types'
 import CategoryList from '@/components/categories/CategoryList.vue'
 import TaskCard from '@/components/task/TaskCard.vue'
+import Tab from '@/components/Tab.vue'
+import TabRev from '@/components/TabRev.vue'
 import { useRoute } from 'vue-router'
-import { filterTasksByCategoryId, filterTasksByDefaultType, countTasksOfDefaultType } from '@/utils/tasks'
+import { toggle } from '@/utils/helpers'
+import {
+  filterTasksByCategoryId,
+  filterTasksByDefaultType,
+  countTasksOfDefaultType,
+} from '@/utils/tasks'
 
 const userGroupStore = useUserGroupsStore()
 const userStore = useUserStore()
@@ -19,6 +26,8 @@ const isNewTask = ref(false)
 const isNewCategory = ref(false)
 const selectedCategory = ref(null)
 const selectedDefaultCategory = ref(null)
+const selectedType = ref('')
+const isShowTypes = ref(false)
 
 const groupId = computed(() => userGroupStore.activeGroup?.id)
 const members = computed(() => userGroupStore.groupMembers || undefined)
@@ -36,16 +45,19 @@ const defaultCategories = computed(() => {
   return userStore.categories?.filter((cat) => cat.isDefault === true) || undefined
 })
 
-const filterTitle = computed(()=> {
-  const selectedId = selectedDefaultCategory.value
-  const defaultCat = defaultCategories.value
-  if(selectedId && defaultCat){
- const chosen =  defaultCat.find((cat)=> cat.id === selectedId)
+// const filterTitle = computed(()=> {
+//   const selectedId = selectedDefaultCategory.value
+//   const defaultCat = defaultCategories.value
+//   if(selectedId && defaultCat){
+//  const chosen =  defaultCat.find((cat)=> cat.id === selectedId)
 
- return chosen ? chosen.title : undefined
-  }
+//  return chosen ? chosen.title : undefined
+//   }
 
-  return undefined
+//   return undefined
+// })
+const filterTitle = computed(() => {
+  return selectedType.value ? selectedType.value : undefined
 })
 
 const groups = computed(() => {
@@ -56,7 +68,7 @@ const groups = computed(() => {
 })
 
 // const groupTasks = computed(() => userGroupStore.tasks)
-const allTasks = computed(()=> {
+const allTasks = computed(() => {
   if (isGroupTasks.value && userGroupStore.tasks) {
     return userGroupStore.tasks
   }
@@ -74,17 +86,23 @@ const tasks = computed(() => {
       tasks: userGroupStore.tasks,
       categoryId: selectedCategoryId,
     })
-    return filterTasksByDefaultType({tasks:filteredTasks, title: filterTitle.value})
+    return filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
   }
 
   if (userStore.tasks) {
-    const filteredTasks =  filterTasksByCategoryId({ tasks: userStore.tasks, categoryId: selectedCategoryId })
-    return filterTasksByDefaultType({tasks:filteredTasks, title: filterTitle.value})
+    const filteredTasks = filterTasksByCategoryId({
+      tasks: userStore.tasks,
+      categoryId: selectedCategoryId,
+    })
+    return filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
   }
 
   return []
 })
 
+function showCount (name: 'For Adoption' | 'Someday' | 'Routine' | 'Scheduled') {
+  return countTasksOfDefaultType( allTasks.value, name)
+}
 
 const handleNewCategory = (category: CategoriesPublic) => {
   if (category.groupId) {
@@ -129,6 +147,16 @@ const handleNewTask = (task: TaskData) => {
   }
   userStore.tasks?.push(task)
 }
+const handleDefaultTypeTabClick = (tabTitle: string) => {
+  const selected = selectedType.value
+
+  if (selected === tabTitle) {
+    selectedType.value = ''
+
+    return
+  }
+  selectedType.value = tabTitle
+}
 
 const handleTaskDeletion = (taskId: number) => {
   if (userGroupStore.tasks && isGroupTasks.value) {
@@ -138,6 +166,10 @@ const handleTaskDeletion = (taskId: number) => {
     userStore.tasks = userStore.tasks.filter((task) => task.id !== taskId)
   }
 }
+
+const toggleShowTypes = () => {
+  toggle(isShowTypes)
+}
 </script>
 <template>
   <!-- <div v-for="task in tasks" :key="task.id">
@@ -145,21 +177,98 @@ const handleTaskDeletion = (taskId: number) => {
     <div>{{ task }}</div>
   </div> -->
   <!-- <div>is group: {{ isGroupTasks }}</div> -->
-   <div>{{ countTasksOfDefaultType(allTasks, 'Routine') }}</div>
-  <div class="flex justify-between">
-    <div class="flex space-x-1">
-      <div>
-        <FwbButton @click="toggleTaskModal">add Task</FwbButton>
+  <!-- <div>{{ countTasksOfDefaultType(allTasks, 'Routine') }}</div> -->
+  <div class="flex flex-col justify-start">
+    <div class="inline-flex self-start">
+      <TabRev
+        :title="'+ Task'"
+        @tab-click="toggleTaskModal"
+        :custom-tailwind-classes="'border-amber-700'"
+      />
+      <TabRev
+        :title="'+ Category'"
+        @tab-click="toggleCategoryModal"
+        :custom-tailwind-classes="'border-yellow-400'"
+      />
+      <div
+        @click="toggleShowTypes"
+        class="ml-2 flex items-center justify-end rounded-md pl-1 pr-1  text-sm  hover:cursor-pointer"
+      >
+        <span>Types</span>
+        <svg
+        v-if="!isShowTypes"
+          class="h-6 w-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m19 9-7 7-7-7"
+          />
+        </svg>
+        <svg
+        v-if="isShowTypes"
+          class="h-6 w-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="m5 15 7-7 7 7"
+          />
+        </svg>
       </div>
     </div>
-    <div>
-      <div class="w-full">
-        <FwbButton @click="toggleCategoryModal" class="w-full">add Category</FwbButton>
+    <div
+      v-if="isShowTypes"
+      class="flex flex-wrap space-x-1 border-l-2 border-green-500 pl-3 sm:flex-nowrap"
+    >
+      <div class="inline-flex space-x-1">
+        <TabRev
+          :title="'Someday'"
+          :is-active="selectedType"
+          @tab-click="handleDefaultTypeTabClick"
+        >{{showCount('Someday') }}</TabRev>
+        <TabRev
+          :title="'Routine'"
+          :is-active="selectedType"
+          @tab-click="handleDefaultTypeTabClick"
+        >{{showCount('Routine') }}</TabRev>
       </div>
-      <!-- <div v-if="categories">
-        <CategoryList :categories="categories" v-model:selected-category="selectedCategory" />
-      </div> -->
+      <div class="inline-flex space-x-1">
+        <TabRev
+          :title="'Scheduled'"
+          :is-active="selectedType"
+          @tab-click="handleDefaultTypeTabClick"
+        >{{showCount('Scheduled') }}</TabRev>
+        <!-- <TabRev
+          :title="'For Adoption'"
+          :is-active="selectedType"
+          @tab-click="handleDefaultTypeTabClick"
+        /> -->
+        <TabRev
+          :title="'For Adoption'"
+          :is-active="selectedType"
+          @tab-click="handleDefaultTypeTabClick"
+        >{{showCount('For Adoption') }}</TabRev>
+      </div>
     </div>
+  </div>
+  <div class="flex justify-between border-t-2">
     <CreateTask
       :is-show-modal="isNewTask"
       :group-id="groupId"
@@ -175,7 +284,7 @@ const handleTaskDeletion = (taskId: number) => {
       @close="toggleCategoryModal"
     />
   </div>
-  <div class="flex justify-between">
+  <div class="flex justify-between ">
     <div v-if="tasks">
       <div v-for="task in tasks" :key="task.id">
         <TaskCard
@@ -191,12 +300,6 @@ const handleTaskDeletion = (taskId: number) => {
     </div>
     <div v-if="categories">
       <CategoryList :categories="categories" v-model:selected-category="selectedCategory" />
-    </div>
-    <div v-if="defaultCategories">
-      <CategoryList
-        :categories="defaultCategories"
-        v-model:selected-category="selectedDefaultCategory"
-      />
     </div>
   </div>
 </template>

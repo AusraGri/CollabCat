@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import type { InsertableReward, PublicReward, RewardUpdateable } from '@server/shared/types'
 import { ref, computed } from 'vue'
-import { FwbDropdown, FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
+import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbModal } from 'flowbite-vue'
 import { useRewardStore } from '@/stores'
 import NewRewardModule from './NewRewardModule.vue'
 import RewardItem from './RewardItem.vue'
 
+// const { isShowRewards } = defineProps<{
+//   isShowRewards: boolean
+// }>()
+
 const emit = defineEmits<{
   (event: 'reward:claimed', value: {cost: number}): void
+  (event: 'closed'): void
 }>()
 
 const rewardStore = useRewardStore()
@@ -67,11 +72,11 @@ const handleRewardChange = async ({
 </script>
 <template>
   <div v-if="isShowRewards" class="flex flex-col flex-nowrap">
-    <FwbDropdown>
+    <FwbDropdown align-to-end @hide="emit('closed')">
       <template #trigger>
-        <span class="cursor-pointer self-center rounded bg-slate-300 p-3 hover:bg-blue-100">
-          Rewards
-        </span>
+        <!-- <span class="cursor-pointer self-center rounded bg-slate-300 p-3 hover:bg-blue-100">
+        </span> -->
+        <slot name="trigger"></slot>
       </template>
       <fwb-list-group class="w-fit">
         <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover>

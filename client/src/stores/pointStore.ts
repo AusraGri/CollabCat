@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { PointsPublic } from '@server/shared/types'
 
+
 interface PointsState {
   pointsData: PointsPublic | null
   isEnabled: boolean

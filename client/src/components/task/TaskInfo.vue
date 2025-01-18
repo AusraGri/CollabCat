@@ -390,7 +390,7 @@ const saveChanges = () => {
           :is-show-modal="isDeleteConfirmation"
           :action="'delete'"
           :object="editableTask.title"
-          @delete="handleConfirmation"
+          @confirmed="handleConfirmation"
         />
         <FwbButton @click="deleteTask" color="red" size="xs">
           <DeleteIcon :color="'white'" />

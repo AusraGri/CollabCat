@@ -134,6 +134,7 @@ const resetForm = () => {
             type="text"
             label="Task Title"
             placeholder="Enter task title"
+            maxlength = "40"
             required
           />
         </div>
@@ -145,6 +146,7 @@ const resetForm = () => {
             :rows="1"
             label="Description"
             placeholder="Enter task description"
+            maxlength = "150"
           />
         </div>
 

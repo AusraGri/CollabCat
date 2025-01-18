@@ -110,11 +110,17 @@ const updateTask = async (updatedTask: TaskData) => {
 
 const deleteTask = async () => {
   const taskId = props.task.id
-  const result = await taskStore.deleteTask(taskId)
+  try {
+    const result = await taskStore.deleteTask(taskId)
 
-  if (result) {
-    emit('task:deleted', taskId)
+    if (result) {
+      emit('task:deleted', taskId)
+    }
+
+  } catch (error) {
+    console.log(error)
   }
+
 }
 
 const updateTaskStatus = (value: boolean) => {

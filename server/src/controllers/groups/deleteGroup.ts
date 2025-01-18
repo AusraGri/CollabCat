@@ -1,7 +1,6 @@
 import { groupAuthProcedure } from '@server/trpc/groupAuthProcedure'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { idSchema } from '@server/entities/shared'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
 
@@ -13,16 +12,15 @@ export default groupAuthProcedure
       path: '/group/remove',
       tags: ['group'],
       protect: true,
-      summary: 'Delete group',
+      summary: 'Delete group', 
     },
   })
   .input(
     z.object({
-      id: idSchema.describe('Group id to remove'),
     })
   )
   .output(z.boolean())
-  .mutation(async ({ input: group, ctx: { authUser, userGroup, repos } }) => {
+  .mutation(async ({ ctx: { authUser, userGroup, repos } }) => {
     if (!userGroup || userGroup.role !== 'Admin') {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
@@ -31,7 +29,7 @@ export default groupAuthProcedure
     }
 
     const isGroupDeleted = await repos.groupsRepository.delete({
-      id: group.id,
+      id: userGroup.groupId,
       createdByUserId: authUser.id,
     })
 

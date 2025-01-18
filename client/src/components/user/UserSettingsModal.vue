@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { trpc } from '@/trpc'
-import { useUserStore } from '@/stores/userProfile'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useUserStore, usePointsStore } from '@/stores'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import ConfirmationModal from '../ConfirmationModal.vue'
 import { FwbModal, FwbButton, FwbInput, FwbCheckbox } from 'flowbite-vue'
 import { type UserPublic } from '@server/shared/types'
+import CategoriesManager from '../categories/CategoriesManager.vue'
+
 
 const { showUserSettings, user } = defineProps<{
   user: UserPublic
@@ -19,10 +20,13 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const pointStore = usePointsStore()
 const username = ref()
-const isPoints = ref(userStore.isPointsEnabled)
+const isPoints = ref(pointStore.isEnabled)
 const isShowConfirmation = ref(false)
+const isShowCategoriesManager = ref(false)
 const router = useRouter()
+const userCategories = computed(()=> userStore.categories?.filter((cat)=> cat.isDefault === false))
 
 async function changeName() {
   try {
@@ -35,7 +39,7 @@ async function changeName() {
     username.value = user.username
     router.push({ params: { username: username.value.replace(' ', '') } })
   } catch (error) {
-    console.log(error) // change to toast
+    console.log(error)
   }
   emit('close')
 }
@@ -58,22 +62,22 @@ const closeModal = () => {
 }
 
 const saveUserSettings = async () => {
+ 
   await changeName()
   await handlePointsChange()
 }
 
 const handlePointsChange = async () => {
   try {
-    if (isPoints.value === userStore.isPointsEnabled) {
+    if (isPoints.value === pointStore.isPointsEnabled) {
       return
     }
     if (isPoints.value) {
-      await trpc.points.createPersonalPoints.mutate()
-      userStore.isPointsEnabled = true
+      await pointStore.enablePoints()
+
       return
     }
-    await trpc.points.deletePoints.mutate({})
-    userStore.isPointsEnabled = false
+    await pointStore.disablePoints()
   } catch (error) {
     console.log('Failed to change point status', error)
   }
@@ -82,6 +86,15 @@ const handlePointsChange = async () => {
 onMounted(() => {
   username.value = user.username
 })
+
+const openCategoryManager = () =>{
+  isShowCategoriesManager.value = true
+}
+
+watch(()=> pointStore.isEnabled, (newValue)=>{
+  isPoints.value = newValue
+})
+
 </script>
 
 <template>
@@ -102,12 +115,12 @@ onMounted(() => {
             >
             </FwbInput>
           </div>
-          <div class="mt-3">
+          <div class="mt-3 w-fit">
             <FwbCheckbox label="Task Points" v-model="isPoints" />
           </div>
         </form>
-        <div class="flex mt-3 border-t-2 items-center pt-3">
-          <FwbButton color="default" outline pill square>
+        <div v-if="userCategories?.length" class="flex mt-3 border-t-2 items-center pt-3">
+          <FwbButton color="default" @click="openCategoryManager" outline pill square>
             Manage Your Categories
             <template #suffix>
               <svg
@@ -124,6 +137,7 @@ onMounted(() => {
               </svg>
             </template>
           </FwbButton>
+          <CategoriesManager :is-show-categories="isShowCategoriesManager" :categories="userCategories || []" @close="isShowCategoriesManager = false" />
         </div>
       </template>
       <template #footer>

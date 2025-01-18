@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { FwbModal, FwbButton } from 'flowbite-vue'
 
 const { isShowModal, object, action } = defineProps<{
@@ -9,12 +8,12 @@ const { isShowModal, object, action } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (event: 'delete', value: boolean): void;
+  (event: 'confirmed', value: boolean): void;
 }>();
 
 
 function confirmAction(confirmed: boolean) {
-  emit('delete', confirmed);  // Emit the confirmation result (true/false)
+  emit('confirmed', confirmed);  // Emit the confirmation result (true/false)
 }
 
 </script>

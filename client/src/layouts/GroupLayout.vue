@@ -3,14 +3,18 @@ import { ref, onMounted, watchEffect, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
 import { useRouter } from 'vue-router'
-import { FwbButton, FwbTabs, FwbTab } from 'flowbite-vue'
 import GroupMembers from '@/components/groups/GroupMembers.vue'
 import { RouterView } from 'vue-router'
 import { useRewardStore } from '@/stores/rewardStore'
 import Rewards from '@/components/rewards/Rewards.vue'
 import GroupSettings from '@/components/groups/GroupSettings.vue'
+import Tab from '@/components/Tab.vue'
+import TabRev from '@/components/TabRev.vue'
 
-// type TabName = 'Tasks' | 'Calendar'
+const emit = defineEmits<{
+  (event: 'new:task'): void
+  (event: 'new:category'): void
+}>()
 
 const userGroupStore = useUserGroupsStore()
 const rewardStore = useRewardStore()
@@ -45,62 +49,71 @@ watchEffect(async () => {
   }
 })
 
-watch(()=> route.name, (newName)=>{
-  const tab  = newName?.toString().replace(/^Personal/, '')
-  activeTab.value = tab
-})
+watch(
+  () => route.name,
+  (newName) => {
+    const tab = newName?.toString().replace(/^Personal/, '')
+    activeTab.value = tab
+  }
+)
 
-const handleRewardClaim = (data: {cost: number}) => {
+const handleRewardClaim = (data: { cost: number }) => {
   const userPoints = pointsStore.userPoints
-if(userPoints > data.cost){
-  const updatedPoints = userPoints - data.cost
-  pointsStore.setPoints(updatedPoints)
-
+  if (userPoints > data.cost) {
+    const updatedPoints = userPoints - data.cost
+    pointsStore.setPoints(updatedPoints)
+  }
 }
-}
-// onMounted(async () => {
-//   await userGroupStore.fetchUserGroups()
-// })
 
-const handlePaneClick = () => {
-  if(isUserInGroupPage.value){
+const openGroupSettings = () => {
+  isShowGroupSettings.value = true
+}
+function handleTabClick(tabName: string) {
+  activeTab.value = tabName
+
+  if (isUserInGroupPage.value) {
     router
       .push({ name: activeTab.value })
       .then(() => {})
       .catch((err) => {
         console.error('Navigation error:', err)
       })
-      return
+    return
   }
   router
-      .push({ name: `Personal${activeTab.value}` })
-      .then(() => {})
-      .catch((err) => {
-        console.error('Navigation error:', err)
-      })
-
-}
-
-const openGroupSettings = () => {
-  isShowGroupSettings.value = true
+    .push({ name: `Personal${activeTab.value}` })
+    .then(() => {})
+    .catch((err) => {
+      console.error('Navigation error:', err)
+    })
 }
 </script>
 <template>
-  <div class="mb-1 flex w-full flex-col divide-x-2">
-    <div class="flex w-full flex-wrap items-center justify-center space-x-1 space-y-1">
-      <FwbTabs v-model="activeTab" @click:pane="handlePaneClick" variant="underline" class="p-5">
-        <FwbTab name="Calendar" title="Calendar"> </FwbTab>
-        <FwbTab name="Tasks" title="Tasks"> </FwbTab>
-      </FwbTabs>
-      <div v-if="isUserInGroupPage">
-        <GroupMembers />
+  <div class=" flex flex-col">
+    <div :class="['flex','justify-end','pr-3', {'border-r-2 border-gray-300' : isUserInGroupPage}]">
+      <div class=" inline-flex space-x-2 w-96">
+        <Tab :title="'Calendar'" :isActive="activeTab" @tab-click="handleTabClick" />
+        <Tab :title="'Tasks'" :isActive="activeTab" @tab-click="handleTabClick" />
+        <Rewards @reward:claimed="handleRewardClaim">
+          <template #trigger>
+            <Tab :title="'Rewards'" :custom-tailwind-classes="'border-red-500'"/>
+          </template>
+        </Rewards>
       </div>
-      <div>
-        <Rewards @reward:claimed="handleRewardClaim"/>
-      </div>
-      <div v-if="isUserInGroupPage">
-        <FwbButton @click="openGroupSettings">Settings</FwbButton>
-        <GroupSettings :is-show-modal="isShowGroupSettings" @close="isShowGroupSettings = false" />
+    </div>
+    <div :class="['flex', 'w-full', 'flex-nowrap', 'h-9', 'justify-end']">
+      <div v-if="isUserInGroupPage" class="inline-flex space-x-1">
+        <div>
+          <GroupMembers>
+            <template #trigger>
+              <Tab :title="'Members'" :custom-tailwind-classes="'border-green-400'" />
+            </template>
+          </GroupMembers>
+        </div>
+        <div>
+          <Tab :title="'Settings'" @tab-click="openGroupSettings" :custom-tailwind-classes="'border-gray-300 text-gray-500'"/>
+          <GroupSettings :is-show-modal="isShowGroupSettings" @close="isShowGroupSettings = false" />
+        </div>
       </div>
     </div>
   </div>

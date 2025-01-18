@@ -24,8 +24,10 @@ export default groupAuthProcedure
     })
   )
   .output(z.boolean())
-  .mutation(async ({ input: user, ctx: { userGroup, repos } }) => {
-    if (!userGroup || userGroup.role !== 'Admin') {
+  .mutation(async ({ input: user, ctx: { authUser, userGroup, repos } }) => {
+    const isAllowed = user.userId === authUser.id || userGroup?.role !== 'Admin'
+
+    if (!userGroup || !isAllowed) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message: 'User does not have permission to remove user from this group',

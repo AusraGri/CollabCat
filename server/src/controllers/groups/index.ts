@@ -1,6 +1,6 @@
 import { router } from '@server/trpc'
 import create from './create'
-import remove from './remove'
+import deleteGroup from './deleteGroup'
 import inviteUser from './inviteUser'
 import removeUser from './removeUser'
 import getUserGroups from './getUserGroups'
@@ -12,7 +12,7 @@ import getGroupData from './getGroupData'
 
 export default router({
   create,
-  remove,
+  deleteGroup,
   inviteUser,
   removeUser,
   getUserGroups,
