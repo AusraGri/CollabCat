@@ -12,13 +12,10 @@ export default groupAuthProcedure
       path: '/group/remove',
       tags: ['group'],
       protect: true,
-      summary: 'Delete group', 
+      summary: 'Delete group',
     },
   })
-  .input(
-    z.object({
-    })
-  )
+  .input(z.object({}))
   .output(z.boolean())
   .mutation(async ({ ctx: { authUser, userGroup, repos } }) => {
     if (!userGroup || userGroup.role !== 'Admin') {

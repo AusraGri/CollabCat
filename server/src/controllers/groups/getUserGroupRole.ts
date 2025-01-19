@@ -12,7 +12,10 @@ export default authenticatedProcedure
     })
   )
   .query(async ({ input: { groupId }, ctx: { authUser, repos } }) => {
-    const groupRole = await repos.groupsRepository.getRole({ groupId, userId: authUser.id })
+    const groupRole = await repos.groupsRepository.getRole({
+      groupId,
+      userId: authUser.id,
+    })
 
     return groupRole || undefined
   })

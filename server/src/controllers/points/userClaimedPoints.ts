@@ -16,22 +16,28 @@ export default authenticatedProcedure
       summary: 'Get points of the user',
     },
   })
-  .input(z.object({
-    taskId: idSchema,
-    taskInstanceDate: z.date()
-  }))
+  .input(
+    z.object({
+      taskId: idSchema,
+      taskInstanceDate: z.date(),
+    })
+  )
   .output(z.boolean())
-  .query(async ({ input: {taskId, taskInstanceDate}, ctx: { authUser, repos } }) => {
+  .query(
+    async ({
+      input: { taskId, taskInstanceDate },
+      ctx: { authUser, repos },
+    }) => {
+      const taskDate = setDateToUTCmidnight(taskInstanceDate)
 
-    const taskDate = setDateToUTCmidnight(taskInstanceDate)
-
-    const queryOptions = {
+      const queryOptions = {
         taskId,
         taskInstanceDate: taskDate,
-        userId: authUser.id
+        userId: authUser.id,
+      }
+
+      const points = await repos.pointsRepository.getPointClaims(queryOptions)
+
+      return !!points
     }
-
-    const points = await repos.pointsRepository.getPointClaims(queryOptions)
-
-    return !!points
-  })
+  )

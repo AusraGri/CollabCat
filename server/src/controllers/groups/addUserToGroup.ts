@@ -3,7 +3,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { idSchema } from '@server/entities/shared'
 import { userGroupsSchema } from '@server/entities/groups'
 import z from 'zod'
-import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure';
+import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
 
 export default authenticatedProcedure
   .use(provideRepos({ groupsRepository }))
@@ -22,10 +22,13 @@ export default authenticatedProcedure
     })
   )
   .output(userGroupsSchema)
-  .mutation(async ({ input: {groupId}, ctx: { authUser, repos } }) => {
-
+  .mutation(async ({ input: { groupId }, ctx: { authUser, repos } }) => {
     const role = 'Member'
-    const result = await repos.groupsRepository.addGroupMember({groupId, userId: authUser.id, role })
+    const result = await repos.groupsRepository.addGroupMember({
+      groupId,
+      userId: authUser.id,
+      role,
+    })
 
     return result
   })

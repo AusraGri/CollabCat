@@ -11,13 +11,18 @@ export const userSchema = z.object({
   createdAt: z.date(),
   provider: z.string(),
   updatedAt: z.date(),
-  picture: z.string().nullable()
+  picture: z.string().nullable(),
 })
 
-export const userPublicSchema = userSchema.omit({auth0Id : true, createdAt: true, provider: true, updatedAt: true})
+export const userPublicSchema = userSchema.omit({
+  auth0Id: true,
+  createdAt: true,
+  provider: true,
+  updatedAt: true,
+})
 
 export const userBasicInfoSchema = userPublicSchema.extend({
-  points: z.number().positive().nullable()
+  points: z.number().positive().nullable(),
 })
 export const userKeysAll = Object.keys(userSchema.shape) as (keyof User)[]
 

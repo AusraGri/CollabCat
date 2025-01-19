@@ -19,15 +19,17 @@ export default authenticatedProcedure
       also points can be personal.`,
     },
   })
-  .input(z.object({
-    groupId: idSchema.optional()
-  }))
+  .input(
+    z.object({
+      groupId: idSchema.optional(),
+    })
+  )
   .output(pointsSchemaOutput)
-  .mutation(async ({ input: {groupId}, ctx: { authUser, repos } }) => {
+  .mutation(async ({ input: { groupId }, ctx: { authUser, repos } }) => {
     const points = {
       userId: authUser.id,
       groupId,
-      points: 0
+      points: 0,
     }
 
     const pointsCreated = await repos.pointsRepository.createPoints(points)

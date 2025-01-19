@@ -22,7 +22,7 @@ export function invitationsRepository(db: Database) {
     },
 
     async getInvitationByEmail(
-      email: Invitations['email'],
+      email: Invitations['email']
     ): Promise<Selectable<Invitations>[]> {
       return db
         .selectFrom('invitations')

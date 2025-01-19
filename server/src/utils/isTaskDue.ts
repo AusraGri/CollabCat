@@ -1,4 +1,4 @@
-import type {TaskData } from '@server/entities/tasks'
+import type { TaskData } from '@server/entities/tasks'
 import moment from 'moment'
 import 'moment-recur-ts'
 
@@ -6,7 +6,7 @@ export default function isTaskDue(task: TaskData, date: Date): boolean {
   try {
     const givenDate = moment(date).startOf('day')
     const startDate = moment(task.startDate)
-    const endDate =  moment(task.endDate).endOf('day')
+    const endDate = moment(task.endDate).endOf('day')
     const recurrType = task.recurrence?.recurringType
     const separation = task.recurrence?.separationCount
       ? task.recurrence.separationCount + 1
@@ -24,8 +24,7 @@ export default function isTaskDue(task: TaskData, date: Date): boolean {
         start: startDate,
         end: startDate.endOf('day'),
       })
-    } else if (recurrType && recurrType === 'daily') {
-
+    } else if (recurrType && recurrType.toLowerCase() === 'daily') {
       recurrenceRule = moment()
         .recur({
           start: startDate,
@@ -33,7 +32,7 @@ export default function isTaskDue(task: TaskData, date: Date): boolean {
         })
         .every(separation)
         .days()
-    } else if (recurrType && recurrType === 'weekly') {
+    } else if (recurrType && recurrType.toLowerCase() === 'weekly') {
       if (daysOfWeek) {
         const currentDay = givenDate.day()
 

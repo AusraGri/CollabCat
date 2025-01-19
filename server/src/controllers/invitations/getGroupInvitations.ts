@@ -8,10 +8,8 @@ export default authenticatedProcedure
   .use(provideRepos({ invitationsRepository }))
   .input(z.void())
   .query(async ({ ctx: { authUser, repos } }) => {
+    const invitations: PublicInvitation[] =
+      await repos.invitationsRepository.getInvitationByEmail(authUser.email)
 
-    const invitations : PublicInvitation []= await repos.invitationsRepository.getInvitationByEmail(
-      authUser.email
-    )
-
-    return invitations 
+    return invitations
   })

@@ -78,8 +78,10 @@ const pathPassedToNode = path.resolve(process.argv[1])
 const isFileRunDirectly = pathToThisFile.includes(pathPassedToNode)
 
 if (isFileRunDirectly) {
-  const db = createDatabase(config.database)
+  const mainDb = createDatabase(config.database)
+  const testDb = createDatabase(config.testDatabase)
 
   const stepCount = parseInt(process.argv[2], 10) || 1
-  await migrateDown(db, stepCount)
+  await migrateDown(mainDb, stepCount)
+  await migrateDown(testDb, stepCount)
 }

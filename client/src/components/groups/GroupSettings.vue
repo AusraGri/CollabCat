@@ -78,7 +78,7 @@ const processConfirmation = async (confirm: boolean) => {
       await userGroupStore.removeUserFromGroup()
     }
     userGroupStore.activeGroup = null
-    userGroupStore.fetchGroupData()
+    userGroupStore.fetchUserGroups()
     emit('close')
     router.push({ name: 'Profile' })
   } catch (error) {
@@ -105,7 +105,7 @@ watch(
         <div class="w-fit">
           <FwbCheckbox v-model="isPointsEnabled" label="My Group Task Points" />
         </div>
-        <div v-if="categories" class="mt-5">
+        <div v-if="categories.length" class="mt-5">
           <FwbButton color="default" @click="isManageCategories = true" outline pill square>
             Manage Your Categories
             <template #suffix>

@@ -28,11 +28,10 @@ export default authenticatedProcedure
         })
       : await repos.pointsRepository.getPoints({ userId: authUser.id })
 
-    if(!currentPoints){
+    if (!currentPoints) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message:
-          'User does not have points enabled',
+        message: 'User does not have points enabled',
       })
     }
 

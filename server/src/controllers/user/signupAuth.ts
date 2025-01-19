@@ -4,7 +4,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import { assertError } from '@server/utils/errors'
 import { userSchema } from '@server/entities/user'
-import { verifyAuth0Token } from '@server/trpc/authenticatedProcedure'
+import { verifyAuth0Token } from '@server/auth0/verifyAuth0Token'
 import z from 'zod'
 import config from '@server/config'
 
@@ -35,12 +35,12 @@ export default publicProcedure
       picture: z.string().optional(),
     })
   )
-  .output(
-   userSchema
-  )
+  .output(userSchema)
   .mutation(
-    async ({ input: { auth0Token, email, username, picture }, ctx: { repos } }) => {
-      // Verify the Auth0 token and get user info from Auth0
+    async ({
+      input: { auth0Token, email, username, picture },
+      ctx: { repos},
+    }) => {
 
       const userFromAuth0 = await verifyAuth0Token(
         auth0Token,
@@ -55,31 +55,26 @@ export default publicProcedure
         })
       }
 
-      // Extract user details from Auth0 (email, name, sub, etc.)
       const { sub: auth0Id } = userFromAuth0
 
-      // Extract provider based on the `sub` value (the `sub` value contains the provider info)
       const provider = auth0Id.split('|')[0]
 
-      // Check if a user already exists by email
       const existingUser = await repos.userRepository.findByEmail(email)
       if (existingUser && existingUser.auth0Id === auth0Id) {
         // res.setHeader('Set-Cookie', `authToken=${auth0Token}; HttpOnly; Secure; SameSite=Strict; Path=/;`);
         return existingUser
       }
 
-      // Create a new user record in your database (without the password field)
       const userCreated = await repos.userRepository
         .create({
           email,
           auth0Id,
           username,
           provider,
-          picture
+          picture,
         })
         .catch((error: unknown) => {
           assertError(error)
-          // Handling database errors (e.g., duplicate key)
           if (error.message.includes('duplicate key')) {
             throw new TRPCError({
               code: 'BAD_REQUEST',

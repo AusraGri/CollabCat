@@ -14,5 +14,5 @@ export default router({
   getAssignedUsers,
   updateUser,
   getUserProfile,
-  deleteUser
+  deleteUser,
 })

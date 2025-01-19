@@ -9,7 +9,7 @@ export function filterTasksByDefaultType(filter: { title?: string; tasks: TaskDa
     return filter.tasks.filter((task: TaskData): boolean => task.startDate === null)
   } else if (filter.title === 'Scheduled') {
     return filter.tasks.filter((task: TaskData): boolean => task.isRecurring === false && task.startDate !== null)
-  } else if (filter.title === 'For Adoption') {
+  } else if (filter.title === 'Not Assigned') {
     return filter.tasks.filter((task: TaskData): boolean => task.assignedUserId === null)
   }
 
@@ -24,6 +24,6 @@ export function filterTasksByCategoryId(filter: { categoryId?: number; tasks: Ta
     return filter.tasks
   }
 
- export  function countTasksOfDefaultType (tasks: TaskData[], count: 'Routine' | 'Someday' | 'Scheduled' | 'For Adoption'): number {
+ export  function countTasksOfDefaultType (tasks: TaskData[], count: 'Routine' | 'Someday' | 'Scheduled' | 'Not Assigned'): number {
     return filterTasksByDefaultType({tasks, title: count}).length
 }

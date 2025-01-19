@@ -91,7 +91,6 @@ export interface Tasks {
   endDate: Timestamp | null
   groupId: number | null
   id: Generated<number>
-  importance: string | null
   isCompleted: Generated<boolean>
   isRecurring: Generated<boolean | null>
   points: number | null

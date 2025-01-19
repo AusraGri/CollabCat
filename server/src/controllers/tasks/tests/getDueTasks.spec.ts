@@ -16,22 +16,24 @@ const createCaller = createCallerFactory(tasksRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 const [user] = await insertAll(db, 'user', [fakeUser()])
 
-const [task, taskTwo, taskThree] = await insertAll(db, 'tasks', [
-  fakeTask({ createdByUserId: user.id, startDate: new Date(2024, 10, 1) }),
-  fakeTask({ createdByUserId: user.id, startDate: new Date(2024, 10, 4) }),
-  fakeTask({ createdByUserId: user.id, startDate: new Date(2024, 10, 4) }),
+const [task, taskTwo, taskThree, taskFour] = await insertAll(db, 'tasks', [
+  fakeTask({ createdByUserId: user.id, startDate: new Date(2024, 1, 1), isRecurring: true }),
+  fakeTask({ createdByUserId: user.id, startDate: new Date(2055, 1, 1), isRecurring: true  }),
+  fakeTask({ createdByUserId: user.id, startDate: new Date(), isRecurring: true  }),
+  fakeTask({ createdByUserId: user.id, startDate: new Date(), isRecurring: false }),
 ])
+
 
 const [taskCompleted] = await insertAll(
   db,
   'completedTasks',
   fakeCompletedTask({
     taskId: taskThree.id,
-    instanceDate: new Date(2024, 10, 11),
+    instanceDate: new Date(),
   })
 )
 
-const [patternOne, patternTwo, patterThree] = await insertAll(
+const [patternOne, patternTwo, patternThree] = await insertAll(
   db,
   'recurringPattern',
   [
@@ -40,28 +42,28 @@ const [patternOne, patternTwo, patterThree] = await insertAll(
       taskId: taskTwo.id,
       recurringType: 'Weekly',
       separationCount: 1,
-      dayOfWeek: [1, 2, 3, 4],
+      dayOfWeek: null,
     }),
     fakePattern({
       taskId: taskThree.id,
       recurringType: 'Weekly',
       separationCount: 0,
-      dayOfWeek: [1, 2, 3, 4],
+      dayOfWeek: [1, 2, 3, 4, 5, 6, 0],
     }),
   ]
 )
 
+
 const { getDueTasks } = createCaller(authContext({ db }, user))
 
 it('should return a task for the given date', async () => {
-  const date = '2024-11-11'
+  const date = new Date().toISOString()
 
   // When (ACT)
   const taskResponse = await getDueTasks({ date })
-
   // Then (ASSERT)
-  expect(taskResponse).toHaveLength(2)
-  const expectedIds = [task.id, taskThree.id]
+  expect(taskResponse).toHaveLength(3)
+  const expectedIds = [task.id, taskThree.id, taskFour.id]
   const actualIds = taskResponse.map((item) => item.id)
   expect(actualIds).toEqual(expect.arrayContaining(expectedIds))
 })

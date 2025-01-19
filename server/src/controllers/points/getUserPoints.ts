@@ -16,16 +16,18 @@ export default authenticatedProcedure
       summary: 'Get points of the user',
     },
   })
-  .input(z.object({
-    groupId: idSchema.optional()
-  }))
+  .input(
+    z.object({
+      groupId: idSchema.optional(),
+    })
+  )
   .output(pointsSchemaOutput.optional())
-  .query(async ({ input: {groupId}, ctx: { authUser, repos } }) => {
-
-    const queryOptions = groupId ? {userId: authUser.id, groupId} : {userId: authUser.id}
+  .query(async ({ input: { groupId }, ctx: { authUser, repos } }) => {
+    const queryOptions = groupId
+      ? { userId: authUser.id, groupId }
+      : { userId: authUser.id }
 
     const points = await repos.pointsRepository.getPoints(queryOptions)
-
 
     return points
   })

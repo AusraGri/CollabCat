@@ -34,13 +34,15 @@ export const createPointsSchema = pointsSchema
     points: pointsSchema.shape.points.optional(),
   })
 
-export const alterPointsSchema = pointsSchema.omit({ createdAt: true, userId: true }).extend({
-  action: z
-    .enum(['+', '-', '='])
-    .describe(
-      "'+' for adding points and '-' for removing, '=' to equal amount of points for user point (bank)"
-    ),
-})
+export const alterPointsSchema = pointsSchema
+  .omit({ createdAt: true, userId: true })
+  .extend({
+    action: z
+      .enum(['+', '-', '='])
+      .describe(
+        "'+' for adding points and '-' for removing, '=' to equal amount of points for user point (bank)"
+      ),
+  })
 export const pointsKeysAll = Object.keys(pointsSchema.shape) as (keyof Points)[]
 
 export const pointsKeysPublic = ['userId', 'groupId', 'points'] as const

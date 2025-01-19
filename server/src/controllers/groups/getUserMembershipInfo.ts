@@ -14,7 +14,7 @@ export default groupAuthProcedure
   )
   .query(async ({ input: { userId }, ctx: { authUser, repos, userGroup } }) => {
     let groupMembership: GroupMember
-    
+
     if (!userGroup?.groupId) {
       throw new Error('Group ID is missing in the context.')
     }

@@ -6,14 +6,13 @@ import {
 import cors from 'cors'
 import { renderTrpcPanel } from 'trpc-panel'
 import swaggerUi from 'swagger-ui-express'
-import { createOpenApiExpressMiddleware } from 'trpc-openapi' 
+import { createOpenApiExpressMiddleware } from 'trpc-openapi'
 import type { Database } from './database'
 import { appRouter } from './controllers'
 import type { Context } from './trpc'
 import config from './config'
 import { openApiDocument } from './trpc/openApi'
 import { validateAccessToken } from './middlewares/auth0Middleware'
-
 
 export default function createApp(db: Database) {
   const app = express()
@@ -22,30 +21,28 @@ export default function createApp(db: Database) {
   app.use(
     cors({
       origin: config.auth0.clientOriginUrl,
-      allowedHeaders: ["Authorization", "Content-Type"],
+      allowedHeaders: ['Authorization', 'Content-Type'],
       maxAge: 86400,
     })
-  );
+  )
 
   app.use(express.json())
 
   app.use('/api/health', (_, res) => {
     res.status(200).send('OK')
   })
-  
 
- // log requests to the API
+  // log requests to the API
   app.use((req, res, next) => {
     // console.log("REQUEST START:")
     // console.log('Incoming Request Method:', req.method);
     // console.log('Incoming Request URL:',req.url);
     // console.log('Incoming Request Header:', req.headers);
     // console.log('Incoming Request Header:', req.body);
-    next();
-  });
+    next()
+  })
 
-
-   // validation applied to all endpoints
+  // validation applied to all endpoints
   // app.use(validateAccessToken)
 
   app.use(
@@ -86,7 +83,6 @@ export default function createApp(db: Database) {
 
   app.use('/', swaggerUi.serve)
   app.get('/', swaggerUi.setup(openApiDocument))
-
 
   return app
 }

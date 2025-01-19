@@ -1,4 +1,8 @@
-import { authContext, requestContext } from '@tests/utils/context'
+import {
+  authContext,
+  requestContext,
+  authGroupRepoContext,
+} from '@tests/utils/context'
 import {
   fakeGroup,
   fakeUser,
@@ -11,6 +15,9 @@ import { insertAll } from '@tests/utils/records'
 import type { GroupRepository } from '@server/repositories/groupsRepository'
 import type { InvitationsRepository } from '@server/repositories/invitationRepository'
 import { sentInvitationMail } from '@server/emailer'
+import {
+  type UserRepository,
+} from '@server/repositories/userRepository'
 import groupsRouter from '..'
 
 vi.mock('@server/emailer', () => ({
@@ -23,14 +30,16 @@ vi.mock('@server/emailer', () => ({
 const createCaller = createCallerFactory(groupsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 const repos = {
+  userRepository: {
+    findByEmail: vi.fn(async () => undefined),
+  } satisfies Partial<UserRepository>,
   groupsRepository: {
     getGroupMembers: vi.fn(async () => []),
-    get: vi.fn(async () => [fakeGroup({ name: 'Group', id: 123 })]),
     getRole: vi.fn(async () => ({ role: 'Admin' })),
   } satisfies Partial<GroupRepository>,
 
   invitationsRepository: {
-    getInvitationByEmail: vi.fn(async () => undefined),
+    getInvitationByGroupAndEmail: vi.fn(async () => undefined),
     createInvitation: vi.fn(async () => ({
       id: 1,
       email: 'email@mail.com',
@@ -125,10 +134,7 @@ it('should invite user to the group (using database) ', async () => {
 
 it('should invite user to the group', async () => {
   // ARRANGE
-  const { inviteUser } = createCaller({
-    authUser: { id: 1 },
-    repos,
-  } as any)
+  const { inviteUser } = createCaller(authGroupRepoContext(repos))
 
   // ACT
   const invitation = await inviteUser({

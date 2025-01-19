@@ -5,7 +5,6 @@ const { env } = process
 
 if (!env.NODE_ENV) env.NODE_ENV = 'development'
 
-// force UTC timezone, so it matches the default timezone in production
 env.TZ = 'UTC'
 
 const isTest = env.NODE_ENV === 'test'
@@ -34,12 +33,15 @@ const schema = z
     database: z.object({
       connectionString: z.string().url(),
     }),
+    testDatabase:  z.object({
+      connectionString: z.string().url(),
+    }),
     auth0: z.object({
       audience: z.string(),
       issuerBaseURL: z.string(),
       clientOriginUrl: z.string(),
-      clientId: z.string(), 
-      clientSecret: z.string()
+      clientId: z.string(),
+      clientSecret: z.string(),
     }),
     emailService: z.object({
       host: z.string(),
@@ -62,15 +64,18 @@ const config = schema.parse({
     expiresIn: env.TOKEN_EXPIRES_IN,
     passwordCost: env.PASSWORD_COST,
   },
-auth0: {
-  audience: env.AUTH0_AUDIENCE,
-  issuerBaseURL: env.AUTH0_DOMAIN,
-  clientOriginUrl: env.CLIENT_ORIGIN_URL,
-  clientId: env.AUTH0_CLIENT_ID,
-  clientSecret: env.AUTH0_CLIENT_SECRET
-},
+  auth0: {
+    audience: env.AUTH0_AUDIENCE,
+    issuerBaseURL: env.AUTH0_DOMAIN,
+    clientOriginUrl: env.CLIENT_ORIGIN_URL,
+    clientId: env.AUTH0_CLIENT_ID,
+    clientSecret: env.AUTH0_CLIENT_SECRET,
+  },
   database: {
     connectionString: env.DATABASE_URL,
+  },
+  testDatabase: {
+    connectionString: env.TEST_DATABASE_URL,
   },
   emailService: {
     host: env.SMTP_HOST,
@@ -84,7 +89,6 @@ auth0: {
 
 export default config
 
-// utility functions
 function coerceBoolean(value: unknown) {
   if (typeof value === 'string') {
     return value === 'true' || value === '1'

@@ -8,22 +8,14 @@ import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import type { Repositories } from '@server/repositories'
 import type { AuthGroup } from '@server/entities/groups'
-// import { type TRPCPanelMeta } from "trpc-panel";
-import { type OpenApiMeta } from 'trpc-openapi' // test
+import { type OpenApiMeta } from 'trpc-openapi'
 
 export type Context = {
   db: Database
-
-  // Express types. These are optional as
-  // vast majority of requests do not need them.
-  // Then it is a bit easier to test procedures.
   req?: Request
   res?: Response
-
-  // We can also add our own custom context properties.
   authUser?: AuthUser
   userGroup?: AuthGroup
-  // For providing repos in a slightly easier to test way
   repos?: Partial<Repositories>
 }
 

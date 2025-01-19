@@ -50,12 +50,6 @@ const props = defineProps({
   },
 })
 
-const isCheckboxDisabled = computed(()=> {
-if(props.task.startDate === null) return false
-
-return props.isCheckboxEnabled
-})
-
 const taskCategory = computed(() => {
   if (!props.categories) return
 
@@ -100,9 +94,9 @@ const updateTask = async (updatedTask: TaskData) => {
     task: { ...task },
     recurrence,
   }
-  emit('task:updated', updatedTask)
   try {
-    await taskStore.updateTask(updateTaskData)
+    const [task] = await taskStore.updateTask(updateTaskData)
+    emit('task:updated', task)
   } catch (error) {
     console.log(error)
   }
@@ -153,7 +147,6 @@ watch(()=> props.task, (newTask)=>{
     >
       <div class="flex w-full justify-between rounded-t p-1">
         <div class="p-1">{{ task.title }}</div>
-        <div class="h-full rounded bg-green-400 p-1">{{ task.importance }}</div>
       </div>
       <div
       v-if="task.startDate"

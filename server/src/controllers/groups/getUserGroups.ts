@@ -19,7 +19,9 @@ export default authenticatedProcedure
   .input(z.void())
   .output(groupsSchema.omit({ createdAt: true }).array())
   .query(async ({ ctx: { authUser, repos } }) => {
-    const groups = await repos.groupsRepository.getUserGroupsByUserId(authUser.id)
+    const groups = await repos.groupsRepository.getUserGroupsByUserId(
+      authUser.id
+    )
 
     return groups
   })

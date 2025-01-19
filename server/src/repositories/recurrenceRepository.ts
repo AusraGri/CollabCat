@@ -1,10 +1,7 @@
 import type { Database } from '@server/database'
-import type { RecurringPattern, RecurringTypes } from '@server/database/types'
+import type { RecurringPattern } from '@server/database/types'
 import type { Insertable, Selectable } from 'kysely'
-import {
-  recurringPatternKeysAll,
-  recurringTypeKeysAll,
-} from '@server/entities/recurrence'
+import { recurringPatternKeysAll } from '@server/entities/recurrence'
 
 export function recurringRepository(db: Database) {
   return {
@@ -16,28 +13,6 @@ export function recurringRepository(db: Database) {
         .values(pattern)
         .returning(recurringPatternKeysAll)
         .executeTakeFirstOrThrow()
-    },
-
-    async createType(
-      type: Insertable<RecurringTypes>
-    ): Promise<Selectable<RecurringTypes>> {
-      return db
-        .insertInto('recurringTypes')
-        .values(type)
-        .returning(recurringTypeKeysAll)
-        .executeTakeFirstOrThrow()
-    },
-
-    async findPattern(
-      taskId: number
-    ): Promise<Selectable<RecurringPattern> | undefined> {
-      const pattern = await db
-        .selectFrom('recurringPattern')
-        .select(recurringPatternKeysAll)
-        .where('taskId', '=', taskId)
-        .executeTakeFirstOrThrow()
-
-      return pattern
     },
   }
 }

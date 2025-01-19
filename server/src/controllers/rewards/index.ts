@@ -11,5 +11,5 @@ export default router({
   getRewards,
   deleteReward,
   update,
-  claimReward
+  claimReward,
 })

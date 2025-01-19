@@ -18,7 +18,7 @@ export default authenticatedProcedure
   .output(taskDataSchema.array())
   .query(async ({ input: requiredTaskData, ctx: { repos } }) => {
     const taskSearchOptions = {
-      ...requiredTaskData
+      ...requiredTaskData,
     }
 
     const tasks = await repos.tasksRepository.getTasks(taskSearchOptions)

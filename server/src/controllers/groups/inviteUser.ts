@@ -40,7 +40,7 @@ export default groupAuthProcedure
         message: 'User does not have permission to invite users to this group',
       })
     }
-    // check if user is not already in the group
+
     const usersInGroup = await repos.groupsRepository.getGroupMembers(
       userGroup.groupId
     )
@@ -53,7 +53,7 @@ export default groupAuthProcedure
         message: 'User is already in the group',
       })
     }
-    // check if this user is not already invited
+
     const isUserInvited =
       await repos.invitationsRepository.getInvitationByGroupAndEmail({
         email,
@@ -69,7 +69,6 @@ export default groupAuthProcedure
 
     const userHasAccount = await repos.userRepository.findByEmail(email)
 
-    // construct invitation token
     const payload = prepareInvitationTokenPayload({ email })
 
     const inviteToken = jsonwebtoken.sign(payload, tokenKey, {
@@ -77,11 +76,9 @@ export default groupAuthProcedure
     })
 
     if (!userHasAccount) {
-      //  send email invitation only if user does not have account
       await sentInvitationMail(mailTransporter, { email, inviteToken })
     }
 
-    // if sending invitation was successful only then save invitation to the database
     const invitation = await repos.invitationsRepository.createInvitation({
       groupId: userGroup.groupId,
       email,

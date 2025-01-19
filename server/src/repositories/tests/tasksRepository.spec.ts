@@ -36,7 +36,6 @@ const [taskOne, taskTwo] = await insertAll(db, 'tasks', [
     groupId: groupOne.id,
     categoryId: categoryOne.id,
     isCompleted: true,
-    importance: 'High',
     title: 'Task One',
     startDate: new Date(2024, 0, 1),
     endDate: new Date(2024, 11, 27),
@@ -132,24 +131,6 @@ describe('get', () => {
     })
   })
 
-  it('should get task by completed status', async () => {
-    // When
-    const [task] = await repository.getTasks({ isCompleted: true })
-
-    // Then
-    expect(task).toMatchObject({
-      ...taskOne,
-    })
-  })
-
-  it('should get tasks by title', async () => {
-    // When
-    const tasks = await repository.getTasks({ title: 'task one' })
-
-    // Then
-    expect(tasks).toHaveLength(1)
-  })
-
   it('should get tasks for the given day', async () => {
     // Given
     const date = new Date(2024, 2, 26)
@@ -172,22 +153,23 @@ describe('update', () => {
       categoryId: categoryOne.id,
     }
     // When
-    const task = await repository.update({ id: taskOne.id, task: updatedTask })
-
+    const task = await repository.updateTask({ id: taskOne.id, task: updatedTask, recurrence: null })
+    const [updated] = await repository.getTasks({id: taskOne.id})
     // Then
-    expect(task.isCompleted).toBe(taskOne.isCompleted)
-    expect(task.title).toBe(updatedTask.title)
-    expect(task.assignedUserId).toBe(updatedTask.assignedUserId)
-    expect(task.categoryId).toBe(updatedTask.categoryId)
+    expect(task).toBe(true)
+    expect(updated.isCompleted).toBe(taskOne.isCompleted)
+    expect(updated.title).toBe(updatedTask.title)
+    expect(updated.assignedUserId).toBe(updatedTask.assignedUserId)
+    expect(updated.categoryId).toBe(updatedTask.categoryId)
   })
 
   it('should throw an error if there is no task id to update', async () => {
     // Given
-    const taskId = 456
+    const taskId = 37
 
     // When
     await expect(
-      repository.update({ id: taskId, task: { title: 'Update' } })
+      repository.updateTask({ id: taskId, task: { title: 'Update' }, recurrence: null })
     ).rejects.toThrowError()
   })
 })

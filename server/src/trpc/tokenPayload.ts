@@ -37,7 +37,7 @@ export function prepareTokenPayload(user: AuthUser): TokenPayload {
  */
 
 export function prepareInvitationTokenPayload(
-  user: AuthUserEmail,
+  user: AuthUserEmail
 ): TokenInvitationPayload {
   return tokenInvitationPayloadSchema.parse({ user })
 }

@@ -10,7 +10,7 @@ interface SequenceResult {
  * Creates a test database instance. In this case, it is the same as the
  * main database instance.
  */
-export const createTestDatabase = () => createDatabase(config.database)
+export const createTestDatabase = () => createDatabase(config.testDatabase)
 
 /**
  * Cleans a database from any data and resets the id sequence

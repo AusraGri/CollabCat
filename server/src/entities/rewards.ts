@@ -41,7 +41,7 @@ export const rewardClaimsSchema = z.object({
   userId: idSchema,
   id: idSchema,
   rewardId: idSchema,
-  claimedAt: z.date()
+  claimedAt: z.date(),
 })
 
 export const createRewardSchema = rewardsSchema.omit({
@@ -79,7 +79,9 @@ export const rewardsKeysAll = Object.keys(
   rewardsSchema.shape
 ) as (keyof Rewards)[]
 
-export const rewardClaimsKeysAll = Object.keys(rewardClaimsSchema.shape) as (keyof RewardClaims)[]
+export const rewardClaimsKeysAll = Object.keys(
+  rewardClaimsSchema.shape
+) as (keyof RewardClaims)[]
 
 export type InsertableReward = z.infer<typeof createRewardSchema>
 export type PublicReward = z.infer<typeof rewardsSchemaOutput>

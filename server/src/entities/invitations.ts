@@ -15,9 +15,12 @@ export const invitationSchema = z.object({
 export const invitationDataSchema = z.object({
   invitation: invitationSchema,
   groupName: z.string(),
-  groupOwner: userSchema.pick({username: true, email: true, picture: true, id: true
-
-  })
+  groupOwner: userSchema.pick({
+    username: true,
+    email: true,
+    picture: true,
+    id: true,
+  }),
 })
 
 export const createInvitationSchema = invitationSchema.omit({

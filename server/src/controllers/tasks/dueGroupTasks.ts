@@ -20,15 +20,17 @@ export default groupAuthProcedure
       example: {
         request: {
           date: '2024-11-11',
-          groupId: 1
+          groupId: 1,
         },
       },
     },
   })
-  .input(z.object({ 
-    date: dateSchema, 
-    userId: idSchema.optional()
-  }))
+  .input(
+    z.object({
+      date: dateSchema,
+      userId: idSchema.optional(),
+    })
+  )
   .output(taskDataSchema.array())
   .query(async ({ input: { date, userId }, ctx: { userGroup, repos } }) => {
     if (!userGroup) {
@@ -38,7 +40,7 @@ export default groupAuthProcedure
       })
     }
 
-     const dateUTC = setDateToUTCmidnight(date)
+    const dateUTC = setDateToUTCmidnight(date)
 
     const tasks: TaskData[] = await repos.tasksRepository.getGroupTasksDue({
       date: dateUTC,
@@ -48,7 +50,9 @@ export default groupAuthProcedure
 
     if (tasks.length === 0) return []
 
-    const dueTasks: TaskData[] = tasks.filter((task: TaskData) => isTaskDue(task, date))
+    const dueTasks: TaskData[] = tasks.filter((task: TaskData) =>
+      isTaskDue(task, date)
+    )
 
     return dueTasks
   })

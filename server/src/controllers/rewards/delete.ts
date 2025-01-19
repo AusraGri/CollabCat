@@ -17,13 +17,14 @@ export default authenticatedProcedure
       protect: true,
     },
   })
-  .input(z.object({
-    rewardId: idSchema
-  }))
+  .input(
+    z.object({
+      rewardId: idSchema,
+    })
+  )
   .output(z.boolean())
-  .mutation(async ({ input: {rewardId}, ctx: { repos } }) => {
-
-     await repos.rewardsRepository.deleteReward(rewardId)
+  .mutation(async ({ input: { rewardId }, ctx: { repos } }) => {
+    await repos.rewardsRepository.deleteReward(rewardId)
 
     return true
   })

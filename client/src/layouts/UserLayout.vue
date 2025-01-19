@@ -40,11 +40,13 @@ const refreshInvitations = async () => {
 watch(
   () => userGroupStore.activeGroup?.name,
   async (newGroupName, oldGroupName) => {
+
+    const isNewValue = newGroupName !== oldGroupName && newGroupName
     if (userGroupStore.activeGroup === null) {
       router.push({ name: 'PersonalCalendar' })
     }
 
-    if (newGroupName !== oldGroupName && newGroupName) {
+    if (isNewValue && userGroupStore.activeGroup) {
       const groupName = stringToUrl(newGroupName)
       const currentTab = 'Calendar'
 

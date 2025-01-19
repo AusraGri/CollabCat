@@ -6,7 +6,7 @@ import {
   userGroupsKeysPublic,
   type UserGroupsPublic,
 } from '@server/entities/userGroups'
-import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres'
+import { jsonArrayFrom } from 'kysely/helpers/postgres'
 import { type DeleteResult, type Insertable } from 'kysely'
 
 export interface GetGroupsOptions {
@@ -49,7 +49,6 @@ export function groupsRepository(db: Database) {
         return newGroup
       })
     },
-    // getGroups- better name. Need to evaluate what is really needed, do I really need all those query options?
     async getGroup(options: GetGroupsOptions): Promise<GroupsPublic[]> {
       if (
         options.createdByUserId === undefined &&
@@ -151,7 +150,7 @@ export function groupsRepository(db: Database) {
         .innerJoin('user', 'userGroups.userId', 'user.id')
         .leftJoin('points', (join) =>
           join
-            .onRef('points.groupId', '=', 'userGroups.groupId') 
+            .onRef('points.groupId', '=', 'userGroups.groupId')
             .onRef('points.userId', '=', 'userGroups.userId')
         )
         .select([
@@ -161,28 +160,6 @@ export function groupsRepository(db: Database) {
           'user.email',
           'userGroups.role',
           'points.points',
-        ])
-        .where('userGroups.groupId', '=', data.groupId)
-        .where('userGroups.userId', '=', data.userId)
-        .executeTakeFirstOrThrow()
-    },
-    async getUserGroupMembershipInfoNEW(data: GroupUserData) {
-      return db
-        .selectFrom('userGroups')
-        .innerJoin('user', 'userGroups.userId', 'user.id')
-        .select((eb) => [
-          'user.id',
-          'user.username',
-          'user.picture',
-          'user.email',
-          'userGroups.role',
-          jsonObjectFrom(
-            eb
-              .selectFrom('points')
-              .select(['points.points'])
-              .whereRef('userGroups.groupId', '=', 'points.groupId')
-              .where('points.userId', '=', data.userId)
-          ).as('points'),
         ])
         .where('userGroups.groupId', '=', data.groupId)
         .where('userGroups.userId', '=', data.userId)

@@ -16,19 +16,19 @@ const [task, taskOther] = await insertAll(db, 'tasks', [
   fakeTask({ createdByUserId: userOther.id }),
 ])
 
-const { get } = createCaller(authContext({ db }, user))
+const { getTasks } = createCaller(authContext({ db }, user))
 
 it('should return a task by id', async () => {
-  const { parentTaskId, ...taskWithoutParentTaskId } = task
+  const { ...taskWithoutParentTaskId } = task
   // When (ACT)
-  const taskResponse = await get({ id: task.id })
+  const taskResponse = await getTasks({ id: task.id })
   // Then (ASSERT)
   expect(taskResponse[0]).toMatchObject(taskWithoutParentTaskId)
 })
 
-it('should throw an error if the task does not exist', async () => {
-  const nonExistantId = task.id + taskOther.id
+it('should return [] if the task does not exist', async () => {
+  const nonExistentId = task.id + taskOther.id
 
   // When (ACT)
-  await expect(get({ id: nonExistantId })).rejects.toThrowError(/not found/i)
+  await expect(getTasks({ id: nonExistentId })).resolves.toEqual([])
 })

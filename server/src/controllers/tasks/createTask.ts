@@ -45,7 +45,6 @@ export default authenticatedProcedure
       recurrence: taskData.recurrence,
     }
 
-    console.log('DATA BEFORE DATABASE: ', newTaskData)
     const taskCreated = await repos.tasksRepository.createTask(newTaskData)
 
     return taskCreated

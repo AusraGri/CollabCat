@@ -20,49 +20,64 @@ export default authenticatedProcedure
   .input(
     z.object({
       rewardId: idSchema,
-      groupId: idSchema.optional()
+      groupId: idSchema.optional(),
     })
   )
   .output(z.boolean())
-  .mutation(async ({ input: { rewardId, groupId }, ctx: { authUser, repos } }) => {
-    const [reward] = await repos.rewardsRepository.getRewards({ id: rewardId })
-
-    if (!reward) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Reward was not found in the database',
+  .mutation(
+    async ({ input: { rewardId, groupId }, ctx: { authUser, repos } }) => {
+      const [reward] = await repos.rewardsRepository.getRewards({
+        id: rewardId,
       })
-    }
 
-    let updatedRewardAmount: number | undefined
-
-    if (reward.amount && reward.amount > 0) {
-      updatedRewardAmount = reward.amount - 1
-    }
-
-    const {id, ...rewardData} = reward
-
-    const updatedReward = {
-      ...rewardData,
-      amount: updatedRewardAmount,
-    }
-    const userPoints = await repos.pointsRepository.getPoints({userId: authUser.id, groupId})
-
-    if(!userPoints || userPoints.points < reward.cost ){
+      if (!reward) {
         throw new TRPCError({
-            code: 'PRECONDITION_FAILED',
-            message: 'User has insufficient points to claim the reward',
-          })
+          code: 'NOT_FOUND',
+          message: 'Reward was not found in the database',
+        })
+      }
+
+      let updatedRewardAmount: number | undefined
+
+      if (reward.amount && reward.amount > 0) {
+        updatedRewardAmount = reward.amount - 1
+      }
+
+      const { id, ...rewardData } = reward
+
+      const updatedReward = {
+        ...rewardData,
+        amount: updatedRewardAmount,
+      }
+      const userPoints = await repos.pointsRepository.getPoints({
+        userId: authUser.id,
+        groupId,
+      })
+
+      if (!userPoints || userPoints.points < reward.cost) {
+        throw new TRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: 'User has insufficient points to claim the reward',
+        })
+      }
+
+      await repos.pointsRepository.alterPoints({
+        userId: authUser.id,
+        action: '-',
+        points: reward.cost,
+        groupId,
+      })
+
+      await repos.rewardsRepository.updateReward({
+        id,
+        reward: updatedReward,
+      })
+
+      await repos.rewardsRepository.addRewardClaim({
+        rewardId,
+        userId: authUser.id,
+      })
+
+      return true
     }
-
-    await repos.pointsRepository.alterPoints({userId: authUser.id, action: '-', points: reward.cost, groupId})
-
-    await repos.rewardsRepository.updateReward({
-      id,
-      reward: updatedReward,
-    })
-
-    await repos.rewardsRepository.addRewardClaim({rewardId, userId: authUser.id})
-
-    return true
-  })
+  )

@@ -100,7 +100,7 @@ const tasks = computed(() => {
   return []
 })
 
-function showCount (name: 'For Adoption' | 'Someday' | 'Routine' | 'Scheduled') {
+function showCount (name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
   return countTasksOfDefaultType( allTasks.value, name)
 }
 
@@ -255,16 +255,11 @@ const toggleShowTypes = () => {
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
         >{{showCount('Scheduled') }}</TabRev>
-        <!-- <TabRev
-          :title="'For Adoption'"
-          :is-active="selectedType"
-          @tab-click="handleDefaultTypeTabClick"
-        /> -->
         <TabRev
-          :title="'For Adoption'"
+          :title="'Not Assigned'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
-        >{{showCount('For Adoption') }}</TabRev>
+        >{{showCount('Not Assigned') }}</TabRev>
       </div>
     </div>
   </div>

@@ -5,11 +5,13 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 
 export default authenticatedProcedure
   .use(provideRepos({ invitationsRepository }))
-  .input(z.object({
-    invitationToken: z.string()
-  }))
-  .mutation(async ({ input: {invitationToken}, ctx: { repos } }) => {
-     await repos.invitationsRepository.deleteInvitation(invitationToken)
+  .input(
+    z.object({
+      invitationToken: z.string(),
+    })
+  )
+  .mutation(async ({ input: { invitationToken }, ctx: { repos } }) => {
+    await repos.invitationsRepository.deleteInvitation(invitationToken)
 
     return true
   })

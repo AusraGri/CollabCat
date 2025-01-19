@@ -16,19 +16,20 @@ export default authenticatedProcedure
       protect: true,
     },
   })
-  .input(z.object({
-    taskId: idSchema
-  }))
+  .input(
+    z.object({
+      taskId: idSchema,
+    })
+  )
   .output(z.boolean())
-  .mutation(async ({ input: {taskId}, ctx: { repos } }) => {
-
+  .mutation(async ({ input: { taskId }, ctx: { repos } }) => {
     const result = await repos.tasksRepository.delete(taskId)
 
-    if(!result.numDeletedRows){
-        throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Tasks were not found. Failed to delete',
-          })
+    if (!result.numDeletedRows) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Tasks were not found. Failed to delete',
+      })
     }
 
     return true

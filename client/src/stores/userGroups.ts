@@ -58,7 +58,7 @@ export const useUserGroupsStore = defineStore('group', {
 
         return data
       } catch (error) {
-        console.error('Failed to fetch user groups data:', error)
+        console.error('Failed to fetch user groups:', error)
       }
     },
     async fetchGroupData() {
@@ -84,8 +84,12 @@ export const useUserGroupsStore = defineStore('group', {
 
     async createNewGroup(groupName: string) {
       try {
-        const newGroup = await trpc.groups.create.mutate({ name: groupName })
-        this.userGroups?.push(newGroup)
+        const newGroup :GroupsPublic = await trpc.groups.create.mutate({ name: groupName })
+        if (this.userGroups) {
+          this.userGroups.push(newGroup)
+        } else {
+          this.userGroups = [newGroup]
+        }
       } catch (error) {
         console.error('Failed to create new group:', error)
       }

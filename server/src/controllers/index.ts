@@ -15,7 +15,7 @@ export const appRouter = router({
   points,
   rewards,
   invitations,
-  categories
+  categories,
 })
 
 export type AppRouter = typeof appRouter

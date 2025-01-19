@@ -4,8 +4,9 @@ import type {
   SelectableCompletedTask,
   TasksRepository,
 } from '@server/repositories/tasksRepository'
-import type { TasksPublic } from '@server/entities/tasks'
+import type { TaskData, TasksPublic } from '@server/entities/tasks'
 import type { DeleteResult } from 'kysely'
+import { authRepoContext } from '@tests/utils/context'
 import tasksRouter from '..'
 
 const createCaller = createCallerFactory(tasksRouter)
@@ -13,9 +14,9 @@ const createCaller = createCallerFactory(tasksRouter)
 it('should trow an error if task id is invalid', async () => {
   // When (ACT)
   const task = {
-    id: 1,
+    id: 11,
     isCompleted: true,
-    instanceDate: new Date().toISOString(),
+    instanceDate: new Date(),
   }
   const repos = {
     tasksRepository: {
@@ -23,13 +24,13 @@ it('should trow an error if task id is invalid', async () => {
     } satisfies Partial<TasksRepository>,
   }
 
-  const { taskCompletion } = createCaller({
-    authUser: { id: 1 },
-    repos,
-  } as any)
+  const { taskCompletion } = createCaller(authRepoContext(repos))
 
   // Then (ASSERT)
   await expect(taskCompletion(task)).rejects.toThrow(/not found/i)
+
+  expect(repos.tasksRepository.getTasks).toBeCalled()
+
 })
 
 it('should add task to completed', async () => {
@@ -37,26 +38,26 @@ it('should add task to completed', async () => {
   const task = {
     id: 1,
     isCompleted: true,
-    instanceDate: new Date(2024, 0, 1).toISOString(),
+    instanceDate: new Date(2024, 0, 1),
   }
 
   const repos = {
     tasksRepository: {
-      getTasks: vi.fn(async () => [fakeTask({ id: 1 }) as TasksPublic]),
+      getTasks: vi.fn(async () => [fakeTask({ id: 1 })] as TaskData[]),
       addToCompletedTasks: vi.fn(
         async () => fakeCompletedTask({ taskId: 1 }) as SelectableCompletedTask
       ),
+      updateTaskCompletion: vi.fn(async()=> 'data' as any)
     } satisfies Partial<TasksRepository>,
   }
 
-  const { taskCompletion } = createCaller({
-    authUser: { id: 1 },
-    repos,
-  } as any)
+  const { taskCompletion } = createCaller(authRepoContext(repos))
 
   // Then (ASSERT)
   const completedTask = await taskCompletion(task)
-
+  expect(repos.tasksRepository.getTasks).toBeCalled()
+  expect(repos.tasksRepository.addToCompletedTasks).not.toBeCalled()
+  expect(repos.tasksRepository.updateTaskCompletion).toBeCalled()
   expect(completedTask).toBe(true)
 })
 
@@ -70,17 +71,14 @@ it('should remove task from completed', async () => {
 
   const repos = {
     tasksRepository: {
-      getTasks: vi.fn(async () => [fakeTask({ id: 1 }) as TasksPublic]),
+      getTasks: vi.fn(async () => [fakeTask({ id: 1 }) as TaskData]),
       removeCompletedTasks: vi.fn(
         async () => ({ numDeletedRows: 1n }) as DeleteResult
       ),
     } satisfies Partial<TasksRepository>,
   }
 
-  const { taskCompletion } = createCaller({
-    authUser: { id: 1 },
-    repos,
-  } as any)
+  const { taskCompletion } = createCaller(authRepoContext(repos))
 
   // Then (ASSERT)
   const completedTask = await taskCompletion(task)

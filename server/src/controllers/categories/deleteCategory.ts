@@ -15,14 +15,15 @@ export default authenticatedProcedure
       summary: 'Delete Category',
     },
   })
-  .input(z.object({
-    categoryId: idSchema
-  }))
+  .input(
+    z.object({
+      categoryId: idSchema,
+    })
+  )
   .output(z.boolean())
-  .mutation(async ({ input: {categoryId}, ctx: {  repos } }) => {
-
-
-    const categoryDeleted = await repos.categoriesRepository.deleteCategory(categoryId)
+  .mutation(async ({ input: { categoryId }, ctx: { repos } }) => {
+    const categoryDeleted =
+      await repos.categoriesRepository.deleteCategory(categoryId)
 
     return !!categoryDeleted.numDeletedRows
   })

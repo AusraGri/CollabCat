@@ -17,16 +17,13 @@ export async function up(db: Kysely<any>) {
     .addColumn('group_id', 'integer', (c) =>
       c.references('groups.id').onDelete('cascade')
     )
-    .addColumn('importance', 'varchar(50)')
     .addColumn('category_id', 'integer', (c) =>
       c.references('categories.id').onDelete('set null')
     )
     .addColumn('is_completed', 'boolean', (c) => c.notNull().defaultTo(false))
     .addColumn('completed_at', 'timestamptz')
     .addColumn('points', 'integer')
-    .addColumn('is_recurring', 'boolean', (c) =>
-      c.defaultTo('false')
-    )
+    .addColumn('is_recurring', 'boolean', (c) => c.defaultTo('false'))
     .addColumn('start_date', 'timestamptz', (c) => c.notNull())
     .addColumn('end_date', 'timestamptz')
     .addColumn('start_time', 'time')

@@ -26,7 +26,6 @@ export default authenticatedProcedure
   .input(z.object({ date: dateSchema }))
   .output(taskDataSchema.array())
   .query(async ({ input: { date }, ctx: { authUser, repos } }) => {
-
     const dateUTC = setDateToUTCmidnight(date)
 
     const tasks = await repos.tasksRepository.getTasksDue(date, authUser.id)

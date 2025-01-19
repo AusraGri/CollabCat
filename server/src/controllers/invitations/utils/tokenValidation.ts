@@ -1,12 +1,12 @@
-import jwt from 'jsonwebtoken';
-import config from '@server/config';
+import jwt from 'jsonwebtoken'
+import config from '@server/config'
 
 export interface DecodedToken {
   user: {
-    email: string;
-  };
-  iat: number;
-  exp: number;
+    email: string
+  }
+  iat: number
+  exp: number
 }
 
 const SECRET_KEY = config.auth.tokenKey
@@ -18,10 +18,10 @@ const SECRET_KEY = config.auth.tokenKey
  */
 export function validateAndDecodeJWT(token: string): DecodedToken {
   try {
-    const decoded = jwt.verify(token, SECRET_KEY) as DecodedToken;
+    const decoded = jwt.verify(token, SECRET_KEY) as DecodedToken
 
-    return decoded;
+    return decoded
   } catch (error) {
-    throw new Error('Invalid or expired token');
+    throw new Error('Invalid or expired token')
   }
 }

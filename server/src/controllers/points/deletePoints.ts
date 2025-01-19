@@ -15,14 +15,16 @@ export default authenticatedProcedure
       summary: 'Delete personal points (bank)',
     },
   })
-  .input(z.object({
-    groupId: idSchema.optional()
-  }))
+  .input(
+    z.object({
+      groupId: idSchema.optional(),
+    })
+  )
   .output(z.boolean())
-  .mutation(async ({ input: {groupId}, ctx: { authUser, repos } }) => {
+  .mutation(async ({ input: { groupId }, ctx: { authUser, repos } }) => {
     const deletedPoints = await repos.pointsRepository.deletePoints({
       userId: authUser.id,
-      groupId
+      groupId,
     })
 
     return !!deletedPoints.numDeletedRows

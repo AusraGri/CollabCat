@@ -5,7 +5,7 @@ import { idSchema } from './shared'
 
 export const recurringPatternSchema = z.object({
   dayOfMonth: z.array(z.number().int().gte(1).lte(31)).nullable(),
-  dayOfWeek: z.array(z.number().int().positive().gte(1).lte(7)).nullable(),
+  dayOfWeek: z.array(z.number().int().min(0).gte(0).lte(7)).nullable(),
   maxNumOfOccurrences: z.number().int().nullable(),
   monthOfYear: z.array(z.number().int().positive().gte(1).lte(12)).nullable(),
   recurringType: z.string(),
@@ -15,9 +15,15 @@ export const recurringPatternSchema = z.object({
 })
 export const recurringPatternSchemaInput = z.object({
   dayOfMonth: z.array(z.number().int().gte(1).lte(31)).nullable().optional(),
-  dayOfWeek: z.array(z.number().int().positive().gte(1).lte(7)).nullable().optional(),
+  dayOfWeek: z
+    .array(z.number().int().min(0).gte(0).lte(7))
+    .nullable()
+    .optional(),
   maxNumOfOccurrences: z.number().int().nullable().optional(),
-  monthOfYear: z.array(z.number().int().positive().gte(1).lte(12)).nullable().optional(),
+  monthOfYear: z
+    .array(z.number().int().positive().gte(1).lte(12))
+    .nullable()
+    .optional(),
   recurringType: z.string(),
   separationCount: z.number().int().min(0),
   weekOfMonth: z.array(z.number().int()).nullable().optional(),
@@ -45,6 +51,8 @@ export const recurringPatternKeysAll = Object.keys(
 
 export type RecurrenceInsertable = Insertable<RecurringPattern>
 
-export type RecurrencePatternInsertable = z.infer<typeof recurringPatternSchemaInput>
+export type RecurrencePatternInsertable = z.infer<
+  typeof recurringPatternSchemaInput
+>
 
 export type RecurrencePattern = Selectable<RecurringPattern>

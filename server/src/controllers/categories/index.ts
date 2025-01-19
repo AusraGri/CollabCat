@@ -5,9 +5,8 @@ import getUserCategories from './getUserCategories'
 import deleteCategory from './deleteCategory'
 
 export default router({
-    createCategory,
-    getGroupCategories,
-    getUserCategories,
-    deleteCategory
-  
+  createCategory,
+  getGroupCategories,
+  getUserCategories,
+  deleteCategory,
 })

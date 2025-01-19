@@ -6,6 +6,7 @@ import {
   type TaskUpdateData,
   type TaskData,
   tasksKeysPublic,
+  taskCompletionKeysAll,
 } from '@server/entities/tasks'
 import { recurringPatternKeysAll } from '@server/entities/recurrence'
 import type { DeleteResult, Insertable, Updateable, Selectable } from 'kysely'
@@ -135,9 +136,6 @@ export function tasksRepository(db: Database) {
       if (options.limit !== undefined) {
         query = query.limit(options.limit)
       }
-      // if (options.groupId === undefined) {
-      //   query = query.where('groupId', 'is', null)
-      // }
 
       return query.execute()
     },
@@ -163,10 +161,15 @@ export function tasksRepository(db: Database) {
           if (task.isRecurring && !recurrence)
             throw new Error('Missing task data')
 
+          if (!id || id <= 0) {
+            throw new Error('Invalid task ID');
+          }
+
           await trx
             .updateTable('tasks')
             .set(task)
             .where('id', '=', id)
+            .returningAll()
             .executeTakeFirstOrThrow()
 
           if (recurrence && task.isRecurring) {
@@ -197,7 +200,7 @@ export function tasksRepository(db: Database) {
       return db
         .insertInto('completedTasks')
         .values(taskData)
-        .returningAll()
+        .returning(taskCompletionKeysAll)
         .executeTakeFirstOrThrow()
     },
 
@@ -226,16 +229,7 @@ export function tasksRepository(db: Database) {
           jsonObjectFrom(
             eb
               .selectFrom('recurringPattern as rp')
-              .select([
-                'rp.dayOfMonth',
-                'rp.dayOfWeek',
-                'rp.maxNumOfOccurrences',
-                'rp.monthOfYear',
-                'rp.recurringType',
-                'rp.separationCount',
-                'rp.taskId',
-                'rp.weekOfMonth'
-              ])
+              .select(recurringPatternKeysAll)
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
           jsonArrayFrom(
@@ -246,7 +240,7 @@ export function tasksRepository(db: Database) {
                 'ct.completedBy',
                 'ct.id',
                 'ct.instanceDate',
-                'ct.taskId'
+                'ct.taskId',
               ])
               .whereRef('ct.taskId', '=', 't.id')
               .where('ct.instanceDate', '=', date)
@@ -277,16 +271,7 @@ export function tasksRepository(db: Database) {
           jsonObjectFrom(
             eb
               .selectFrom('recurringPattern as rp')
-              .select([
-                'rp.dayOfMonth',
-                'rp.dayOfWeek',
-                'rp.maxNumOfOccurrences',
-                'rp.monthOfYear',
-                'rp.recurringType',
-                'rp.separationCount',
-                'rp.taskId',
-                'rp.weekOfMonth'
-              ])
+              .select(recurringPatternKeysAll)
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
           jsonArrayFrom(
@@ -297,7 +282,7 @@ export function tasksRepository(db: Database) {
                 'ct.completedBy',
                 'ct.id',
                 'ct.instanceDate',
-                'ct.taskId'
+                'ct.taskId',
               ])
               .whereRef('ct.taskId', '=', 't.id')
               .where('ct.instanceDate', '=', date)
@@ -315,65 +300,6 @@ export function tasksRepository(db: Database) {
 
       return tasksToDate
     },
-    // async getGroupTasksDue(data: {
-    //   date: Date
-    //   userId: number
-    //   groupId: number
-    // }): Promise<TaskData[]> {
-    //   const tasksToDate = await db
-    //     .selectFrom('tasks as t')
-    //     .select((eb) => [
-    //       ...tasksKeysPublic,
-    //       jsonObjectFrom(
-    //         eb
-    //           .selectFrom('recurringPattern as rp')
-    //           .select([
-    //             'rp.dayOfMonth',
-    //             'rp.dayOfWeek',
-    //             'rp.maxNumOfOccurrences',
-    //             'rp.monthOfYear',
-    //             'rp.recurringType',
-    //             'rp.separationCount',
-    //             'rp.taskId',
-    //             'rp.weekOfMonth'
-    //           ])
-    //           .whereRef('rp.taskId', '=', 't.id')
-    //       ).as('recurrence'),
-    //       jsonArrayFrom(
-    //         eb
-    //           .selectFrom('completedTasks as ct')
-    //           .select([
-    //             'ct.completedAt',
-    //             'ct.completedBy',
-    //             'ct.id',
-    //             'ct.instanceDate',
-    //             'ct.taskId'
-    //           ])
-    //           .whereRef('ct.taskId', '=', 't.id')
-    //           .where('ct.instanceDate', '=', data.date)
-    //       ).as('completed'),
-    //     ])
-    //     .where((eb) =>
-    //       eb.or([
-    //         eb('t.createdByUserId', '=', data.userId),
-    //         eb('t.assignedUserId', '=', data.userId),
-    //       ])
-    //     )
-    //     .where('t.groupId', '=', data.groupId)
-    //     .where((eb) =>
-    //       eb.or([
-    //         eb('t.startDate', '<=', data.date).and(
-    //           eb.or([
-    //             eb('t.endDate', '>=', data.date),
-    //             eb('t.endDate', 'is', null),
-    //           ])
-    //         ),
-    //       ])
-    //     )
-    //     .execute()
-
-    //   return tasksToDate
-    // },
     async getGroupTasksDue(data: {
       date: Date
       userId?: number
@@ -386,16 +312,7 @@ export function tasksRepository(db: Database) {
           jsonObjectFrom(
             eb
               .selectFrom('recurringPattern as rp')
-              .select([
-                'rp.dayOfMonth',
-                'rp.dayOfWeek',
-                'rp.maxNumOfOccurrences',
-                'rp.monthOfYear',
-                'rp.recurringType',
-                'rp.separationCount',
-                'rp.taskId',
-                'rp.weekOfMonth'
-              ])
+              .select(recurringPatternKeysAll)
               .whereRef('rp.taskId', '=', 't.id')
           ).as('recurrence'),
           jsonArrayFrom(
@@ -406,24 +323,23 @@ export function tasksRepository(db: Database) {
                 'ct.completedBy',
                 'ct.id',
                 'ct.instanceDate',
-                'ct.taskId'
+                'ct.taskId',
               ])
               .whereRef('ct.taskId', '=', 't.id')
               .where('ct.instanceDate', '=', data.date)
           ).as('completed'),
         ])
 
-        if(data.userId){
-          query = query
-          .where((eb) =>
-            eb.or([
-              eb('t.createdByUserId', '=', data.userId as number),
-              eb('t.assignedUserId', '=', data.userId as number),
-            ])
-          )
-        }
+      if (data.userId) {
+        query = query.where((eb) =>
+          eb.or([
+            eb('t.createdByUserId', '=', data.userId as number),
+            eb('t.assignedUserId', '=', data.userId as number),
+          ])
+        )
+      }
 
-        query = query
+      query = query
         .where('t.groupId', '=', data.groupId)
         .where((eb) =>
           eb.or([
@@ -435,7 +351,6 @@ export function tasksRepository(db: Database) {
             ),
           ])
         )
-
 
       return query.execute()
     },

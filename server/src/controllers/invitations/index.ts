@@ -5,9 +5,8 @@ import deleteInvitation from './deleteInvitation'
 import getInvitationData from './getInvitationData'
 
 export default router({
-    getGroupInvitations,
-    validateInvitationToken,
-    deleteInvitation,
-    getInvitationData
-
+  getGroupInvitations,
+  validateInvitationToken,
+  deleteInvitation,
+  getInvitationData,
 })

@@ -1,7 +1,11 @@
 import type { Database } from '@server/database'
 import type { PointClaims, Points } from '@server/database/types'
 import type { DeleteResult, Insertable } from 'kysely'
-import { pointsKeysPublic, type PointsClaimed, type PointsPublic } from '@server/entities/points'
+import {
+  pointsKeysPublic,
+  type PointsClaimed,
+  type PointsPublic,
+} from '@server/entities/points'
 
 export interface PointAlterObject {
   groupId?: number
@@ -22,21 +26,25 @@ export function pointsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async getPoints(queryData: {userId: number, groupId?: number}): Promise<PointsPublic | undefined> {
-      let query =  db
+    async getPoints(queryData: {
+      userId: number
+      groupId?: number
+    }): Promise<PointsPublic | undefined> {
+      let query = db
         .selectFrom('points')
         .select(pointsKeysPublic)
         .where('userId', '=', queryData.userId)
 
-        if(queryData.groupId){
-          query = query.where('points.groupId', '=', queryData.groupId)
-        }
+      if (queryData.groupId) {
+        query = query.where('points.groupId', '=', queryData.groupId)
+      }
 
-
-        return query.executeTakeFirst()
+      return query.executeTakeFirst()
     },
 
-    async addPointClaims(claimData: Insertable<PointClaims>): Promise<PointsClaimed> {
+    async addPointClaims(
+      claimData: Insertable<PointClaims>
+    ): Promise<PointsClaimed> {
       return db
         .insertInto('pointClaims')
         .values(claimData)
@@ -44,7 +52,11 @@ export function pointsRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async getPointClaims(claimData: {userId: number, taskId: number, taskInstanceDate: Date}): Promise<PointsClaimed | undefined> {
+    async getPointClaims(claimData: {
+      userId: number
+      taskId: number
+      taskInstanceDate: Date
+    }): Promise<PointsClaimed | undefined> {
       return db
         .selectFrom('pointClaims')
         .select([
@@ -52,7 +64,7 @@ export function pointsRepository(db: Database) {
           'pointClaims.id',
           'pointClaims.taskId',
           'pointClaims.taskInstanceDate',
-          'pointClaims.userId'
+          'pointClaims.userId',
         ])
         .where('pointClaims.taskId', '=', claimData.taskId)
         .where('pointClaims.userId', '=', claimData.userId)
@@ -62,13 +74,11 @@ export function pointsRepository(db: Database) {
 
     async deletePoints(options: DeletePoints): Promise<DeleteResult> {
       let query = db.deleteFrom('points').where('userId', '=', options.userId)
-          console.log('OPTIONS', options)
       if (options.groupId !== undefined) {
         query = query.where('groupId', '=', options.groupId)
-      }else{
+      } else {
         query = query.where('groupId', 'is', null)
       }
-
 
       return query.executeTakeFirstOrThrow()
     },

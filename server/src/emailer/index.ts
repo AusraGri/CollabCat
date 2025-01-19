@@ -6,7 +6,9 @@ export interface EmailData {
   inviteToken: string
 }
 
-export const mailTransporter: Transporter = nodemailer.createTransport(config.emailService)
+export const mailTransporter: Transporter = nodemailer.createTransport(
+  config.emailService
+)
 
 export async function sentInvitationMail(
   transporter: Transporter,

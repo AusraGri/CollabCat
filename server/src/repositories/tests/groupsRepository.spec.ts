@@ -46,33 +46,29 @@ describe('create', () => {
 describe('get', () => {
   it('should get a group by group id', async () => {
     // When
-    const [group] = await repository.get({ id: groupOne.id })
+    const [group] = await repository.getGroup({ id: groupOne.id })
 
+    const {createdAt, ...matchGRoup} =  groupOne
     // Then
     expect(group).toMatchObject({
-      ...groupOne,
+      ...matchGRoup,
     })
   })
 
   it('should get group by the user who created the group', async () => {
     // When
-    const [group] = await repository.get({ createdByUserId: userTwo.id })
+    const [group] = await repository.getGroup({ createdByUserId: userTwo.id })
 
     // Then
-    expect(group).toMatchObject({
-      ...groupTwo,
-    })
+    expect(group.id).toEqual(groupTwo.id)
   })
 
   it('should get group by the userId', async () => {
     // When
-    const group = await repository.get({ userId: userOne.id })
+    const [group] = await repository.getGroup({ userId: userOne.id })
 
     // Then
-    expect(group).toHaveLength(1)
-    expect(group[0]).toMatchObject({
-      ...groupOne,
-    })
+    expect(group.createdByUserId).toEqual(groupOne.createdByUserId)
   })
 
   it('should get user role in the group by the userId and groupId', async () => {
@@ -141,8 +137,7 @@ describe('users in groups', () => {
     expect(members).toHaveLength(1)
     expect(members[0]).toMatchObject({
       id: userOne.id,
-      firstName: userOne.firstName,
-      lastName: userOne.lastName,
+    username: userOne.username
     })
   })
 

@@ -28,7 +28,7 @@ export default authenticatedProcedure
     //   rewardData.targetUserIds !== undefined &&
     //   rewardData.targetUserIds.length > 0
     // ) {
-    if(rewardData.groupId !== undefined ){
+    if (rewardData.groupId !== undefined) {
       const [isGroup] = await repos.groupsRepository.getGroup({
         id: rewardData.groupId,
       })

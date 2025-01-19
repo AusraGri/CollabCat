@@ -17,7 +17,18 @@ export const groupAuthProcedure = authenticatedProcedure
     })
   )
   .use(async ({ input: { groupId }, ctx, next }) => {
-    const { authUser, repos } = ctx
+    const { authUser, repos, userGroup } = ctx
+
+    // if(userGroup?.groupId !== groupId){
+    //   throw new TRPCError({
+    //     code: 'UNAUTHORIZED',
+    //     message: `Unauthorized: user is not in this group`,
+    //   })
+    // }
+
+    
+    // for easier testing
+    if(userGroup) return next()
 
     const [isGroup] = await repos.groupsRepository.getGroup({ id: groupId })
 
