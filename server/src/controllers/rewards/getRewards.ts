@@ -30,6 +30,6 @@ export default authenticatedProcedure
       : { createdByUserId: authUser.id }
 
     const rewards = await repos.rewardsRepository.getRewards(searchBy)
-    console.log('REWARDs: ', rewards)
+
     return rewards
   })

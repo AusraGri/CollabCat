@@ -42,15 +42,15 @@ export async function verifyAuth0Token(
       audience,
       issuer,
       algorithms: ['RS256'],
-    }) as Auth0TokenPayload;
-    return decoded;
+    }) as Auth0TokenPayload
+    return decoded
   } catch (error) {
     if (error instanceof jsonwebtoken.TokenExpiredError) {
-      throw new Error('Token has expired');
+      throw new Error('Token has expired')
     } else if (error instanceof jsonwebtoken.JsonWebTokenError) {
-      throw new Error('Invalid token');
+      throw new Error('Invalid token')
     } else {
-      throw new Error('Token verification failed');
+      throw new Error('Token verification failed')
     }
   }
 }

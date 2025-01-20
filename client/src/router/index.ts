@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory} from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import UserLayout from '@/layouts/UserLayout.vue'
+import GroupLayout from '../layouts/GroupLayout.vue'
 import TasksView from '../views/TasksView.vue'
 import { authenticate } from './guards'
 
@@ -8,20 +9,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/login',
-      name: 'Login',
-      component: () => import('../views/LoginView.vue'),
-    },
-    {
       path: '/logout',
       name: 'Logout',
-      component: () => import('../views/LoginView.vue'),
-    },
-
-    {
-      path: '/signup',
-      name: 'Signup',
-      component: () => import('../views/SignupView.vue'),
+      component: () => import('../views/LogoutView.vue'),
     },
     {
       path: '/invite',
@@ -46,14 +36,14 @@ const router = createRouter({
         {
           path: ':group',
           name: 'Group',
-          component: () => import('../layouts/GroupLayout.vue'),
+          // component: () => import('../layouts/GroupLayout.vue'),
           children: [
-            {
-              path: '',
-              name: 'GroupPage',
-              component: () => import('../views/GroupView.vue'),
-              meta: { group: true }
-            },
+            // {
+            //   path: '',
+            //   name: 'GroupPage',
+            //   component: () => import('../views/GroupView.vue'),
+            //   meta: { group: true }
+            // },
             {
               path: 'tasks',
               name: 'Tasks',
@@ -71,7 +61,7 @@ const router = createRouter({
         {
           path: '',
           name: 'Profile',
-          component: () => import('../layouts/GroupLayout.vue'),
+          // component: GroupLayout,
           meta: { personal: true }, 
           children: [
             {

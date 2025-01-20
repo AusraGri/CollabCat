@@ -1,11 +1,20 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
+import { useAuthService } from '@/services/auth0'
+import { useAuthStore } from '@/stores/authStore'
+import { useUserStore } from '@/stores/userProfile'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { trpc } from '@/trpc'
 // import PageForm from '@/components/PageForm.vue'
 // import { FwbAlert, FwbButton, FwbInput } from 'flowbite-vue'
 import { useRouter } from 'vue-router'
 // import useErrorMessage from '@/composables/useErrorMessage'
 
 const router = useRouter()
+const { getUserData } = useAuthService()
+const authStore = useAuthStore()
+const userStore = useUserStore()
+const { loginWithRedirect, isAuthenticated, getAccessTokenSilently  } = useAuth0()
 
 // const userForm = ref({
 //   email: 'test@email.com',
@@ -24,6 +33,8 @@ const router = useRouter()
 
 //   router.push(redirectTo)
 // })
+
+
 onMounted(()=> {
   router.push({name: 'Home' })
 })

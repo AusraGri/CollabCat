@@ -64,7 +64,7 @@ const isFileRunDirectly = pathToThisFile.includes(pathPassedToNode)
 
 if (isFileRunDirectly) {
   const mainDb = createDatabase(config.database)
- const testDb = createDatabase(config.testDatabase)
+  const testDb = createDatabase(config.testDatabase)
   await migrateLatest(mainDb)
   await migrateLatest(testDb)
 }

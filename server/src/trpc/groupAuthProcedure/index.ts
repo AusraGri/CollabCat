@@ -26,9 +26,8 @@ export const groupAuthProcedure = authenticatedProcedure
     //   })
     // }
 
-    
     // for easier testing
-    if(userGroup) return next()
+    if (userGroup) return next()
 
     const [isGroup] = await repos.groupsRepository.getGroup({ id: groupId })
 

@@ -39,6 +39,6 @@ watch(isChecked, (newVal) => {
 
 /* When the checkbox is checked, change the background image */
 .checkbox-input:checked + .checkbox-label {
-  background-image: url('checked.png'); /* Image for checked state */
+  background-image: url('../assets/collabCat.png'); /* Image for checked state */
 }
 </style>

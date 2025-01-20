@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed, watchEffect } from 'vue'
-import { FwbButton, FwbListGroupItem, FwbSpinner } from 'flowbite-vue'
+import { onMounted, watch, computed } from 'vue'
+import {  FwbListGroupItem, } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
-import { useUserStore, useTasksStore, useUserGroupsStore, usePointsStore } from '@/stores'
+import { useUserStore, useUserGroupsStore, usePointsStore } from '@/stores'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter} from 'vue-router'
 import { stringToUrl } from '@/utils/helpers'
-import Points from '@/components/points/Points.vue'
+import GroupLayout from './GroupLayout.vue'
 
 const router = useRouter()
-const route = useRoute()
-// const isLoading = ref(true)
-const taskStore = useTasksStore()
 const pointStore = usePointsStore()
 const userStore = useUserStore()
 const userGroupStore = useUserGroupsStore()
@@ -22,7 +19,6 @@ const activeGroupId = computed(() =>
   userGroupStore.activeGroup ? userGroupStore.activeGroup.id : undefined
 )
 const invitations = computed(() => userStore.invitations)
-const isUserInGroupPage = computed(() => route.meta.group)
 
 onMounted(async () => {
   if (userGroupStore.activeGroup) {
@@ -33,8 +29,6 @@ onMounted(async () => {
     await userStore.fetchUserTasks()
     await pointStore.managePoints(activeGroupId.value)
 
-  // isLoading.value = false
-  // console.log('herer')
 })
 
 const refreshInvitations = async () => {
@@ -63,15 +57,11 @@ watch(
 
     await pointStore.managePoints(activeGroupId.value)
 
-    // isLoading.value = false
   }
 )
 </script>
 
 <template>
-  <!-- <div v-if="isLoading" class="flex w-full justify-center mt-40" >
-    <FwbSpinner size="12"/>
-  </div> -->
   <div>
     <div
       v-if="userStore.user"
@@ -93,6 +83,7 @@ watch(
         </Notifications>
       </div>
     </div>
+    <GroupLayout />
     <main>
       <div class="container mx-auto w-full">
         <RouterView />

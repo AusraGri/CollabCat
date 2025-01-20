@@ -162,7 +162,7 @@ export function tasksRepository(db: Database) {
             throw new Error('Missing task data')
 
           if (!id || id <= 0) {
-            throw new Error('Invalid task ID');
+            throw new Error('Invalid task ID')
           }
 
           await trx

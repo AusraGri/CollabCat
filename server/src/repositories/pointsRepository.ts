@@ -39,7 +39,7 @@ export function pointsRepository(db: Database) {
         query = query.where('points.groupId', '=', queryData.groupId)
       }
 
-      if(queryData.groupId === undefined){
+      if (queryData.groupId === undefined) {
         query = query.where('points.groupId', 'is', null)
       }
 
@@ -107,7 +107,7 @@ export function pointsRepository(db: Database) {
         query = query.where('groupId', '=', object.groupId)
       }
 
-      if(!object.groupId){
+      if (!object.groupId) {
         query = query.where('groupId', 'is', null)
       }
 

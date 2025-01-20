@@ -153,8 +153,12 @@ describe('update', () => {
       categoryId: categoryOne.id,
     }
     // When
-    const task = await repository.updateTask({ id: taskOne.id, task: updatedTask, recurrence: null })
-    const [updated] = await repository.getTasks({id: taskOne.id})
+    const task = await repository.updateTask({
+      id: taskOne.id,
+      task: updatedTask,
+      recurrence: null,
+    })
+    const [updated] = await repository.getTasks({ id: taskOne.id })
     // Then
     expect(task).toBe(true)
     expect(updated.isCompleted).toBe(taskOne.isCompleted)
@@ -169,7 +173,11 @@ describe('update', () => {
 
     // When
     await expect(
-      repository.updateTask({ id: taskId, task: { title: 'Update' }, recurrence: null })
+      repository.updateTask({
+        id: taskId,
+        task: { title: 'Update' },
+        recurrence: null,
+      })
     ).rejects.toThrowError()
   })
 })

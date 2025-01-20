@@ -39,9 +39,8 @@ export default publicProcedure
   .mutation(
     async ({
       input: { auth0Token, email, username, picture },
-      ctx: { repos},
+      ctx: { repos },
     }) => {
-
       const userFromAuth0 = await verifyAuth0Token(
         auth0Token,
         config.auth0.audience,

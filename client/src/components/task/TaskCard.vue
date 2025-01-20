@@ -10,7 +10,6 @@ import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
 import { useTasksStore } from '@/stores/taskStore'
 
 
-
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
   (event: 'task:deleted', value: number): void

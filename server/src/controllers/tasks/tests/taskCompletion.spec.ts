@@ -4,7 +4,7 @@ import type {
   SelectableCompletedTask,
   TasksRepository,
 } from '@server/repositories/tasksRepository'
-import type { TaskData} from '@server/entities/tasks'
+import type { TaskData } from '@server/entities/tasks'
 import type { DeleteResult } from 'kysely'
 import { authRepoContext } from '@tests/utils/context'
 import tasksRouter from '..'
@@ -30,7 +30,6 @@ it('should trow an error if task id is invalid', async () => {
   await expect(taskCompletion(task)).rejects.toThrow(/not found/i)
 
   expect(repos.tasksRepository.getTasks).toBeCalled()
-
 })
 
 it('should mark task as completed', async () => {
@@ -47,7 +46,7 @@ it('should mark task as completed', async () => {
       addToCompletedTasks: vi.fn(
         async () => fakeCompletedTask({ taskId: 1 }) as SelectableCompletedTask
       ),
-      updateTaskCompletion: vi.fn(async()=> 'data' as any)
+      updateTaskCompletion: vi.fn(async () => 'data' as any),
     } satisfies Partial<TasksRepository>,
   }
 
@@ -70,14 +69,16 @@ it('should add task to completed tasks when task is recurring', async () => {
 
   const repos = {
     tasksRepository: {
-      getTasks: vi.fn(async () => [fakeTask({ id: 1, isRecurring: true })] as TaskData[]),
+      getTasks: vi.fn(
+        async () => [fakeTask({ id: 1, isRecurring: true })] as TaskData[]
+      ),
       addToCompletedTasks: vi.fn(
         async () => fakeCompletedTask({ taskId: 1 }) as SelectableCompletedTask
       ),
       removeCompletedTasks: vi.fn(
         async () => ({ numDeletedRows: 1n }) as DeleteResult
       ),
-      updateTaskCompletion: vi.fn(async()=> 'data' as any)
+      updateTaskCompletion: vi.fn(async () => 'data' as any),
     } satisfies Partial<TasksRepository>,
   }
 
@@ -102,14 +103,16 @@ it('should remove task from completed', async () => {
 
   const repos = {
     tasksRepository: {
-      getTasks: vi.fn(async () => [fakeTask({ id: 1, isRecurring: true }) as TaskData]),
+      getTasks: vi.fn(async () => [
+        fakeTask({ id: 1, isRecurring: true }) as TaskData,
+      ]),
       removeCompletedTasks: vi.fn(
         async () => ({ numDeletedRows: 1n }) as DeleteResult
       ),
       addToCompletedTasks: vi.fn(
         async () => fakeCompletedTask({ taskId: 1 }) as SelectableCompletedTask
       ),
-      updateTaskCompletion: vi.fn(async()=> 'data' as any)
+      updateTaskCompletion: vi.fn(async () => 'data' as any),
     } satisfies Partial<TasksRepository>,
   }
 

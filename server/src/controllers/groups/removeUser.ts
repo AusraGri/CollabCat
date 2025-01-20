@@ -30,7 +30,8 @@ export default groupAuthProcedure
     if (!userGroup || !isAllowed) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'Unauthorized. User does not have permission to remove user from this group',
+        message:
+          'Unauthorized. User does not have permission to remove user from this group',
       })
     }
 

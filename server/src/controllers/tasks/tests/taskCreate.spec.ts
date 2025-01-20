@@ -21,9 +21,7 @@ it('should throw an error if user is not authenticated', async () => {
   const { createTask } = createCaller(requestContext({ db }))
 
   // ACT & ASSERT
-  await expect(
-    createTask(newTask)
-  ).rejects.toThrow(/unauthenticated/i)
+  await expect(createTask(newTask)).rejects.toThrow(/unauthenticated/i)
 })
 
 it('should create a persisted task', async () => {

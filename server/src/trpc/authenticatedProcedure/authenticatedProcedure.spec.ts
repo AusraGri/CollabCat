@@ -1,7 +1,4 @@
-import {
-  authContext,
-  repoContext
-} from '@tests/utils/context'
+import { authContext, repoContext } from '@tests/utils/context'
 import type { UserRepository } from '@server/repositories/userRepository'
 import { createCallerFactory, router } from '..'
 import { authenticatedProcedure } from './index'
@@ -36,12 +33,12 @@ const repos = {
       updatedAt: new Date(),
       username: 'User',
     })),
-  } satisfies Partial<UserRepository>
+  } satisfies Partial<UserRepository>,
 }
 const reposUserUndefined = {
   userRepository: {
     findByAuth0Id: vi.fn(async () => undefined),
-  } satisfies Partial<UserRepository>
+  } satisfies Partial<UserRepository>,
 }
 
 const mockReq = {
@@ -61,8 +58,7 @@ it('should pass if user is already authenticated', async () => {
 })
 
 it('should pass if user provides a valid token', async () => {
-  const usingValidToken = createCaller(repoContext(repos)
-  )
+  const usingValidToken = createCaller(repoContext(repos))
 
   const response = await usingValidToken.testCall()
 

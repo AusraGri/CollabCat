@@ -4,17 +4,12 @@ import { useRoute } from 'vue-router'
 import { useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import GroupMembers from '@/components/groups/GroupMembers.vue'
-import { RouterView } from 'vue-router'
+// import { RouterView } from 'vue-router'
 import { useRewardStore } from '@/stores/rewardStore'
 import Rewards from '@/components/rewards/Rewards.vue'
 import GroupSettings from '@/components/groups/GroupSettings.vue'
 import Tab from '@/components/Tab.vue'
-import TabRev from '@/components/TabRev.vue'
 
-const emit = defineEmits<{
-  (event: 'new:task'): void
-  (event: 'new:category'): void
-}>()
 
 const userGroupStore = useUserGroupsStore()
 const rewardStore = useRewardStore()
@@ -25,13 +20,13 @@ const route = useRoute()
 const isShowGroupSettings = ref(false)
 const activeTab = ref<any>(route.name?.toString().replace(/^Personal/, ''))
 const isUserInGroupPage = computed(() => route.meta.group)
-const isAdmin = computed(() => {
-  if (isUserInGroupPage.value) {
-    return userGroupStore.isAdmin
-  }
+// const isAdmin = computed(() => {
+//   if (isUserInGroupPage.value) {
+//     return userGroupStore.isAdmin
+//   }
 
-  return true
-})
+//   return true
+// })
 
 watchEffect(async () => {
   if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
@@ -68,6 +63,7 @@ const handleRewardClaim = (data: { cost: number }) => {
 const openGroupSettings = () => {
   isShowGroupSettings.value = true
 }
+
 function handleTabClick(tabName: string) {
   activeTab.value = tabName
 
@@ -87,6 +83,26 @@ function handleTabClick(tabName: string) {
       console.error('Navigation error:', err)
     })
 }
+
+onMounted(async ()=>{
+  const tab =  route.name ? route.name.toString().replace(/^Personal/, '') :  'Calendar'
+  activeTab.value =  tab
+
+  if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
+    await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)
+    return
+  }
+
+  if (userStore.user && !isUserInGroupPage.value) {
+    const userInfo = {
+      ...userStore.user,
+      points: pointsStore.userPoints || 0,
+      role: 'Admin',
+    }
+    await rewardStore.managePersonalRewards(userInfo)
+  }
+
+})
 </script>
 <template>
   <div class=" flex flex-col">
@@ -117,9 +133,9 @@ function handleTabClick(tabName: string) {
       </div>
     </div>
   </div>
-  <div class="container mx-auto">
+  <!-- <div class="container mx-auto">
     <RouterView />
-  </div>
+  </div> -->
 </template>
 
 <style scoped></style>

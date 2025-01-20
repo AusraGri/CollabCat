@@ -4,7 +4,6 @@ import {
   type CreateExpressContextOptions,
 } from '@trpc/server/adapters/express'
 import cors from 'cors'
-import { renderTrpcPanel } from 'trpc-panel'
 import swaggerUi from 'swagger-ui-express'
 import { createOpenApiExpressMiddleware } from 'trpc-openapi'
 import type { Database } from './database'
@@ -12,7 +11,6 @@ import { appRouter } from './controllers'
 import type { Context } from './trpc'
 import config from './config'
 import { openApiDocument } from './trpc/openApi'
-import { validateAccessToken } from './middlewares/auth0Middleware'
 
 export default function createApp(db: Database) {
   const app = express()
@@ -58,16 +56,16 @@ export default function createApp(db: Database) {
     })
   )
 
-  if (config.env === 'development') {
-    app.use('/api/v1/trpc-panel', (_, res) =>
-      res.send(
-        renderTrpcPanel(appRouter, {
-          url: `http://localhost:${config.port}/api/v1/trpc`,
-          transformer: 'superjson',
-        })
-      )
-    )
-  }
+  // if (config.env === 'development') {
+  //   app.use('/api/v1/trpc-panel', (_, res) =>
+  //     res.send(
+  //       renderTrpcPanel(appRouter, {
+  //         url: `http://localhost:${config.port}/api/v1/trpc`,
+  //         transformer: 'superjson',
+  //       })
+  //     )
+  //   )
+  // }
 
   app.use(
     '/api',

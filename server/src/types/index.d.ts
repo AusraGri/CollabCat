@@ -1,5 +1,5 @@
 declare namespace Express {
-    export interface Request {
-       isTest?: boolean
-    }
- }
+  export interface Request {
+    isTest?: boolean
+  }
+}

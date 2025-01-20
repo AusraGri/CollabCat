@@ -15,9 +15,7 @@ import { insertAll } from '@tests/utils/records'
 import type { GroupRepository } from '@server/repositories/groupsRepository'
 import type { InvitationsRepository } from '@server/repositories/invitationRepository'
 import { sentInvitationMail } from '@server/emailer'
-import {
-  type UserRepository,
-} from '@server/repositories/userRepository'
+import { type UserRepository } from '@server/repositories/userRepository'
 import groupsRouter from '..'
 
 vi.mock('@server/emailer', () => ({

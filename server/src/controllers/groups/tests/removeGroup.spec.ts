@@ -1,4 +1,8 @@
-import { authContext, requestContext, authGroupContext } from '@tests/utils/context'
+import {
+  authContext,
+  requestContext,
+  authGroupContext,
+} from '@tests/utils/context'
 import {
   fakeUser,
   fakeGroup,
@@ -57,12 +61,14 @@ it('should throw an error if user is authenticated, belongs to the group, but do
     fakeUserGroup({ userId: userTwo.id, groupId: group.id, role: 'User' }),
   ])
 
-  const { removeUser } = createCaller(authGroupContext({ db }, user, {groupId: group.id, role: 'User'}))
+  const { removeUser } = createCaller(
+    authGroupContext({ db }, user, { groupId: group.id, role: 'User' })
+  )
 
   // ACT & ASSERTs
-  await expect(removeUser({ userId: userTwo.id, groupId: group.id })).rejects.toThrow(
-    /unauthorized/i
-  )
+  await expect(
+    removeUser({ userId: userTwo.id, groupId: group.id })
+  ).rejects.toThrow(/unauthorized/i)
 })
 
 it('should delete group by id', async () => {

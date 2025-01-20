@@ -33,7 +33,7 @@ const schema = z
     database: z.object({
       connectionString: z.string().url(),
     }),
-    testDatabase:  z.object({
+    testDatabase: z.object({
       connectionString: z.string().url(),
     }),
     auth0: z.object({

@@ -48,7 +48,7 @@ describe('get', () => {
     // When
     const [group] = await repository.getGroup({ id: groupOne.id })
 
-    const {createdAt, ...matchGRoup} =  groupOne
+    const { createdAt, ...matchGRoup } = groupOne
     // Then
     expect(group).toMatchObject({
       ...matchGRoup,
@@ -137,7 +137,7 @@ describe('users in groups', () => {
     expect(members).toHaveLength(1)
     expect(members[0]).toMatchObject({
       id: userOne.id,
-    username: userOne.username
+      username: userOne.username,
     })
   })
 

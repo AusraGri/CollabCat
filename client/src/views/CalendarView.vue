@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import { FwbButton, FwbSelect } from 'flowbite-vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import { useTasksStore, useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
+import { useTasksStore, useUserGroupsStore, usePointsStore } from '@/stores'
 import TaskCard from '@/components/task/TaskCard.vue'
 import moment from 'moment'
 import { type TaskData } from '@server/shared/types'
@@ -11,9 +11,9 @@ import { trpc } from '@/trpc'
 
 const route = useRoute()
 const userGroupStore = useUserGroupsStore()
-const userStore = useUserStore()
 const taskStore = useTasksStore()
 const pointsStore = usePointsStore()
+const isLoading = ref(true)
 const tasksFor = ref('all')
 const memberOptions = computed(() => {
   const options =
@@ -35,12 +35,7 @@ const groupId = computed(() => userGroupStore.activeGroup?.id)
 const date = ref(new Date())
 const startDate = ref(new Date())
 const tasks = ref<TaskData[]>([])
-// const isPointsEnabled = computed(()=>{
-//   if(isGroupTasks.value){
-//     return userGroupStore.isUserGroupPointsEnabled
-//   }
-//   return userStore.isPointsEnabled
-// })
+
 const isCheckboxEnabled = computed(() => {
   const today = new Date()
 
@@ -131,53 +126,49 @@ watch(
 
 onMounted(async () => {
   await fetchDueTasks(date.value)
+  isLoading.value = false
 })
 </script>
 
 <template>
-  <!-- <div v-for="task in tasks" :key="task.id">
-    <br>
-    {{ task }}
-    <br>
-    <span> Completion: {{ task.completed }}</span>
-  </div> -->
-  <!-- <div>{{ isCheckboxEnabled }}</div> -->
-  <div v-if="isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
-    <span> Show Tasks for:</span>
-    <FwbSelect v-model="tasksFor" :options="memberOptions" class="whitespace-nowrap" />
-  </div>
-  <div v-if="!isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
-    <span> Show Tasks for:</span>
-    <FwbSelect v-model="tasksFor" :options="personalOptions" class="whitespace-nowrap" />
-  </div>
-  <div class="mx-auto flex max-w-screen-md flex-col justify-between p-3 sm:flex-row">
-    <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-80">
-      <div class="w-full border-b-2 text-center">{{ formatDate(date) }}</div>
-      <div v-if="tasks">
-        <div v-for="task in tasks" :key="task.id">
-          <TaskCard
-            :task="task"
-            :is-task-info="false"
-            :is-checkbox-enabled="isCheckboxEnabled"
-            @task:status="handleTaskStatusChange"
-          />
-        </div>
-      </div>
-      <div v-if="!tasks.length" class="p-3 text-center">No tasks for this day</div>
+  <div v-if="!isLoading">
+    <div v-if="isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
+      <span> Show Tasks for:</span>
+      <FwbSelect v-model="tasksFor" :options="memberOptions" class="whitespace-nowrap" />
     </div>
-    <div class="order-first mx-auto max-w-fit sm:order-last">
-      <VueDatePicker
-        v-model="date"
-        :six-weeks="true"
-        inline
-        auto-apply
-        :start-date="startDate"
-        focus-start-date
-        :enable-time-picker="false"
-        month-name-format="long"
-      />
-      <div>
-        <FwbButton class="w-full" @click="todayDate">Today</FwbButton>
+    <div v-if="!isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
+      <span> Show Tasks for:</span>
+      <FwbSelect v-model="tasksFor" :options="personalOptions" class="whitespace-nowrap" />
+    </div>
+    <div class="mx-auto flex max-w-screen-md flex-col justify-between p-3 sm:flex-row">
+      <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-80">
+        <div class="w-full border-b-2 text-center">{{ formatDate(date) }}</div>
+        <div v-if="tasks">
+          <div v-for="task in tasks" :key="task.id">
+            <TaskCard
+              :task="task"
+              :is-task-info="false"
+              :is-checkbox-enabled="isCheckboxEnabled"
+              @task:status="handleTaskStatusChange"
+            />
+          </div>
+        </div>
+        <div v-if="!tasks.length" class="p-3 text-center">No tasks for this day</div>
+      </div>
+      <div class="order-first mx-auto max-w-fit sm:order-last">
+        <VueDatePicker
+          v-model="date"
+          :six-weeks="true"
+          inline
+          auto-apply
+          :start-date="startDate"
+          focus-start-date
+          :enable-time-picker="false"
+          month-name-format="long"
+        />
+        <div>
+          <FwbButton class="w-full" @click="todayDate">Today</FwbButton>
+        </div>
       </div>
     </div>
   </div>

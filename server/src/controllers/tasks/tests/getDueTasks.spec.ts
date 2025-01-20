@@ -17,12 +17,27 @@ const db = await wrapInRollbacks(createTestDatabase())
 const [user] = await insertAll(db, 'user', [fakeUser()])
 
 const [task, taskTwo, taskThree, taskFour] = await insertAll(db, 'tasks', [
-  fakeTask({ createdByUserId: user.id, startDate: new Date(2024, 1, 1), isRecurring: true }),
-  fakeTask({ createdByUserId: user.id, startDate: new Date(2055, 1, 1), isRecurring: true  }),
-  fakeTask({ createdByUserId: user.id, startDate: new Date(), isRecurring: true  }),
-  fakeTask({ createdByUserId: user.id, startDate: new Date(), isRecurring: false }),
+  fakeTask({
+    createdByUserId: user.id,
+    startDate: new Date(2024, 1, 1),
+    isRecurring: true,
+  }),
+  fakeTask({
+    createdByUserId: user.id,
+    startDate: new Date(2055, 1, 1),
+    isRecurring: true,
+  }),
+  fakeTask({
+    createdByUserId: user.id,
+    startDate: new Date(),
+    isRecurring: true,
+  }),
+  fakeTask({
+    createdByUserId: user.id,
+    startDate: new Date(),
+    isRecurring: false,
+  }),
 ])
-
 
 const [taskCompleted] = await insertAll(
   db,
@@ -52,7 +67,6 @@ const [patternOne, patternTwo, patternThree] = await insertAll(
     }),
   ]
 )
-
 
 const { getDueTasks } = createCaller(authContext({ db }, user))
 
