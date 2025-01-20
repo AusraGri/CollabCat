@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed, watchEffect } from 'vue'
-import { FwbButton, FwbListGroupItem } from 'flowbite-vue'
+import { FwbButton, FwbListGroupItem, FwbSpinner } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
 import { useUserStore, useTasksStore, useUserGroupsStore, usePointsStore } from '@/stores'
@@ -13,6 +13,7 @@ import Points from '@/components/points/Points.vue'
 
 const router = useRouter()
 const route = useRoute()
+// const isLoading = ref(true)
 const taskStore = useTasksStore()
 const pointStore = usePointsStore()
 const userStore = useUserStore()
@@ -28,15 +29,19 @@ onMounted(async () => {
     await userGroupStore.fetchGroupData()
     await userGroupStore.fetchUserMembershipInfo()
   }
-  await refreshInvitations()
-  await userStore.fetchUserTasks()
-  await pointStore.managePoints(activeGroupId.value)
+    await refreshInvitations()
+    await userStore.fetchUserTasks()
+    await pointStore.managePoints(activeGroupId.value)
+
+  // isLoading.value = false
+  // console.log('herer')
 })
 
 const refreshInvitations = async () => {
   await userStore.fetchInvitations()
   await userGroupStore.fetchUserGroups()
 }
+
 watch(
   () => userGroupStore.activeGroup?.name,
   async (newGroupName, oldGroupName) => {
@@ -57,35 +62,42 @@ watch(
     }
 
     await pointStore.managePoints(activeGroupId.value)
+
+    // isLoading.value = false
   }
 )
 </script>
 
 <template>
-  <div
-    v-if="userStore.user"
-    class="mt-1 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50 p-3"
-  >
-    <div class="flex max-w-screen-lg grow items-center justify-between">
-      <UserAvatarMenu :user="userStore.user" />
-      <GroupSelection />
-      <Notifications :has-notifications="!!invitations?.length">
-        <template #notifications>
-          <FwbListGroupItem
-            class="flex flex-col space-y-2 bg-gray-100 p-4 dark:bg-gray-700"
-            v-for="invitation in invitations"
-            :key="invitation.id"
-          >
-            <Invitations :invitation="invitation" @invitation:action="refreshInvitations" />
-          </FwbListGroupItem>
-        </template>
-      </Notifications>
+  <!-- <div v-if="isLoading" class="flex w-full justify-center mt-40" >
+    <FwbSpinner size="12"/>
+  </div> -->
+  <div>
+    <div
+      v-if="userStore.user"
+      class="mt-1 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50 p-3"
+    >
+      <div class="flex max-w-screen-lg grow items-center justify-between">
+        <UserAvatarMenu :user="userStore.user" />
+        <GroupSelection />
+        <Notifications :has-notifications="!!invitations?.length">
+          <template #notifications>
+            <FwbListGroupItem
+              class="flex flex-col space-y-2 bg-gray-100 p-4 dark:bg-gray-700"
+              v-for="invitation in invitations"
+              :key="invitation.id"
+            >
+              <Invitations :invitation="invitation" @invitation:action="refreshInvitations" />
+            </FwbListGroupItem>
+          </template>
+        </Notifications>
+      </div>
     </div>
+    <main>
+      <div class="container mx-auto w-full">
+        <RouterView />
+      </div>
+    </main>
   </div>
-  <main>
-    <div class="container mx-auto w-full">
-      <RouterView />
-    </div>
-  </main>
 </template>
 <style scoped></style>

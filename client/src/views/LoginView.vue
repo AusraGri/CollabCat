@@ -1,33 +1,37 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
-import PageForm from '@/components/PageForm.vue'
-import { FwbAlert, FwbButton, FwbInput } from 'flowbite-vue'
+import { ref, onMounted } from 'vue'
+// import PageForm from '@/components/PageForm.vue'
+// import { FwbAlert, FwbButton, FwbInput } from 'flowbite-vue'
 import { useRouter } from 'vue-router'
-import useErrorMessage from '@/composables/useErrorMessage'
+// import useErrorMessage from '@/composables/useErrorMessage'
 
 const router = useRouter()
 
-const userForm = ref({
-  email: 'test@email.com',
-  password: 'SomePassword',
-})
+// const userForm = ref({
+//   email: 'test@email.com',
+//   password: 'SomePassword',
+// })
 
-const [submitLogin, errorMessage] = useErrorMessage(async () => {
-  // await login(userForm.value)
+// const [submitLogin, errorMessage] = useErrorMessage(async () => {
+//   // await login(userForm.value)
 
-  // Support redirects back to the page the user was on before logging in
-  // if it is provided in the query string:
-  // :to="/login?redirect=/some-page-to-go/after-login"
-  const redirectTo = (router.currentRoute.value.query.redirect as string) ?? {
-    name: 'WriteArticle',
-  }
+//   // Support redirects back to the page the user was on before logging in
+//   // if it is provided in the query string:
+//   // :to="/login?redirect=/some-page-to-go/after-login"
+//   const redirectTo = (router.currentRoute.value.query.redirect as string) ?? {
+//     name: 'WriteArticle',
+//   }
 
-  router.push(redirectTo)
+//   router.push(redirectTo)
+// })
+onMounted(()=> {
+  router.push({name: 'Home' })
 })
 </script>
 
 <template>
-  <PageForm heading="Log in to your account" formLabel="Login" @submit="submitLogin">
+  <div> Successfully logged out</div>
+  <!-- <PageForm heading="Log in to your account" formLabel="Login" @submit="submitLogin">
     <template #default>
       <FwbInput
         label="Email"
@@ -72,5 +76,5 @@ const [submitLogin, errorMessage] = useErrorMessage(async () => {
         </RouterLink>
       </FwbAlert>
     </template>
-  </PageForm>
+  </PageForm> -->
 </template>

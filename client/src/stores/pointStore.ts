@@ -64,6 +64,21 @@ export const usePointsStore = defineStore('points', {
         console.error('Failed to set user points:', error)
       }
     },
+    async alterPoints(action: '+' | '-', points: number): Promise<void> {
+        const groupId = this.pointsData?.groupId || undefined
+      try {
+         const result = await trpc.points.alterPoints.mutate({
+          groupId,
+          action,
+          points
+        })
+
+        this.isEnabled = !!result
+        this.pointsData = result
+      } catch (error) {
+        console.error('Failed to set user points:', error)
+      }
+    },
   },
 })
 

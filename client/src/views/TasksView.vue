@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { FwbButton } from 'flowbite-vue'
-import { useUserGroupsStore, useUserStore } from '@/stores'
+import { useUserGroupsStore, useUserStore, usePointsStore, useTasksStore } from '@/stores'
 import CreateTask from '../components/task/CreateTask.vue'
 import CreateCategory from '@/components/categories/CreateCategory.vue'
 import type { CategoriesPublic, TaskData } from '@server/shared/types'
@@ -11,6 +11,7 @@ import Tab from '@/components/Tab.vue'
 import TabRev from '@/components/TabRev.vue'
 import { useRoute } from 'vue-router'
 import { toggle } from '@/utils/helpers'
+import { trpc } from '@/trpc'
 import {
   filterTasksByCategoryId,
   filterTasksByDefaultType,
@@ -19,6 +20,8 @@ import {
 
 const userGroupStore = useUserGroupsStore()
 const userStore = useUserStore()
+const pointsStore = usePointsStore()
+const taskStore = useTasksStore()
 const route = useRoute()
 
 const isGroupTasks = computed(() => route.meta.group)
@@ -170,6 +173,44 @@ const handleTaskDeletion = (taskId: number) => {
 const toggleShowTypes = () => {
   toggle(isShowTypes)
 }
+const handleTaskStatusChange = async (taskData: {
+  id: number
+  isCompleted: boolean
+  points: number | null
+  groupId: number | null
+}) => {
+  const { id, isCompleted, points } = taskData
+
+  const date = new Date()
+  const taskCompletionData = {
+    id,
+    isCompleted,
+    instanceDate: date,
+  }
+
+  try {
+    await taskStore.updateTaskCompletion(taskCompletionData)
+    if (points && isCompleted) {
+      const isPointsEnabled = pointsStore.isPointsEnabled
+
+      if (isPointsEnabled) {
+        const isClaimed = await trpc.points.isUserClaimedPoints.query({
+          taskId: id,
+          taskInstanceDate: date,
+        })
+
+        if (isClaimed) return
+
+        if (!isClaimed) {
+          pointsStore.alterPoints('+', points)
+          await trpc.points.addClaimedPoints.mutate({ taskId: id, taskInstanceDate: date })
+        }
+      }
+    }
+  } catch (error) {
+    console.log('Failed to update task status', error)
+  }
+}
 </script>
 <template>
   <!-- <div v-for="task in tasks" :key="task.id">
@@ -290,6 +331,7 @@ const toggleShowTypes = () => {
           :is-checkbox="!task.startDate"
           @task:updated="updateTasksData"
           @task:deleted="handleTaskDeletion"
+          @task:status="handleTaskStatusChange"
         />
       </div>
     </div>

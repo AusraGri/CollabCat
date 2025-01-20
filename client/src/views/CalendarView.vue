@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import { FwbButton, FwbSelect } from 'flowbite-vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import { useTasksStore, useUserGroupsStore, useUserStore } from '@/stores'
+import { useTasksStore, useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
 import TaskCard from '@/components/task/TaskCard.vue'
 import moment from 'moment'
 import { type TaskData } from '@server/shared/types'
@@ -13,6 +13,7 @@ const route = useRoute()
 const userGroupStore = useUserGroupsStore()
 const userStore = useUserStore()
 const taskStore = useTasksStore()
+const pointsStore = usePointsStore()
 const tasksFor = ref('all')
 const memberOptions = computed(() => {
   const options =
@@ -77,7 +78,7 @@ const handleTaskStatusChange = async (taskData: {
   points: number | null
   groupId: number | null
 }) => {
-  const { id, isCompleted, points, groupId } = taskData
+  const { id, isCompleted, points } = taskData
   const taskCompletionData = {
     id,
     isCompleted,
@@ -87,10 +88,7 @@ const handleTaskStatusChange = async (taskData: {
   try {
     await taskStore.updateTaskCompletion(taskCompletionData)
     if (points && isCompleted) {
-      const userGroupId = groupId || undefined
-      const isPointsEnabled = await trpc.points.getUserPoints.query({
-        groupId: userGroupId,
-      })
+      const isPointsEnabled = pointsStore.isPointsEnabled
 
       if (isPointsEnabled) {
         const isClaimed = await trpc.points.isUserClaimedPoints.query({
@@ -101,23 +99,8 @@ const handleTaskStatusChange = async (taskData: {
         if (isClaimed) return
 
         if (!isClaimed) {
-          if (groupId) {
-            const updatedGroupPoints = await trpc.points.alterPoints.mutate({
-              action: '+',
-              groupId: groupId,
-              points,
-            })
-
-            if (isGroupTasks.value) {
-              userGroupStore.setMemberPoints(updatedGroupPoints.points)
-            }
-          } else {
-            const updatedPoints = await trpc.points.alterPoints.mutate({ action: '+', points })
-            userStore.updateUserPoints(updatedPoints.points)
-          }
-
+          pointsStore.alterPoints('+', points)
           await trpc.points.addClaimedPoints.mutate({ taskId: id, taskInstanceDate: date.value })
-
         }
       }
     }

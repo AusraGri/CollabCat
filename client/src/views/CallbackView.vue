@@ -15,9 +15,9 @@ const router = useRouter()
 onMounted(async () => {
   try {
     if (isAuthenticated.value) {
-      router.push({ name: 'Profile' })
+      router.push({ name: 'PersonalCalendar' })
     } else {
-      router.push({ name: 'Login' })
+      router.push({ name: 'Home' })
     }
   } catch (error) {
     console.error('Error during Auth0 redirect callback', error)

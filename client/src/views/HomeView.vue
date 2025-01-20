@@ -1,42 +1,52 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
-import { FwbButton, FwbCarousel } from 'flowbite-vue'
+import {
+  FwbButton,
+  FwbCarousel,
+  FwbHeading,
+  FwbAvatar,
+} from 'flowbite-vue'
 import { useAuthService } from '@/services/auth0'
 import { useAuthStore } from '@/stores/authStore'
 import { useUserStore } from '@/stores/userProfile'
 import { useAuth0 } from '@auth0/auth0-vue'
-
+import logo from '@/assets/collabCat.png'
+import pic1 from '@/assets/001.webp'
+import pic2 from '@/assets/002.webp'
+import pic3 from '@/assets/003.webp'
+import AppDescription from '@/components/AppDescription.vue'
 
 const pictures = [
-  { src: '../assets/intro/01.jpeg', alt: 'Image 1' },
-  { src: '../assets/intro/02.jpg', alt: 'Image 2' },
-  { src: '../assets/intro/03.jpg', alt: 'Image 3' },
+  { src: pic1, alt: 'Image 1' },
+  { src: pic2, alt: 'Image 2' },
+  { src: pic3, alt: 'Image 3' },
 ]
 
-// import useErrorMessage from '@/composables/useErrorMessage'
+const collabCatLogo = ref(logo)
+
+
 const { getUserData } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
-const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } = useAuth0()
+const { loginWithRedirect, isAuthenticated, getAccessTokenSilently  } = useAuth0()
 const router = useRouter()
-const users = ref()
-const signup = async () => {
+const join = async (hint: 'signup' | 'login') => {
   loginWithRedirect({
     appState: {
-      target: '/', // Where to redirect after successful login
+      target: '/',
     },
     authorizationParams: {
-      prompt: 'login', // Forces the login form to appear
-      screen_hint: 'signup', // Forces the signup screen to appear
+      prompt: 'login',
+      screen_hint: hint,
     },
   })
 }
 
 const handleAuthRedirect = async () => {
   try {
-    if (!isAuthenticated) {
+    if (!isAuthenticated.value) {
       console.log('User is not authenticated yet.')
       return
     }
@@ -65,8 +75,7 @@ const handleAuthRedirect = async () => {
 
 onMounted(async () => {
   try {
-    if (isAuthenticated) {
-      // Handle post-authentication actions if already authenticated
+    if (isAuthenticated.value) {
       await handleAuthRedirect()
     } else {
       console.log('User not authenticated. Waiting for login...')
@@ -75,33 +84,31 @@ onMounted(async () => {
     console.error('Error in onMounted:', error)
   }
 })
+
+watch(() => isAuthenticated.value, async (newValue) => {
+  if (newValue) {
+    await handleAuthRedirect();
+  }
+})
 </script>
 
 <template>
-  <div class="dark:bg-gray-800">
-    <FwbCarousel :pictures="pictures" />
-    <Carousel />
-    <div>isAuth: {{ isAuthenticated }}</div>
-    <div v-if="isAuthenticated">authorized {{ user?.email }}</div>
-    <div v-if="!isAuthenticated">not authorized</div>
-    <div>This is Home page view</div>
-    <div>
-      is user logged in by user store: {{ userStore.isLoggedIn }} {{ userStore.user?.email }}
+  <div>{{ isAuthenticated }}</div>
+  <div class="container mx-auto dark:bg-gray-800">
+    <div class="m-7 flex flex-col items-center space-x-2 sm:flex-row">
+      <FwbAvatar :img="collabCatLogo" rounded size="lg" bordered />
+      <FwbHeading>CollabCat</FwbHeading>
+      <span class="whitespace-nowrap"> Best way to share task!</span>
     </div>
-    <div>{{ user }}</div>
-    <div v-for="user in users" :key="user">{{ user }}</div>
-    <div v-if="!userStore.isLoggedIn" class="rounded-md bg-white px-6 py-8">
-      <div class="items-center lg:flex">
-        <div class="lg:w-1/2">
-          <h2 class="text-4xl font-bold text-gray-800 dark:text-gray-100">API test platform</h2>
-          <p class="mt-4 text-gray-500 dark:text-gray-400 lg:max-w-md">
-            Hi! To begin the test, please sign up and then login.
-          </p>
-          <div class="mt-6 flex items-center gap-2">
-            <FwbButton @click="signup">Sign up</FwbButton>
-          </div>
-        </div>
-      </div>
+    <div class="mt-1 space-x-2 p-3">
+      <FwbButton @click="join('signup')" color="alternative">SignUp</FwbButton>
+      <FwbButton @click="join('login')" color="alternative">Login</FwbButton>
+    </div>
+    <div class=" w-full">
+      <FwbCarousel :pictures="pictures" slide :slide-interval="5000" />
+    </div>
+    <div>
+      <AppDescription />
     </div>
   </div>
 </template>

@@ -39,6 +39,10 @@ export function pointsRepository(db: Database) {
         query = query.where('points.groupId', '=', queryData.groupId)
       }
 
+      if(queryData.groupId === undefined){
+        query = query.where('points.groupId', 'is', null)
+      }
+
       return query.executeTakeFirst()
     },
 
@@ -101,6 +105,10 @@ export function pointsRepository(db: Database) {
 
       if (object.groupId !== undefined) {
         query = query.where('groupId', '=', object.groupId)
+      }
+
+      if(!object.groupId){
+        query = query.where('groupId', 'is', null)
       }
 
       return query.returning(pointsKeysPublic).executeTakeFirstOrThrow()
