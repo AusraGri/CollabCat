@@ -13,17 +13,17 @@ jobs:
       VITE_API_PATH: /api/v1/trpc
 
       # variables for our back-end tests, see server/src/config.ts
-      TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5432/testdb
-      DATABASE_URL: postgres://capstone:capstone@localhost:5432/devdb
+      TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5433/testdb
+      DATABASE_URL: postgres://capstone:capstone@localhost:5434/devdb
       BASE_URL: http://localhost:3000
 
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
       SMTP_PORT: ${{ secrets.SMTP_PORT }}
-      SMTP_USER : ${{ secrets.SMTP_USER }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
       SMTP_PASS: ${{ secrets.SMTP_PASS }}
 
       AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
-      AUTH0_DOMAIN : ${{ secrets.AUTH0_DOMAIN }}
+      AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
       CLIENT_ORIGIN_URL: ${{ secrets.CLIENT_ORIGIN_URL }}
       AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
       AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
@@ -37,7 +37,7 @@ jobs:
           POSTGRES_PASSWORD: capstone
           POSTGRES_DB: testdb
         ports:
-          - 5432:5432
+          - 5433:5432
       postgres-dev:
         image: postgres:16.1-alpine
         env:
@@ -46,7 +46,7 @@ jobs:
           POSTGRES_PASSWORD: capstone
           POSTGRES_DB: devdb
         ports:
-          - 5432:5432
+          - 5434:5432
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -59,6 +59,20 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Wait for PostgreSQL test database to be ready
+        run: |
+          until pg_isready -h localhost -p 5433; do
+            echo "Waiting for PostgreSQL Test DB..."
+            sleep 5
+          done
+
+      - name: Wait for PostgreSQL dev database to be ready
+        run: |
+          until pg_isready -h localhost -p 5434; do
+            echo "Waiting for PostgreSQL Dev DB..."
+            sleep 5
+          done
 
       - name: Type check server
         run: npm run typecheck -w=server
