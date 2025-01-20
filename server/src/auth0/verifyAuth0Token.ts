@@ -3,7 +3,7 @@ import config from '@server/config'
 import jsonwebtoken from 'jsonwebtoken'
 import jwksClient from 'jwks-rsa'
 
-interface Auth0TokenPayload {
+export interface Auth0TokenPayload {
   sub: string
   email: string
   name?: string
@@ -11,7 +11,7 @@ interface Auth0TokenPayload {
 }
 
 const client = jwksClient({
-  jwksUri: `https://${config.auth0.issuerBaseURL}/.well-known/jwks.json`
+  jwksUri: `https://${config.auth0.issuerBaseURL}/.well-known/jwks.json`,
 })
 
 // Promisify the `getSigningKey` function
@@ -37,12 +37,20 @@ export async function verifyAuth0Token(
   }
 
   const publicKey = key.getPublicKey()
-
- 
-  const decoded = jsonwebtoken.verify(token, publicKey, {
-    audience,
-    issuer,
-    algorithms: ['RS256'],
-  }) as Auth0TokenPayload
-  return decoded 
+  try {
+    const decoded = jsonwebtoken.verify(token, publicKey, {
+      audience,
+      issuer,
+      algorithms: ['RS256'],
+    }) as Auth0TokenPayload;
+    return decoded;
+  } catch (error) {
+    if (error instanceof jsonwebtoken.TokenExpiredError) {
+      throw new Error('Token has expired');
+    } else if (error instanceof jsonwebtoken.JsonWebTokenError) {
+      throw new Error('Invalid token');
+    } else {
+      throw new Error('Token verification failed');
+    }
+  }
 }

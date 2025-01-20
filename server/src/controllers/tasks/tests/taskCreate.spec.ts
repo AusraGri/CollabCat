@@ -9,29 +9,30 @@ import tasksRouter from '..'
 const createCaller = createCallerFactory(tasksRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
+const newTask = {
+  task: {
+    title: 'My New Task',
+    startDate: '2024-11-11',
+  },
+}
+
 it('should throw an error if user is not authenticated', async () => {
   // ARRANGE
-  const { create } = createCaller(requestContext({ db }))
+  const { createTask } = createCaller(requestContext({ db }))
 
   // ACT & ASSERT
   await expect(
-    create({
-      title: 'My New Task',
-      startDate: '2024-11-11',
-    })
+    createTask(newTask)
   ).rejects.toThrow(/unauthenticated/i)
 })
 
 it('should create a persisted task', async () => {
   // ARRANGE
   const [user] = await insertAll(db, 'user', fakeUser())
-  const { create } = createCaller(authContext({ db }, user))
+  const { createTask } = createCaller(authContext({ db }, user))
 
   // ACT
-  const taskReturned = await create({
-    title: 'New Task',
-    startDate: '2024-11-11',
-  })
+  const taskReturned = await createTask(newTask)
 
   // ASSERT
   expect(taskReturned).toMatchObject({
@@ -43,12 +44,10 @@ it('should create a persisted task', async () => {
     createdByUserId: user.id,
     description: null,
     groupId: null,
-    importance: null,
     points: null,
     startDate: expect.any(Date),
-    isFullDayEvent: false,
     startTime: null,
-    title: 'New Task',
+    title: 'My New Task',
   })
 
   const [taskCreated] = await selectAll(db, 'tasks', (eb) =>

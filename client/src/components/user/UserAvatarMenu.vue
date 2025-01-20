@@ -48,6 +48,7 @@ const handleDeletion = async (value: boolean) => {
 async function deleteAccount() {
   logout()
   await userStore.deleteUser()
+  authStore.logout()
 }
 
 onMounted(() => {

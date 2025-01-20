@@ -31,7 +31,7 @@ export default publicProcedure
     z.object({
       auth0Token: z.string(),
       username: z.string(),
-      email: z.string().email(),
+      email: z.string().trim().toLowerCase().email(),
       picture: z.string().optional(),
     })
   )

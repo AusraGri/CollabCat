@@ -1,12 +1,20 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
-import { FwbButton } from 'flowbite-vue'
+import { FwbButton, FwbCarousel } from 'flowbite-vue'
 import { useAuthService } from '@/services/auth0'
 import { useAuthStore } from '@/stores/authStore'
 import { useUserStore } from '@/stores/userProfile'
 import { useAuth0 } from '@auth0/auth0-vue'
+
+
+const pictures = [
+  { src: '../assets/intro/01.jpeg', alt: 'Image 1' },
+  { src: '../assets/intro/02.jpg', alt: 'Image 2' },
+  { src: '../assets/intro/03.jpg', alt: 'Image 3' },
+]
+
 // import useErrorMessage from '@/composables/useErrorMessage'
 const { getUserData } = useAuthService()
 const authStore = useAuthStore()
@@ -28,7 +36,6 @@ const signup = async () => {
 
 const handleAuthRedirect = async () => {
   try {
- 
     if (!isAuthenticated) {
       console.log('User is not authenticated yet.')
       return
@@ -39,10 +46,9 @@ const handleAuthRedirect = async () => {
     authStore.setAuthToken(idToken)
     let routeUsername: string
     try {
-    
       const newUser = await getUserData()
-        const signedUser = await trpc.user.signupAuth.mutate(newUser)
-        userStore.user = {...signedUser}
+      const signedUser = await trpc.user.signupAuth.mutate(newUser)
+      userStore.user = { ...signedUser }
     } catch (error) {
       console.log(error)
     }
@@ -52,7 +58,6 @@ const handleAuthRedirect = async () => {
 
       router.push({ name: 'PersonalCalendar', params: { username: routeUsername } })
     }
-  
   } catch (error) {
     console.error('Error handling Auth0 redirect callback:', error)
   }
@@ -74,7 +79,9 @@ onMounted(async () => {
 
 <template>
   <div class="dark:bg-gray-800">
-    <div>isAuth: {{isAuthenticated}}</div>
+    <FwbCarousel :pictures="pictures" />
+    <Carousel />
+    <div>isAuth: {{ isAuthenticated }}</div>
     <div v-if="isAuthenticated">authorized {{ user?.email }}</div>
     <div v-if="!isAuthenticated">not authorized</div>
     <div>This is Home page view</div>
