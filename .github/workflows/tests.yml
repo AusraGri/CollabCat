@@ -13,8 +13,8 @@ jobs:
       VITE_API_PATH: /api/v1/trpc
 
       # variables for our back-end tests, see server/src/config.ts
-      TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5433/testdb
-      DATABASE_URL: postgres://capstone:capstone@localhost:5434/devdb
+      TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5432/capstone
+      DATABASE_URL: postgres://capstone:capstone@localhost:5432/capstone_tests
       BASE_URL: http://localhost:3000
 
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -29,24 +29,19 @@ jobs:
       AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
     services:
       # spin up a database for tests
-      postgres-test:
+      postgres:
         image: postgres:16.1-alpine
         env:
           # Postgres will create a database with the following credentials
           POSTGRES_USER: capstone
           POSTGRES_PASSWORD: capstone
-          POSTGRES_DB: testdb
+          POSTGRES_DB: capstone
         ports:
-          - 5433:5432
-      postgres-dev:
-        image: postgres:16.1-alpine
-        env:
-          # Postgres will create a database with the following credentials
-          POSTGRES_USER: capstone
-          POSTGRES_PASSWORD: capstone
-          POSTGRES_DB: devdb
-        ports:
-          - 5434:5432
+          - 5432:5432
+        options: >
+          --health-cmd="pg_isready -U capstone" --health-timeout=30s --health-retries=5
+        volumes:
+          - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -62,17 +57,11 @@ jobs:
 
       - name: Wait for PostgreSQL test database to be ready
         run: |
-          until pg_isready -h localhost -p 5433; do
-            echo "Waiting for PostgreSQL Test DB..."
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for PostgreSQL DB..."
             sleep 5
           done
 
-      - name: Wait for PostgreSQL dev database to be ready
-        run: |
-          until pg_isready -h localhost -p 5434; do
-            echo "Waiting for PostgreSQL Dev DB..."
-            sleep 5
-          done
 
       - name: Type check server
         run: npm run typecheck -w=server
