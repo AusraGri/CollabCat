@@ -1,0 +1,60 @@
+services:
+  # spin up a database
+  postgres:
+    image: postgres:16.1-alpine
+    environment:
+      POSTGRES_USER: capstone
+      POSTGRES_PASSWORD: capstone
+      POSTGRES_DB: capstone
+    ports:
+      - '5432'
+    volumes:
+      - capstone-db:/var/lib/postgresql/data
+      - ./server/init-db:/docker-entrypoint-initdb.d
+
+  # start up an API server
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    env_file:
+      - ./server/.env
+    environment:
+      DATABASE_URL: postgres://capstone:capstone@postgres:5432/capstone
+      TEST_DATABASE_URL: postgres://capstone:capstone@postgres:5432/capstone_tests
+      PORT: 3000
+    ports:
+      - '3000'
+    depends_on:
+      - postgres
+
+  # start up a client (and proxy) server
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+      args:
+      # provide needed environmental variables in the .env (client side) file
+      # and run  'ocker compose --env-file ./client/.env up --buildup --build'
+        VITE_AUTH0_DOMAIN: ${VITE_AUTH0_DOMAIN}
+        VITE_AUTH0_CLIENT_ID: ${VITE_AUTH0_CLIENT_ID}
+        VITE_AUTH0_AUDIENCE: ${VITE_AUTH0_AUDIENCE}
+        VITE_AUTH0_CALLBACK_URL: ${VITE_AUTH0_CALLBACK_URL}
+
+      # or directly hard-code variables here and then no need to use  'ocker compose --env-file ./client/.env up --build'
+        VITE_AUTH0_DOMAIN: your auht0 domain
+        VITE_AUTH0_CLIENT_ID: your auth0 client id
+        VITE_AUTH0_AUDIENCE: auht0 audience
+        VITE_AUTH0_CALLBACK_URL: auht0 callback url
+
+    env_file:
+      - ./client/.env
+    environment:
+      API_PROXY_PASS: http://server:3000
+    ports:
+      - '5174:80'
+    depends_on:
+      - server
+
+volumes:
+  capstone-db:
