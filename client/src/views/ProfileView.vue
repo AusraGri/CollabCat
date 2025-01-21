@@ -1,17 +1,11 @@
 <template>
-    <div>
-<div>
-    todays all tasks
-</div>
-<div>Calendar</div>
-<div>rewards</div>
-    </div>
+  <div>
+    <div>todays all tasks</div>
+    <div>Calendar</div>
+    <div>rewards</div>
+  </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-
-<style scoped>
-
-</style>
+<style scoped></style>

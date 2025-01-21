@@ -2,7 +2,6 @@
 import { ref, computed, type PropType } from 'vue'
 import { FwbModal, FwbButton, FwbCheckbox } from 'flowbite-vue'
 
-
 const { isShowDateModal } = defineProps<{
   isShowDateModal: boolean
   isRecurring: boolean
@@ -27,7 +26,7 @@ const emit = defineEmits<{
 }>()
 
 const closeDateModal = () => {
-    emit('closeDate')
+  emit('closeDate')
 }
 
 const formatDate = (date: Date) => {

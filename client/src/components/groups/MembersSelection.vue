@@ -21,14 +21,13 @@ const updateValue = (event: Event, member: GroupMember) => {
   const target = event.target as HTMLInputElement
 
   if (target.checked) {
-    if(maxSelections && selectedMembers.value.length >= maxSelections){
-      selectedMembers.value = selectedMembers.value.slice(- maxSelections + 1)
+    if (maxSelections && selectedMembers.value.length >= maxSelections) {
+      selectedMembers.value = selectedMembers.value.slice(-maxSelections + 1)
     }
     selectedMembers.value.push(member.id)
   } else {
     selectedMembers.value = selectedMembers.value.filter((selected) => selected !== member.id)
   }
-
 }
 </script>
 

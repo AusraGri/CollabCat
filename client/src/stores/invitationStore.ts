@@ -70,7 +70,6 @@ export const useInvitationStore = defineStore('invitations', {
         if (!groupId) throw new Error('Missing group id')
 
         await trpc.groups.addUserToGroup.mutate({ groupId })
-
       } catch (error) {
         throw new Error('Failed to fetch group info')
       }

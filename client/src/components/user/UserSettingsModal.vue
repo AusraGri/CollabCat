@@ -8,7 +8,6 @@ import { FwbModal, FwbButton, FwbInput, FwbCheckbox } from 'flowbite-vue'
 import { type UserPublic } from '@server/shared/types'
 import CategoriesManager from '../categories/CategoriesManager.vue'
 
-
 const { showUserSettings, user } = defineProps<{
   user: UserPublic
   showUserSettings: boolean
@@ -26,7 +25,9 @@ const isPoints = ref(pointStore.isEnabled)
 const isShowConfirmation = ref(false)
 const isShowCategoriesManager = ref(false)
 const router = useRouter()
-const userCategories = computed(()=> userStore.categories?.filter((cat)=> cat.isDefault === false))
+const userCategories = computed(() =>
+  userStore.categories?.filter((cat) => cat.isDefault === false)
+)
 
 async function changeName() {
   try {
@@ -62,7 +63,6 @@ const closeModal = () => {
 }
 
 const saveUserSettings = async () => {
- 
   await changeName()
   await handlePointsChange()
 }
@@ -87,14 +87,16 @@ onMounted(() => {
   username.value = user.username
 })
 
-const openCategoryManager = () =>{
+const openCategoryManager = () => {
   isShowCategoriesManager.value = true
 }
 
-watch(()=> pointStore.isEnabled, (newValue)=>{
-  isPoints.value = newValue
-})
-
+watch(
+  () => pointStore.isEnabled,
+  (newValue) => {
+    isPoints.value = newValue
+  }
+)
 </script>
 
 <template>
@@ -119,7 +121,7 @@ watch(()=> pointStore.isEnabled, (newValue)=>{
             <FwbCheckbox label="Task Points" v-model="isPoints" />
           </div>
         </form>
-        <div v-if="userCategories?.length" class="flex mt-3 border-t-2 items-center pt-3">
+        <div v-if="userCategories?.length" class="mt-3 flex items-center border-t-2 pt-3">
           <FwbButton color="default" @click="openCategoryManager" outline pill square>
             Manage Your Categories
             <template #suffix>
@@ -137,7 +139,11 @@ watch(()=> pointStore.isEnabled, (newValue)=>{
               </svg>
             </template>
           </FwbButton>
-          <CategoriesManager :is-show-categories="isShowCategoriesManager" :categories="userCategories || []" @close="isShowCategoriesManager = false" />
+          <CategoriesManager
+            :is-show-categories="isShowCategoriesManager"
+            :categories="userCategories || []"
+            @close="isShowCategoriesManager = false"
+          />
         </div>
       </template>
       <template #footer>

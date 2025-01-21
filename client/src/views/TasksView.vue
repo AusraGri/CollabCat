@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { FwbButton } from 'flowbite-vue'
 import { useUserGroupsStore, useUserStore, usePointsStore, useTasksStore } from '@/stores'
 import CreateTask from '../components/task/CreateTask.vue'
 import CreateCategory from '@/components/categories/CreateCategory.vue'
 import type { CategoriesPublic, TaskData } from '@server/shared/types'
 import CategoryList from '@/components/categories/CategoryList.vue'
 import TaskCard from '@/components/task/TaskCard.vue'
-import Tab from '@/components/Tab.vue'
 import TabRev from '@/components/TabRev.vue'
 import { useRoute } from 'vue-router'
 import { toggle } from '@/utils/helpers'
@@ -28,7 +26,6 @@ const isGroupTasks = computed(() => route.meta.group)
 const isNewTask = ref(false)
 const isNewCategory = ref(false)
 const selectedCategory = ref(null)
-const selectedDefaultCategory = ref(null)
 const selectedType = ref('')
 const isShowTypes = ref(false)
 
@@ -41,24 +38,6 @@ const categories = computed(() => {
   return userStore.categories?.filter((cat) => cat.isDefault === false) || undefined
 })
 
-const defaultCategories = computed(() => {
-  if (groupId.value) {
-    return userGroupStore.categories?.filter((cat) => cat.isDefault === true) || undefined
-  }
-  return userStore.categories?.filter((cat) => cat.isDefault === true) || undefined
-})
-
-// const filterTitle = computed(()=> {
-//   const selectedId = selectedDefaultCategory.value
-//   const defaultCat = defaultCategories.value
-//   if(selectedId && defaultCat){
-//  const chosen =  defaultCat.find((cat)=> cat.id === selectedId)
-
-//  return chosen ? chosen.title : undefined
-//   }
-
-//   return undefined
-// })
 const filterTitle = computed(() => {
   return selectedType.value ? selectedType.value : undefined
 })
@@ -70,7 +49,6 @@ const groups = computed(() => {
   return undefined
 })
 
-// const groupTasks = computed(() => userGroupStore.tasks)
 const allTasks = computed(() => {
   if (isGroupTasks.value && userGroupStore.tasks) {
     return userGroupStore.tasks
@@ -103,8 +81,8 @@ const tasks = computed(() => {
   return []
 })
 
-function showCount (name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
-  return countTasksOfDefaultType( allTasks.value, name)
+function showCount(name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
+  return countTasksOfDefaultType(allTasks.value, name)
 }
 
 const handleNewCategory = (category: CategoriesPublic) => {
@@ -213,12 +191,6 @@ const handleTaskStatusChange = async (taskData: {
 }
 </script>
 <template>
-  <!-- <div v-for="task in tasks" :key="task.id">
-    <br />
-    <div>{{ task }}</div>
-  </div> -->
-  <!-- <div>is group: {{ isGroupTasks }}</div> -->
-  <!-- <div>{{ countTasksOfDefaultType(allTasks, 'Routine') }}</div> -->
   <div class="flex flex-col justify-start">
     <div class="inline-flex self-start">
       <TabRev
@@ -233,11 +205,11 @@ const handleTaskStatusChange = async (taskData: {
       />
       <div
         @click="toggleShowTypes"
-        class="ml-2 flex items-center justify-end rounded-md pl-1 pr-1  text-sm  hover:cursor-pointer"
+        class="ml-2 flex items-center justify-end rounded-md pl-1 pr-1 text-sm hover:cursor-pointer"
       >
         <span>Types</span>
         <svg
-        v-if="!isShowTypes"
+          v-if="!isShowTypes"
           class="h-6 w-6 text-gray-800 dark:text-white"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
@@ -255,7 +227,7 @@ const handleTaskStatusChange = async (taskData: {
           />
         </svg>
         <svg
-        v-if="isShowTypes"
+          v-if="isShowTypes"
           class="h-6 w-6 text-gray-800 dark:text-white"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
@@ -283,24 +255,28 @@ const handleTaskStatusChange = async (taskData: {
           :title="'Someday'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
-        >{{showCount('Someday') }}</TabRev>
+          >{{ showCount('Someday') }}</TabRev
+        >
         <TabRev
           :title="'Routine'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
-        >{{showCount('Routine') }}</TabRev>
+          >{{ showCount('Routine') }}</TabRev
+        >
       </div>
       <div class="inline-flex space-x-1">
         <TabRev
           :title="'Scheduled'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
-        >{{showCount('Scheduled') }}</TabRev>
+          >{{ showCount('Scheduled') }}</TabRev
+        >
         <TabRev
           :title="'Not Assigned'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
-        >{{showCount('Not Assigned') }}</TabRev>
+          >{{ showCount('Not Assigned') }}</TabRev
+        >
       </div>
     </div>
   </div>
@@ -320,7 +296,7 @@ const handleTaskStatusChange = async (taskData: {
       @close="toggleCategoryModal"
     />
   </div>
-  <div class="flex justify-between ">
+  <div class="flex justify-between">
     <div v-if="tasks">
       <div v-for="task in tasks" :key="task.id">
         <TaskCard

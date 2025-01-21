@@ -26,7 +26,7 @@ const isEnoughRewardAmount = computed(() => {
   return reward.amount === null || reward.amount > 0
 })
 
-const isShowAmount = computed(()=> {
+const isShowAmount = computed(() => {
   return reward.amount !== null
 })
 

@@ -6,7 +6,7 @@ export const validateAccessTokenMiddleware = middleware(
   async ({ ctx, next }) => {
     const { req, res } = ctx
 
-    if (req && req.isTest) return next()
+    if (ctx.isTest) return next()
 
     if (!req || !res) {
       throw new Error(

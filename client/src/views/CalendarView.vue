@@ -27,7 +27,7 @@ const memberOptions = computed(() => {
 
 const personalOptions = ref([
   { value: 'all', name: 'All Groups' },
-  {value: 'personal', name: 'My Personal'}
+  { value: 'personal', name: 'My Personal' },
 ])
 
 const isGroupTasks = computed(() => route.meta.group || false)
@@ -120,7 +120,7 @@ watch(
 watch(
   () => tasksFor.value,
   async () => {
-      await fetchDueTasks(date.value)
+    await fetchDueTasks(date.value)
   }
 )
 
@@ -132,11 +132,17 @@ onMounted(async () => {
 
 <template>
   <div v-if="!isLoading">
-    <div v-if="isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
+    <div
+      v-if="isGroupTasks"
+      class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm"
+    >
       <span> Show Tasks for:</span>
       <FwbSelect v-model="tasksFor" :options="memberOptions" class="whitespace-nowrap" />
     </div>
-    <div v-if="!isGroupTasks" class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm">
+    <div
+      v-if="!isGroupTasks"
+      class="mx-auto flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm"
+    >
       <span> Show Tasks for:</span>
       <FwbSelect v-model="tasksFor" :options="personalOptions" class="whitespace-nowrap" />
     </div>

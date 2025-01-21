@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {type PropType } from 'vue'
+import { type PropType } from 'vue'
 import { FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
 import type { CategoriesPublic } from '@server/shared/types'
 
@@ -25,7 +25,13 @@ const isSelected = (id: number) => {
 <template>
   <div v-if="categories">
     <FwbListGroup v-for="category in categories" :key="category.id">
-      <FwbListGroupItem :class="['tracking-wider, w-fit whitespace-nowrap',{'bg-blue-400' : isSelected(category.id), 'font-bold' : category.isDefault}]" hover>
+      <FwbListGroupItem
+        :class="[
+          'tracking-wider, w-fit whitespace-nowrap',
+          { 'bg-blue-400': isSelected(category.id), 'font-bold': category.isDefault },
+        ]"
+        hover
+      >
         <template v-if="isSelected(category.id)" #prefix>
           <svg
             class="h-5 w-5 text-gray-800 dark:text-white"
@@ -45,9 +51,10 @@ const isSelected = (id: number) => {
             />
           </svg>
         </template>
-        <button class="w-full text-left pr-3" @click="selectCategory(category)">{{ category.title }}</button>
+        <button class="w-full pr-3 text-left" @click="selectCategory(category)">
+          {{ category.title }}
+        </button>
       </FwbListGroupItem>
     </FwbListGroup>
   </div>
 </template>
-

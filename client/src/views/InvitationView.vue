@@ -2,7 +2,7 @@
 import { trpc } from '@/trpc'
 import { type UserPublic, type GroupsPublic } from '@server/shared/types'
 import { FwbAvatar, FwbButton } from 'flowbite-vue'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthService } from '@/services/auth0'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -11,8 +11,8 @@ import { useInvitationStore } from '@/stores/invitationStore'
 import { useUserStore } from '@/stores/userProfile'
 import { stringToUrl } from '@/utils/helpers'
 
-const { getToken, getUserData, signup, isAuth } = useAuthService()
-const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } = useAuth0()
+const { getToken, getUserData, isAuth } = useAuthService()
+const { loginWithRedirect } = useAuth0()
 const isTokenValid = ref(true)
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -24,8 +24,6 @@ const groupInfo = ref<GroupsPublic>()
 const groupOwner = ref<UserPublic>()
 
 const signupUser = async () => {
-  // await signup('/invite')
-
   loginWithRedirect({
     appState: {
       target: '/invite',
@@ -127,15 +125,15 @@ const redirectToHomePage = () => {
 }
 </script>
 <template>
-  <div class="p-6 bg-white rounded-lg shadow-md">
+  <div class="rounded-lg bg-white p-6 shadow-md">
     <div>
       <div v-if="!isAuth" class="text-center">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to CollabCat!</h1>
-        <div class="text-lg text-gray-600 text-center">
+        <h1 class="mb-4 text-2xl font-bold text-gray-800">Welcome to CollabCat!</h1>
+        <div class="text-center text-lg text-gray-600">
           <div v-if="isTokenValid">
-            <div class="flex flex-col sm:flex-row mb-1 items-center space-x-3 justify-center">
+            <div class="mb-1 flex flex-col items-center justify-center space-x-3 sm:flex-row">
               <span class="inline-flex items-center">
-                <FwbAvatar :img="groupOwner?.picture || undefined" rounded class="w-10 h-10 mr-2" />
+                <FwbAvatar :img="groupOwner?.picture || undefined" rounded class="mr-2 h-10 w-10" />
                 <span class="font-semibold">{{ groupOwner?.username }}</span>
               </span>
               <span>invited you</span>
@@ -147,7 +145,10 @@ const redirectToHomePage = () => {
           </div>
           <p class="text-sm text-gray-500">If you want to join, please sign up to CollabCat</p>
           <div class="mt-6">
-            <FwbButton @click="signupUser" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            <FwbButton
+              @click="signupUser"
+              class="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+            >
               Signup
             </FwbButton>
           </div>
@@ -155,13 +156,16 @@ const redirectToHomePage = () => {
         <p v-if="loading" class="mt-4 text-gray-500">Validating invitation...</p>
         <p v-else-if="error" class="mt-4 text-red-500">{{ error }}</p>
       </div>
-  
+
       <div v-if="authStore.isLoggedIn" class="text-center">
-        <h1 class="text-2xl font-bold text-green-600 mb-4">Welcome aboard!</h1>
-        <p class="text-lg text-gray-600 mb-4">You have successfully joined the group!</p>
+        <h1 class="mb-4 text-2xl font-bold text-green-600">Welcome aboard!</h1>
+        <p class="mb-4 text-lg text-gray-600">You have successfully joined the group!</p>
         <div class="mb-6">You can now go to your profile page</div>
         <div>
-          <FwbButton @click="redirectToProfilePage" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+          <FwbButton
+            @click="redirectToProfilePage"
+            class="rounded-lg bg-green-600 px-4 py-2 text-white transition hover:bg-green-700"
+          >
             To Profile Page
           </FwbButton>
         </div>
@@ -171,14 +175,14 @@ const redirectToHomePage = () => {
     <div v-if="!isTokenValid" class="text-center text-red-600">
       <p>We are very sorry, but it looks like your invitation token has expired or is invalid.</p>
       <div class="mt-6">
-        <FwbButton @click="redirectToHomePage" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+        <FwbButton
+          @click="redirectToHomePage"
+          class="rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+        >
           Go to home page
         </FwbButton>
       </div>
     </div>
   </div>
 </template>
-
-
-
 <style scoped></style>

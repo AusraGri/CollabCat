@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { InsertableReward, PublicReward, RewardUpdateable } from '@server/shared/types'
 import { ref, computed } from 'vue'
-import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbModal } from 'flowbite-vue'
+import { FwbDropdown, FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
 import { useRewardStore } from '@/stores'
 import NewRewardModule from './NewRewardModule.vue'
 import RewardItem from './RewardItem.vue'
@@ -11,7 +11,7 @@ import RewardItem from './RewardItem.vue'
 // }>()
 
 const emit = defineEmits<{
-  (event: 'reward:claimed', value: {cost: number}): void
+  (event: 'reward:claimed', value: { cost: number }): void
   (event: 'closed'): void
 }>()
 
@@ -62,7 +62,7 @@ const handleRewardChange = async ({
       break
     case 'claim':
       await rewardStore.claimReward(reward)
-      emit('reward:claimed', {cost: reward.cost})
+      emit('reward:claimed', { cost: reward.cost })
       break
     default:
       isNewReward.value = false

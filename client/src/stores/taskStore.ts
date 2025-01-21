@@ -1,26 +1,13 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type {
-  InsertTaskData,
-  TaskUpdateData,
-  TaskData,
-  CategoriesPublic,
-  GroupMember,
-  GroupsPublic
-} from '@server/shared/types'
+import type { InsertTaskData, TaskUpdateData, TaskData } from '@server/shared/types'
 
 interface TasksState {
   tasks: TaskData[] | null
-  // categories: CategoriesPublic[] | null
-  // groupMembers: GroupMember[] | null
-  // groups: GroupsPublic [] | null
 }
 export const useTasksStore = defineStore('tasks', {
   state: (): TasksState => ({
     tasks: null,
-    // categories: null,
-    // groupMembers: null,
-    // groups: null
   }),
 
   getters: {
@@ -39,9 +26,9 @@ export const useTasksStore = defineStore('tasks', {
     async getDuePersonalTasks(date: string, noGroup?: boolean) {
       try {
         const tasks = await trpc.tasks.getDuePersonalTasks.query({ date })
-        if(noGroup){
-          this.tasks = tasks.filter((task)=> task.groupId === null)
-        }else{
+        if (noGroup) {
+          this.tasks = tasks.filter((task) => task.groupId === null)
+        } else {
           this.tasks = tasks
         }
         return this.tasks

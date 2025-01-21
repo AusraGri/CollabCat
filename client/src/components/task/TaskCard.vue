@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from 'vue'
 import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
-import { type TaskData, type CategoriesPublic, type GroupMember, type GroupsPublic } from '@server/shared/types'
+import {
+  type TaskData,
+  type CategoriesPublic,
+  type GroupMember,
+  type GroupsPublic,
+} from '@server/shared/types'
 import UserBasicProfile from '../user/UserBasicProfile.vue'
 import RecurrenceCard from './RecurrenceCard.vue'
 import TaskInfo from './TaskInfo.vue'
@@ -9,11 +14,13 @@ import { toggle } from '@/utils/helpers'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
 import { useTasksStore } from '@/stores/taskStore'
 
-
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
   (event: 'task:deleted', value: number): void
-  (event: 'task:status', value: {id: number, isCompleted: boolean, points: number | null, groupId: number|null}): void
+  (
+    event: 'task:status',
+    value: { id: number; isCompleted: boolean; points: number | null; groupId: number | null }
+  ): void
 }>()
 
 const taskStore = useTasksStore()
@@ -75,13 +82,12 @@ const toggleTaskInfo = () => {
   toggle(showTaskInfo)
 }
 
-function isTaskCompleted (task: TaskData) {
-  if(!task.isRecurring && !task.recurrence) return task.isCompleted
+function isTaskCompleted(task: TaskData) {
+  if (!task.isRecurring && !task.recurrence) return task.isCompleted
 
-  if(task.isRecurring){
+  if (task.isRecurring) {
     return !!task.completed?.length
   }
-
 }
 
 const updateTask = async (updatedTask: TaskData) => {
@@ -109,11 +115,9 @@ const deleteTask = async () => {
     if (result) {
       emit('task:deleted', taskId)
     }
-
   } catch (error) {
     console.log(error)
   }
-
 }
 
 const updateTaskStatus = (value: boolean) => {
@@ -121,14 +125,17 @@ const updateTaskStatus = (value: boolean) => {
     isCompleted: value,
     id: props.task.id,
     points: props.task.points,
-    groupId: props.task.groupId
+    groupId: props.task.groupId,
   }
   emit('task:status', taskData)
 }
 
-watch(()=> props.task, (newTask)=>{
- check.value = isTaskCompleted(newTask)
-})
+watch(
+  () => props.task,
+  (newTask) => {
+    check.value = isTaskCompleted(newTask)
+  }
+)
 </script>
 
 <template>
@@ -137,7 +144,11 @@ watch(()=> props.task, (newTask)=>{
     aria-label="task item"
   >
     <div v-if="isCheckbox" class="h-6 self-center">
-      <FwbCheckbox v-model="check" :disabled="!isCheckboxEnabled" @update:model-value="updateTaskStatus" />
+      <FwbCheckbox
+        v-model="check"
+        :disabled="!isCheckboxEnabled"
+        @update:model-value="updateTaskStatus"
+      />
     </div>
     <div
       @click="toggleTaskInfo"
@@ -148,7 +159,7 @@ watch(()=> props.task, (newTask)=>{
         <div class="p-1">{{ task.title }}</div>
       </div>
       <div
-      v-if="task.startDate"
+        v-if="task.startDate"
         :class="[
           'flex',
           'w-full',
@@ -162,7 +173,9 @@ watch(()=> props.task, (newTask)=>{
           {{ formatDateToLocal(task.startDate) }}
           <span v-if="task.endDate">--> {{ formatDateToLocal(task.endDate) }}</span>
         </div>
-        <div v-if="task.startTime && task.startDate">{{ timeToLocalTime(task.startTime, task.startDate) }}</div>
+        <div v-if="task.startTime && task.startDate">
+          {{ timeToLocalTime(task.startTime, task.startDate) }}
+        </div>
       </div>
       <div v-if="task.recurrence">
         <RecurrenceCard :recurrence="task.recurrence" />

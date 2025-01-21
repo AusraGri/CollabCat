@@ -16,14 +16,12 @@ const emit = defineEmits<{
 }>()
 
 const recurrencePattern = defineModel('recurrencePattern', {
-    type: [Object, null] as PropType<RecurrencePattern | null>,
-    })
+  type: [Object, null] as PropType<RecurrencePattern | null>,
+})
 
 const recurrence = ref(isRecurring)
 const recurrenceOrigin = ref(isRecurring)
-const originalRecurrence = ref(
-  recurrencePattern.value
-)
+const originalRecurrence = ref(recurrencePattern.value)
 
 const current = computed(() => {
   if (!recurrence.value) return null
@@ -54,12 +52,11 @@ const savePatternChanges = () => {
 }
 
 const resetPatternChanges = () => {
-    recurrence.value = recurrenceOrigin.value
-  if (originalRecurrence.value ) {
+  recurrence.value = recurrenceOrigin.value
+  if (originalRecurrence.value) {
     recurrencePattern.value = originalRecurrence.value
   }
 }
-
 </script>
 
 <template>
@@ -68,7 +65,7 @@ const resetPatternChanges = () => {
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       @click.self.stop="closeRecurrenceModal"
     >
-      <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg m-3">
+      <div class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
         <header class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">Edit Recurrence</h2>
           <button @click.stop="closeRecurrenceModal" class="text-gray-500 hover:text-black">
@@ -108,7 +105,7 @@ const resetPatternChanges = () => {
             Save Changes
           </fwb-button>
         </footer>
-    </div>
+      </div>
     </div>
   </div>
 </template>

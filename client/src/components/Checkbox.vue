@@ -10,7 +10,6 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 
-
 // Define the state of the checkbox
 const isChecked = ref(false)
 

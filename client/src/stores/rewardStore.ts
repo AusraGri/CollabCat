@@ -4,7 +4,6 @@ import type {
   PublicReward,
   GroupMember,
   InsertableReward,
-  UserPublic,
   RewardUpdateable,
 } from '@server/shared/types'
 
@@ -99,13 +98,13 @@ export const useRewardStore = defineStore('reward', {
       try {
         await trpc.rewards.claimReward.mutate({ rewardId, groupId })
 
-        if(reward.amount && reward.amount > 0){
-          const updateAmount = reward.amount -1 
+        if (reward.amount && reward.amount > 0) {
+          const updateAmount = reward.amount - 1
 
-          const updatedReward = {...reward, amount: updateAmount}
+          const updatedReward = { ...reward, amount: updateAmount }
 
           this.rewards =
-          this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
+            this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
         }
       } catch (error) {
         console.error('Failed to claim reward:', error)

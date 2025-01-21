@@ -14,13 +14,13 @@ export const requestContext = (
         sub: 'sub',
       },
     },
-    isTest: true,
     header: () => undefined,
     get: () => undefined,
   } as any,
   res: {
     cookie: () => undefined,
   } as any,
+  isTest:true,
   ...context,
 })
 

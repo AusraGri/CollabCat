@@ -22,12 +22,14 @@ const isPointsEnabled = ref(pointStore.isPointsEnabled)
 const isShowConfirmation = ref(false)
 const isManageCategories = ref(false)
 const isAdmin = computed(() => userGroupStore.isAdmin)
-const categories = computed(()=> {
-  const groupCategories = userGroupStore.categories?.filter((cat)=>cat.isDefault === false) || []
+const categories = computed(() => {
+  const groupCategories = userGroupStore.categories?.filter((cat) => cat.isDefault === false) || []
 
-  if(isAdmin.value) return groupCategories
+  if (isAdmin.value) return groupCategories
 
-  return groupCategories.filter((cat)=> cat.createdByUserId === userGroupStore.userMembership?.id ) || []
+  return (
+    groupCategories.filter((cat) => cat.createdByUserId === userGroupStore.userMembership?.id) || []
+  )
 })
 
 const removeText = computed(() => {
@@ -86,7 +88,6 @@ const processConfirmation = async (confirm: boolean) => {
   }
 }
 
-
 watch(
   () => pointStore.isEnabled,
   (newValue) => {
@@ -123,7 +124,11 @@ watch(
               </svg>
             </template>
           </FwbButton>
-          <CategoriesManager :categories="categories" :is-show-categories="isManageCategories" @close="isManageCategories=false" />
+          <CategoriesManager
+            :categories="categories"
+            :is-show-categories="isManageCategories"
+            @close="isManageCategories = false"
+          />
         </div>
       </template>
       <template #footer>

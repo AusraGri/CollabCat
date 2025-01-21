@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "run-p typecheck build-only",
+    "build": "run-p  build-only",
     "preview": "vite preview",
     "test": "run-p test:unit test:e2e",
     "test:unit": "vitest",

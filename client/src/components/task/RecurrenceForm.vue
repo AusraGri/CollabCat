@@ -11,7 +11,6 @@ const { isRecurring, pickDates } = defineProps<{
   pickDates: boolean
 }>()
 
-
 const recurrencePattern = defineModel('recurrencePattern', {
   type: [Object, null] as PropType<Partial<RecurrencePattern> | null>,
 })
@@ -94,7 +93,7 @@ const endDateMin = computed(() => {
 watch(
   () => recurrencePatternNew.value,
   (newPattern) => {
-    if(!areObjectsEqual(newPattern, recurrencePattern.value)){
+    if (!areObjectsEqual(newPattern, recurrencePattern.value)) {
       recurrencePattern.value = newPattern
     }
   },

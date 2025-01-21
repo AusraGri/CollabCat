@@ -8,23 +8,24 @@ const { isShowModal, object, action } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (event: 'confirmed', value: boolean): void;
-}>();
-
+  (event: 'confirmed', value: boolean): void
+}>()
 
 function confirmAction(confirmed: boolean) {
-  emit('confirmed', confirmed);  // Emit the confirmation result (true/false)
+  emit('confirmed', confirmed) // Emit the confirmation result (true/false)
 }
-
 </script>
 
 <template>
-  <FwbModal v-if="isShowModal" persistent >
-      <template #header>
+  <FwbModal v-if="isShowModal" persistent>
+    <template #header>
       <div class="flex items-center text-lg text-black">Please Confirm the Action</div>
     </template>
     <template #body>
-    <p>Do you really want to <span class=" text-red-600">{{ action }}</span> <span class=" font-extrabold text-base">{{ object }}</span> ?</p>
+      <p>
+        Do you really want to <span class="text-red-600">{{ action }}</span>
+        <span class="text-base font-extrabold">{{ object }}</span> ?
+      </p>
     </template>
     <template #footer>
       <div class="flex justify-between">

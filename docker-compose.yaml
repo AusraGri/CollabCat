@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: capstone
       POSTGRES_DB: capstone
     ports:
-      - "5432:5432"
+      - '5432'
     volumes:
       - capstone-db:/var/lib/postgresql/data
       - ./server/init-db:/docker-entrypoint-initdb.d
@@ -17,7 +17,6 @@ services:
     build:
       context: .
       dockerfile: ./server/Dockerfile
-    # If we would have some secrets that we want to pass:
     env_file:
       - ./server/.env
     environment:
@@ -25,7 +24,7 @@ services:
       TEST_DATABASE_URL: postgres://capstone:capstone@postgres:5432/capstone_tests
       PORT: 3000
     ports:
-      - "3000"
+      - '3000'
     depends_on:
       - postgres
 
@@ -34,9 +33,19 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
+      args:
+        VITE_API_ORIGIN: http://localhost:3000
+        VITE_API_PATH: /api/v1/trpc
+        VITE_API_SERVER_URL: http://localhost:3000
+        VITE_AUTH0_DOMAIN: dev-3qsgmfliabn71f32.eu.auth0.com
+        VITE_AUTH0_CLIENT_ID: 0MNQbCbBy2PO3pMtNM1jLsKc9SVmErjD
+        VITE_AUTH0_AUDIENCE: https://hello-world.example.com
+        VITE_AUTH0_CALLBACK_URL: http://localhost:5174/callback
+
     env_file:
       - ./client/.env
     environment:
+
       # Since our client NGINX server is not only serving static
       # files, but also routing /api requests to our API server,
       # we need to inform NGINX how it can reach the API server.
@@ -52,7 +61,7 @@ services:
       # below.
       API_PROXY_PASS: http://server:3000
     ports:
-      - "3001:80"
+      - '5174:80'
     depends_on:
       - server
 

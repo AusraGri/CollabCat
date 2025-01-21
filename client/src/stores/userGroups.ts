@@ -84,7 +84,7 @@ export const useUserGroupsStore = defineStore('group', {
 
     async createNewGroup(groupName: string) {
       try {
-        const newGroup :GroupsPublic = await trpc.groups.create.mutate({ name: groupName })
+        const newGroup: GroupsPublic = await trpc.groups.create.mutate({ name: groupName })
         if (this.userGroups) {
           this.userGroups.push(newGroup)
         } else {
@@ -108,13 +108,13 @@ export const useUserGroupsStore = defineStore('group', {
         console.error('Failed to create new group:', error)
       }
     },
-    async removeUserFromGroup(userId?:number) {
+    async removeUserFromGroup(userId?: number) {
       try {
         const userIdToRemove = userId || this.userMembership?.id
         const groupId = this.activeGroup?.id
         if (userIdToRemove && groupId) {
-          await trpc.groups.removeUser.mutate({userId: userIdToRemove, groupId})
-          await trpc.points.deletePoints.mutate({groupId})
+          await trpc.groups.removeUser.mutate({ userId: userIdToRemove, groupId })
+          await trpc.points.deletePoints.mutate({ groupId })
         }
       } catch (error) {
         console.error('Failed to create new group:', error)
@@ -124,7 +124,7 @@ export const useUserGroupsStore = defineStore('group', {
       try {
         const groupId = this.activeGroup?.id
         if (groupId) {
-          await trpc.groups.deleteGroup.mutate({groupId})
+          await trpc.groups.deleteGroup.mutate({ groupId })
         }
       } catch (error) {
         console.error('Failed to create new group:', error)

@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { type RecurrencePattern } from '@server/shared/types'
 
-const { recurrence} = defineProps<{
+const { recurrence } = defineProps<{
   recurrence: RecurrencePattern
 }>()
 
@@ -42,9 +42,16 @@ function separation(count: number) {
     <div v-if="isDaily">
       <div>{{ separationLabel }}</div>
     </div>
-    <div v-if="isWeekly" class="flex sm:space-x-3 flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0">
+    <div
+      v-if="isWeekly"
+      class="flex flex-col space-y-1 sm:flex-row sm:items-center sm:space-x-3 sm:space-y-0"
+    >
       <div v-if="recurrence.dayOfWeek" class="flex space-x-1">
-        <div v-for="day in weekdays" :key="day" class="rounded min-w-8 w-fit p-1 bg-green-500 text-white text-center">
+        <div
+          v-for="day in weekdays"
+          :key="day"
+          class="w-fit min-w-8 rounded bg-green-500 p-1 text-center text-white"
+        >
           {{ day }}
         </div>
       </div>

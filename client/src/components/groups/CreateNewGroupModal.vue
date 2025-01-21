@@ -22,12 +22,12 @@ function confirmAction(confirmed: boolean) {
 }
 
 const closeModal = () => {
-    emit('close')
+  emit('close')
 }
 </script>
 
 <template>
-  <FwbModal v-if="isShowModal"  @close="closeModal">
+  <FwbModal v-if="isShowModal" @close="closeModal">
     <template #header>
       <div class="flex items-center text-lg">Create New Group</div>
     </template>

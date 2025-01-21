@@ -33,7 +33,6 @@ const confirmInvitation = async (value: boolean) => {
   try {
     if (value) {
       await trpc.groups.addUserToGroup.mutate({ groupId: invitation.groupId })
-
     }
 
     await userStore.deleteInvitation(invitation)

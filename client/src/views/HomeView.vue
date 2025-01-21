@@ -2,12 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
-import {
-  FwbButton,
-  FwbCarousel,
-  FwbHeading,
-  FwbAvatar,
-} from 'flowbite-vue'
+import { FwbButton, FwbCarousel, FwbHeading, FwbAvatar } from 'flowbite-vue'
 import { useAuthService } from '@/services/auth0'
 import { useAuthStore } from '@/stores/authStore'
 import { useUserStore } from '@/stores/userProfile'
@@ -26,11 +21,10 @@ const pictures = [
 
 const collabCatLogo = ref(logo)
 
-
 const { getUserData } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
-const { loginWithRedirect, isAuthenticated, getAccessTokenSilently  } = useAuth0()
+const { loginWithRedirect, isAuthenticated, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 const join = async (hint: 'signup' | 'login') => {
   loginWithRedirect({
@@ -85,15 +79,17 @@ onMounted(async () => {
   }
 })
 
-watch(() => isAuthenticated.value, async (newValue) => {
-  if (newValue) {
-    await handleAuthRedirect();
+watch(
+  () => isAuthenticated.value,
+  async (newValue) => {
+    if (newValue) {
+      await handleAuthRedirect()
+    }
   }
-})
+)
 </script>
 
 <template>
-  <div>{{ isAuthenticated }}</div>
   <div class="container mx-auto dark:bg-gray-800">
     <div class="m-7 flex flex-col items-center space-x-2 sm:flex-row">
       <FwbAvatar :img="collabCatLogo" rounded size="lg" bordered />
@@ -104,7 +100,7 @@ watch(() => isAuthenticated.value, async (newValue) => {
       <FwbButton @click="join('signup')" color="alternative">SignUp</FwbButton>
       <FwbButton @click="join('login')" color="alternative">Login</FwbButton>
     </div>
-    <div class=" w-full">
+    <div class="w-full">
       <FwbCarousel :pictures="pictures" slide :slide-interval="5000" />
     </div>
     <div>

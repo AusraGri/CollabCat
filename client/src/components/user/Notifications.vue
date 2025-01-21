@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import {ref, computed} from 'vue'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
 
 const { hasNotifications = false } = defineProps<{
   hasNotifications?: boolean
 }>()
-// const hasNotifications = ref(false)
-// const isNotifications = computed(()=> hasNotifications)
-
-
 </script>
 
 <template>
@@ -17,7 +12,7 @@ const { hasNotifications = false } = defineProps<{
       <span>
         <svg
           class="h-5 w-5"
-          :class="{ 'animate-bounce text-red-500': hasNotifications}"
+          :class="{ 'animate-bounce text-red-500': hasNotifications }"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="currentColor"
@@ -29,25 +24,24 @@ const { hasNotifications = false } = defineProps<{
         </svg>
       </span>
     </template>
-    <div class=" bg-gray-200 ">
-        <div
-          class="block w-full rounded-t-lg bg-gray-200 px-4 py-2 text-center font-medium text-gray-700 dark:bg-gray-800 dark:text-white"
-        >
-          Notifications
-        </div>
-        <div>
-    <FwbListGroup>
-        <slot name="notifications" :active="hasNotifications">
-        </slot>
-        <FwbListGroupItem v-if="!hasNotifications">
-          <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-            No new notifications.
-          </div>
-        </FwbListGroupItem>
-    </FwbListGroup>
-        </div>
-        <div>
-            <a
+    <div class="bg-gray-200">
+      <div
+        class="block w-full rounded-t-lg bg-gray-200 px-4 py-2 text-center font-medium text-gray-700 dark:bg-gray-800 dark:text-white"
+      >
+        Notifications
+      </div>
+      <div>
+        <FwbListGroup>
+          <slot name="notifications" :active="hasNotifications"> </slot>
+          <FwbListGroupItem v-if="!hasNotifications">
+            <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+              No new notifications.
+            </div>
+          </FwbListGroupItem>
+        </FwbListGroup>
+      </div>
+      <div>
+        <a
           href="#"
           class="block w-full rounded-b-lg bg-gray-200 py-2 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
         >
@@ -66,9 +60,8 @@ const { hasNotifications = false } = defineProps<{
             View all
           </div>
         </a>
-        </div>
+      </div>
     </div>
-
   </FwbDropdown>
 </template>
 <style scoped></style>

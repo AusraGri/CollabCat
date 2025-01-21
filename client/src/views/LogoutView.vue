@@ -1,91 +1,14 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
-import { useAuthService } from '@/services/auth0'
-import { useAuthStore } from '@/stores/authStore'
-import { useUserStore } from '@/stores/userProfile'
-import { useAuth0 } from '@auth0/auth0-vue'
-import { trpc } from '@/trpc'
-// import PageForm from '@/components/PageForm.vue'
-// import { FwbAlert, FwbButton, FwbInput } from 'flowbite-vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-// import useErrorMessage from '@/composables/useErrorMessage'
 
 const router = useRouter()
-const { getUserData } = useAuthService()
-const authStore = useAuthStore()
-const userStore = useUserStore()
-const { loginWithRedirect, isAuthenticated, getAccessTokenSilently  } = useAuth0()
 
-// const userForm = ref({
-//   email: 'test@email.com',
-//   password: 'SomePassword',
-// })
-
-// const [submitLogin, errorMessage] = useErrorMessage(async () => {
-//   // await login(userForm.value)
-
-//   // Support redirects back to the page the user was on before logging in
-//   // if it is provided in the query string:
-//   // :to="/login?redirect=/some-page-to-go/after-login"
-//   const redirectTo = (router.currentRoute.value.query.redirect as string) ?? {
-//     name: 'WriteArticle',
-//   }
-
-//   router.push(redirectTo)
-// })
-
-
-onMounted(()=> {
-  router.push({name: 'Home' })
+onMounted(() => {
+  router.push({ name: 'Home' })
 })
 </script>
 
 <template>
-  <div> Successfully logged out</div>
-  <!-- <PageForm heading="Log in to your account" formLabel="Login" @submit="submitLogin">
-    <template #default>
-      <FwbInput
-        label="Email"
-        type="email"
-        autocomplete="username"
-        v-model="userForm.email"
-        :required="true"
-      />
-
-      <FwbInput
-        label="Password"
-        id="password"
-        name="password"
-        type="password"
-        autocomplete="current-password"
-        v-model="userForm.password"
-        :required="true"
-      />
-
-      <FwbAlert v-if="errorMessage" data-testid="errorMessage" type="danger">
-        {{ errorMessage }}
-      </FwbAlert>
-
-      <div class="grid">
-        <FwbButton color="default" type="submit" size="xl">Log in</FwbButton>
-      </div>
-    </template>
-
-    <template #footer>
-      <FwbAlert class="bg-transparent text-center">
-        Not a member?
-        <RouterLink
-          to="/signup"
-          class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-        >
-          Sign up
-        </RouterLink>
-        <br />
-        or go
-        <RouterLink to="/" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-          back home
-        </RouterLink>
-      </FwbAlert>
-    </template>
-  </PageForm> -->
+  <div>Successfully logged out</div>
 </template>

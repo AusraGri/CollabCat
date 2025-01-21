@@ -11,16 +11,15 @@ const props = defineProps({
 })
 const users = ref()
 
-onMounted(async()=> {
-users.value = await trpc.user.getAssignedUsers.query(props.taskId)
+onMounted(async () => {
+  users.value = await trpc.user.getAssignedUsers.query(props.taskId)
 })
-
 </script>
 
 <template>
-    <div v-for="user in users" :key="user.id" class="flex w-full rounded-b bg-orange-100 p-1">
-      <FwbAvatar v-if="user.picture" :image="user.picture" rounded size="sm" />
-      <div>{{ user.username }}</div>
-    </div>
+  <div v-for="user in users" :key="user.id" class="flex w-full rounded-b bg-orange-100 p-1">
+    <FwbAvatar v-if="user.picture" :image="user.picture" rounded size="sm" />
+    <div>{{ user.username }}</div>
+  </div>
 </template>
 <style scoped></style>

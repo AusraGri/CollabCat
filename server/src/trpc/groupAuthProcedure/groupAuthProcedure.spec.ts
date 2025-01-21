@@ -32,15 +32,9 @@ await insertAll(db, 'userGroups', [
   fakeUserGroup({ userId: userTwo.id, groupId: groupTwo.id }),
 ])
 
-const mockReq = {
-  isTest: true,
-} as any
-
-const mockRes = {} as any
-
 const createCaller = createCallerFactory(routes)
 const authenticated = createCaller(
-  authGroupContext({ db, req: mockReq, res: mockRes }, userOne, {
+  authGroupContext({ db }, userOne, {
     groupId: groupOne.id,
     role: 'Admin',
   })
@@ -58,7 +52,7 @@ it('should throw an error if groupId is not provided', async () => {
 
 it('should throw an error if user provides a non-existing groupId', async () => {
   const notAuthenticated = createCaller(
-    authContext({ db, req: mockReq, res: mockRes }, userOne)
+    authContext({ db }, userOne)
   )
   await expect(
     (notAuthenticated.testCall as any)({ groupId: 999 })

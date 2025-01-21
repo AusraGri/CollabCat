@@ -1,7 +1,6 @@
-import { createRouter, createWebHistory} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import UserLayout from '@/layouts/UserLayout.vue'
-import GroupLayout from '../layouts/GroupLayout.vue'
 import TasksView from '../views/TasksView.vue'
 import { authenticate } from './guards'
 
@@ -48,13 +47,13 @@ const router = createRouter({
               path: 'tasks',
               name: 'Tasks',
               component: TasksView,
-              meta: { group: true }
+              meta: { group: true },
             },
             {
               path: 'calendar',
               name: 'Calendar',
               component: () => import('../views/CalendarView.vue'),
-              meta: { group: true }
+              meta: { group: true },
             },
           ],
         },
@@ -62,22 +61,21 @@ const router = createRouter({
           path: '',
           name: 'Profile',
           // component: GroupLayout,
-          meta: { personal: true }, 
+          meta: { personal: true },
           children: [
             {
               path: 'tasks',
               name: 'PersonalTasks',
               component: TasksView,
-              meta: { personal: true }
+              meta: { personal: true },
             },
             {
               path: 'calendar',
               name: 'PersonalCalendar',
               component: () => import('../views/CalendarView.vue'),
-              meta: { personal: true }
+              meta: { personal: true },
             },
-
-          ]
+          ],
         },
       ],
     },

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import {
   FwbAccordion,
   FwbAccordionHeader,
@@ -11,7 +10,7 @@ import {
 <template>
   <div>
     <FwbAccordion>
-        <FwbAccordionPanel>
+      <FwbAccordionPanel>
         <FwbAccordionHeader>CollabCat: Task Management Made Fun!</FwbAccordionHeader>
         <FwbAccordionContent>
           <div>
@@ -46,7 +45,6 @@ import {
           </div>
         </FwbAccordionContent>
       </FwbAccordionPanel>
-      
     </FwbAccordion>
   </div>
 </template>

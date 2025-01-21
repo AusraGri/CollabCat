@@ -1,11 +1,6 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type {
-  PublicInvitation,
-  CategoriesPublic,
-  TaskData,
-  UserPublic
-} from '@server/shared/types'
+import type { PublicInvitation, CategoriesPublic, TaskData, UserPublic } from '@server/shared/types'
 
 interface UserUpdate {
   picture?: string

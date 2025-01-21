@@ -8,7 +8,6 @@ import {
   type CategoriesPublic,
   type GroupMember,
   type RecurrencePatternInsertable,
-  type TaskData,
 } from '@server/shared/types'
 import MembersSelection from '../groups/MembersSelection.vue'
 
@@ -33,8 +32,8 @@ const tasksStore = useTasksStore()
 const selectedCategory = ref<string | undefined>()
 const selectedMembers = ref<number[]>([])
 const recurringPattern = ref<RecurrencePatternInsertable>()
-const startDate = ref<Date | string >()
-const endDate = ref<Date | string >()
+const startDate = ref<Date | string>()
+const endDate = ref<Date | string>()
 const points = ref<string>('')
 
 const taskData = computed(() => {
@@ -49,9 +48,9 @@ const taskData = computed(() => {
   const newTaskData = {
     title: taskForm.value.title,
     categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
-    description: taskForm.value.description ? taskForm.value.description: undefined,
+    description: taskForm.value.description ? taskForm.value.description : undefined,
     endDate: endDate.value ? endDate.value.toString() : undefined,
-    startDate: startDate.value? startDate.value.toString() : undefined,
+    startDate: startDate.value ? startDate.value.toString() : undefined,
     isRecurring: taskForm.value.isRecurring,
     startTime: taskForm.value.isTime ? taskTime : undefined,
     groupId: groupId ? groupId : undefined,
@@ -69,7 +68,6 @@ const taskForm = ref({
   isTime: false,
   isPoints: false,
 })
-
 
 function closeModal() {
   taskForm.value.isRecurring = false
@@ -134,7 +132,7 @@ const resetForm = () => {
             type="text"
             label="Task Title"
             placeholder="Enter task title"
-            maxlength = "40"
+            maxlength="40"
             required
           />
         </div>
@@ -146,7 +144,7 @@ const resetForm = () => {
             :rows="1"
             label="Description"
             placeholder="Enter task description"
-            maxlength = "150"
+            maxlength="150"
           />
         </div>
 
@@ -158,7 +156,7 @@ const resetForm = () => {
           <RecurrenceForm
             :is-recurring="taskForm.isRecurring"
             :pick-dates="true"
-           v-model:recurrence-pattern="recurringPattern"
+            v-model:recurrence-pattern="recurringPattern"
             v-model:start-date="startDate"
             v-model:end-date="endDate"
           />
@@ -166,7 +164,7 @@ const resetForm = () => {
         <!-- Date and Time Input -->
         <div v-if="!taskForm.isRecurring" class="flex flex-col">
           <div class="flex items-center whitespace-nowrap">
-            <label for="dueDate" class="mr-2 w-20 text-sm ">Task Date</label>
+            <label for="dueDate" class="mr-2 w-20 text-sm">Task Date</label>
             <VueDatePicker
               v-model="startDate"
               id="dueDate"
@@ -180,11 +178,19 @@ const resetForm = () => {
           </div>
         </div>
         <div v-if="categories">
-          <CategorySelect v-model:selected-category="selectedCategory" :categories="categories" :label="'Select Category'"/>
+          <CategorySelect
+            v-model:selected-category="selectedCategory"
+            :categories="categories"
+            :label="'Select Category'"
+          />
         </div>
         <div v-if="groupMembers" class="flex items-center space-x-3">
           <span class="text-sm">Assign To:</span>
-          <MembersSelection :selected-members="selectedMembers" :group-members="groupMembers" :max-selections="1" />
+          <MembersSelection
+            :selected-members="selectedMembers"
+            :group-members="groupMembers"
+            :max-selections="1"
+          />
         </div>
         <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
           <div>

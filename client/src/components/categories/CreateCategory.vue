@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { trpc } from '@/trpc'
-import type { CategoriesPublic} from '@server/shared/types'
+import type { CategoriesPublic } from '@server/shared/types'
 import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
 import { ref } from 'vue'
 

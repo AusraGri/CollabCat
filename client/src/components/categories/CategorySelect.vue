@@ -14,7 +14,7 @@ const categoryOptions = computed(() => {
     value: String(category.id),
     name: category.title,
   }))
-  return [ ...userCategories, { value: '', name: '-- No Category --' }]
+  return [...userCategories, { value: '', name: '-- No Category --' }]
 })
 </script>
 

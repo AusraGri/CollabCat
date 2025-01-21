@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref, watchEffect, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbAvatar } from 'flowbite-vue'
 import { useUserGroupsStore } from '@/stores/userGroups'
 import InviteUsers from './InviteUsers.vue'
 
 const userGroupStore = useUserGroupsStore()
 const isShowInvite = ref(false)
-const members = computed(()=>userGroupStore.groupMembers)
+const members = computed(() => userGroupStore.groupMembers)
 
 const openMemberSettings = () => {
-  if(!userGroupStore.isAdmin) return
+  if (!userGroupStore.isAdmin) return
 
   console.log('opening settings...')
 }
@@ -29,11 +29,11 @@ const handleInvitation = async (email: string) => {
   <div class="w-full">
     <FwbDropdown>
       <template #trigger>
-      <!-- <span class=" self-center p-3 bg-slate-300 rounded cursor-pointer hover:bg-blue-100">
+        <!-- <span class=" self-center p-3 bg-slate-300 rounded cursor-pointer hover:bg-blue-100">
         Members
       </span> -->
-      <slot name="trigger"></slot>
-    </template>
+        <slot name="trigger"></slot>
+      </template>
       <fwb-list-group>
         <FwbListGroupItem v-for="member in members" :key="member.id" hover>
           <button @click="openMemberSettings">

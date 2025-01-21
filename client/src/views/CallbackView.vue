@@ -1,9 +1,3 @@
-<template>
-  <div>
-    <p>Loading...</p>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { onMounted } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
@@ -16,7 +10,7 @@ import { useUserStore } from '@/stores/userProfile'
 const { getUserData } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
-const { loginWithRedirect, isAuthenticated, getAccessTokenSilently  } = useAuth0()
+const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 
 const handleAuthRedirect = async () => {
@@ -60,3 +54,8 @@ onMounted(async () => {
   }
 })
 </script>
+<template>
+  <div>
+    <p>Loading...</p>
+  </div>
+</template>

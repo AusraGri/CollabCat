@@ -230,7 +230,7 @@ const saveChanges = () => {
     ...editableTask.value,
     categoryId: selectedCategory.value ? Number(selectedCategory.value) : null,
     assignedUserId: assignedMember.value,
-    isRecurring: editableTask.value.recurrence ?  true : false
+    isRecurring: editableTask.value.recurrence ? true : false,
   }
   emit('update:task', updatedTask)
   emit('close')
@@ -325,7 +325,10 @@ const saveChanges = () => {
               </div>
             </div>
           </div>
-          <div v-if="editableTask.startTime && editableTask.startDate" class="flex items-center space-x-3 text-sm">
+          <div
+            v-if="editableTask.startTime && editableTask.startDate"
+            class="flex items-center space-x-3 text-sm"
+          >
             <span>
               <ClockIcon />
             </span>

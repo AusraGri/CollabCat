@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { PointsPublic } from '@server/shared/types'
 
-
 interface PointsState {
   pointsData: PointsPublic | null
   isEnabled: boolean
@@ -52,9 +51,9 @@ export const usePointsStore = defineStore('points', {
       }
     },
     async disablePoints(): Promise<void> {
-        const groupId = this.pointsData?.groupId || undefined
+      const groupId = this.pointsData?.groupId || undefined
       try {
-         await trpc.points.deletePoints.mutate({
+        await trpc.points.deletePoints.mutate({
           groupId,
         })
 
@@ -65,12 +64,12 @@ export const usePointsStore = defineStore('points', {
       }
     },
     async alterPoints(action: '+' | '-', points: number): Promise<void> {
-        const groupId = this.pointsData?.groupId || undefined
+      const groupId = this.pointsData?.groupId || undefined
       try {
-         const result = await trpc.points.alterPoints.mutate({
+        const result = await trpc.points.alterPoints.mutate({
           groupId,
           action,
-          points
+          points,
         })
 
         this.isEnabled = !!result

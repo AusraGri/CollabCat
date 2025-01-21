@@ -22,7 +22,7 @@ function confirmAction(confirmed: boolean) {
 }
 
 const closeModal = () => {
-    emit('close')
+  emit('close')
 }
 </script>
 <template>
@@ -32,7 +32,7 @@ const closeModal = () => {
     </template>
     <template #body>
       <div>
-          <FwbInput label="User Email" placeholder="enter user email" v-model="email" required />
+        <FwbInput label="User Email" placeholder="enter user email" v-model="email" required />
       </div>
     </template>
     <template #footer>

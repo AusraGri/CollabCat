@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRewardStore } from '@/stores/rewardStore'
-import {
-  FwbButton,
-  FwbModal,
-  FwbInput,
-  FwbRange,
-  FwbToggle,
-} from 'flowbite-vue'
+import { FwbButton, FwbModal, FwbInput, FwbRange, FwbToggle } from 'flowbite-vue'
 import type { PublicReward, RewardUpdateable, InsertableReward } from '@server/shared/types'
 import MembersSelection from '../groups/MembersSelection.vue'
 

@@ -15,7 +15,7 @@ const isCreateNewGroup = ref(false)
 const selected = computed(() => userGroupStore.activeGroup?.name)
 const dropdownRef = ref<HTMLElement | null>(null)
 
-const selectItem = async (group: GroupsPublic):Promise<void> => {
+const selectItem = async (group: GroupsPublic): Promise<void> => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdByUserId, ...activeGroup } = group
   userGroupStore.activeGroup = activeGroup
@@ -92,7 +92,9 @@ const handleNoGroup = () => {
           {{ group.name }}
         </fwb-list-group-item>
         <FwbListGroupItem v-if="!groups.length">You have no groups 👇</FwbListGroupItem>
-        <FwbListGroupItem v-if="selected" hover @click="handleNoGroup">-- No Group --</FwbListGroupItem>
+        <FwbListGroupItem v-if="selected" hover @click="handleNoGroup"
+          >-- No Group --</FwbListGroupItem
+        >
       </fwb-list-group>
       <div class="my-1 border-t border-gray-200"></div>
       <button

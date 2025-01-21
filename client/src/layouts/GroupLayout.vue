@@ -10,7 +10,6 @@ import Rewards from '@/components/rewards/Rewards.vue'
 import GroupSettings from '@/components/groups/GroupSettings.vue'
 import Tab from '@/components/Tab.vue'
 
-
 const userGroupStore = useUserGroupsStore()
 const rewardStore = useRewardStore()
 const userStore = useUserStore()
@@ -84,9 +83,9 @@ function handleTabClick(tabName: string) {
     })
 }
 
-onMounted(async ()=>{
-  const tab =  route.name ? route.name.toString().replace(/^Personal/, '') :  'Calendar'
-  activeTab.value =  tab
+onMounted(async () => {
+  const tab = route.name ? route.name.toString().replace(/^Personal/, '') : 'Calendar'
+  activeTab.value = tab
 
   if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
     await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)
@@ -101,18 +100,19 @@ onMounted(async ()=>{
     }
     await rewardStore.managePersonalRewards(userInfo)
   }
-
 })
 </script>
 <template>
-  <div class=" flex flex-col">
-    <div :class="['flex','justify-end','pr-3', {'border-r-2 border-gray-300' : isUserInGroupPage}]">
-      <div class=" inline-flex space-x-2 w-96">
+  <div class="flex flex-col">
+    <div
+      :class="['flex', 'justify-end', 'pr-3', { 'border-r-2 border-gray-300': isUserInGroupPage }]"
+    >
+      <div class="inline-flex w-96 space-x-2">
         <Tab :title="'Calendar'" :isActive="activeTab" @tab-click="handleTabClick" />
         <Tab :title="'Tasks'" :isActive="activeTab" @tab-click="handleTabClick" />
         <Rewards @reward:claimed="handleRewardClaim">
           <template #trigger>
-            <Tab :title="'Rewards'" :custom-tailwind-classes="'border-red-500'"/>
+            <Tab :title="'Rewards'" :custom-tailwind-classes="'border-red-500'" />
           </template>
         </Rewards>
       </div>
@@ -127,8 +127,15 @@ onMounted(async ()=>{
           </GroupMembers>
         </div>
         <div>
-          <Tab :title="'Settings'" @tab-click="openGroupSettings" :custom-tailwind-classes="'border-gray-300 text-gray-500'"/>
-          <GroupSettings :is-show-modal="isShowGroupSettings" @close="isShowGroupSettings = false" />
+          <Tab
+            :title="'Settings'"
+            @tab-click="openGroupSettings"
+            :custom-tailwind-classes="'border-gray-300 text-gray-500'"
+          />
+          <GroupSettings
+            :is-show-modal="isShowGroupSettings"
+            @close="isShowGroupSettings = false"
+          />
         </div>
       </div>
     </div>

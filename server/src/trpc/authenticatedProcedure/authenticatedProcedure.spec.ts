@@ -41,14 +41,9 @@ const reposUserUndefined = {
   } satisfies Partial<UserRepository>,
 }
 
-const mockReq = {
-  isTest: true,
-} as any
-const mockRes = {} as any
-
 const db = {} as any
 const authenticated = createCaller(
-  authContext({ db, req: mockReq, res: mockRes })
+  authContext({ db})
 )
 
 it('should pass if user is already authenticated', async () => {

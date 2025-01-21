@@ -11,6 +11,7 @@ export const auth0 = createAuth0({
 })
 
 export const useAuthService = () => {
+
   const { loginWithRedirect, getAccessTokenSilently, user, isAuthenticated, logout } = useAuth0()
 
   const login = async (targetPath: string = '/') => {

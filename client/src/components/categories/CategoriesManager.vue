@@ -48,7 +48,10 @@ const deleteCategory = async (confirmed: boolean) => {
       </template>
       <template #body>
         <FwbListGroup v-for="category in categories" :key="category.id" class="w-full">
-          <FwbListGroupItem class="flex w-full justify-between whitespace-nowrap tracking-wider" hover>
+          <FwbListGroupItem
+            class="flex w-full justify-between whitespace-nowrap tracking-wider"
+            hover
+          >
             <span>{{ category.title }}</span>
             <FwbButton
               class="w-fit p-1 text-left"

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
-import {  FwbListGroupItem, } from 'flowbite-vue'
+import { FwbListGroupItem } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
 import { useUserStore, useUserGroupsStore, usePointsStore } from '@/stores'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
-import { useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 import { stringToUrl } from '@/utils/helpers'
 import GroupLayout from './GroupLayout.vue'
 
@@ -25,10 +25,9 @@ onMounted(async () => {
     await userGroupStore.fetchGroupData()
     await userGroupStore.fetchUserMembershipInfo()
   }
-    await refreshInvitations()
-    await userStore.fetchUserTasks()
-    await pointStore.managePoints(activeGroupId.value)
-
+  await refreshInvitations()
+  await userStore.fetchUserTasks()
+  await pointStore.managePoints(activeGroupId.value)
 })
 
 const refreshInvitations = async () => {
@@ -39,7 +38,6 @@ const refreshInvitations = async () => {
 watch(
   () => userGroupStore.activeGroup?.name,
   async (newGroupName, oldGroupName) => {
-
     const isNewValue = newGroupName !== oldGroupName && newGroupName
     if (userGroupStore.activeGroup === null) {
       router.push({ name: 'PersonalCalendar' })
@@ -56,7 +54,6 @@ watch(
     }
 
     await pointStore.managePoints(activeGroupId.value)
-
   }
 )
 </script>

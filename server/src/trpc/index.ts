@@ -17,6 +17,7 @@ export type Context = {
   authUser?: AuthUser
   userGroup?: AuthGroup
   repos?: Partial<Repositories>
+  isTest?: boolean
 }
 
 export type ContextMinimal = Pick<Context, 'db'>

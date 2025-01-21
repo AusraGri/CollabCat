@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useAuth0 } from '@auth0/auth0-vue'
 import { useUserStore, usePointsStore } from '@/stores'
 import { useAuthStore } from '@/stores/authStore'
 import { useAuthService } from '@/services/auth0'
@@ -23,7 +22,6 @@ const avatar = computed(() => (user.picture ? user.picture : undefined))
 const router = useRouter()
 const authStore = useAuthStore()
 const userStore = useUserStore()
-// const { logout } = useAuth0()
 
 const { logout } = useAuthService()
 
@@ -63,9 +61,9 @@ onMounted(() => {
         <template #trigger>
           <span class="flex items-center hover:cursor-pointer">
             <FwbAvatar :img="avatar" rounded bordered size="lg" class="align-middle" />
-            <div class="flex flex-col h-full">
-              <span v-if="user.username" class="cursor-default mt-5 ml-3 ">{{ user.username }}</span>
-              <div class=" h-5 ml-0">
+            <div class="flex h-full flex-col">
+              <span v-if="user.username" class="ml-3 mt-5 cursor-default">{{ user.username }}</span>
+              <div class="ml-0 h-5">
                 <Points v-if="pointsStore.isPointsEnabled" :points="pointsStore.userPoints" />
               </div>
             </div>
