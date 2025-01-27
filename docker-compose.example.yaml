@@ -35,13 +35,13 @@ services:
       dockerfile: ./client/Dockerfile
       args:
       # provide needed environmental variables in the .env (client side) file
-      # and run  'ocker compose --env-file ./client/.env up --buildup --build'
+      # and run  'docker compose --env-file ./client/.env up --buildup --build'
         VITE_AUTH0_DOMAIN: ${VITE_AUTH0_DOMAIN}
         VITE_AUTH0_CLIENT_ID: ${VITE_AUTH0_CLIENT_ID}
         VITE_AUTH0_AUDIENCE: ${VITE_AUTH0_AUDIENCE}
         VITE_AUTH0_CALLBACK_URL: ${VITE_AUTH0_CALLBACK_URL}
 
-      # or directly hard-code variables here and then no need to use  'ocker compose --env-file ./client/.env up --build'
+      # or directly hard-code variables here and then no need to use  'docker compose --env-file ./client/.env up --build'
         VITE_AUTH0_DOMAIN: your auht0 domain
         VITE_AUTH0_CLIENT_ID: your auth0 client id
         VITE_AUTH0_AUDIENCE: auht0 audience

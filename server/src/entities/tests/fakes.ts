@@ -107,12 +107,15 @@ export const fakeUserGroup = <T extends Partial<Insertable<UserGroups>>>(
  * Generates a fake category with some default test data.
  * @param overrides createdByUserId and any properties that should be different from default fake data.
  */
-export const fakeCategory = <T extends Partial<Insertable<Groups>>>(
-  overrides: T
+export const fakeCategory = <T extends Partial<Insertable<Categories>>>(
+  overrides: T = {} as T
 ) =>
   ({
     title: random.string().slice(0, 7),
     createdByUserId: randomId(),
+    groupId: null,
+    isDefault: false,
+    isGroupDefault: false,
     ...overrides,
   }) satisfies Insertable<Categories>
 

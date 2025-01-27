@@ -34,7 +34,7 @@ WORKDIR /app/client
 RUN npm run build
 
 # Stage 2: Serve the application with Nginx
-FROM nginx:1.27.0-alpine3.19 as nginx
+FROM nginx:1.27.0-alpine3.19 AS nginx
 
 # Delete the default welcome page.
 RUN rm /usr/share/nginx/html/* -rf
@@ -42,23 +42,13 @@ RUN rm /usr/share/nginx/html/* -rf
 # Copy the built client app assets to the Nginx directory
 COPY --from=builder /app/client/dist /usr/share/nginx/html
 
-# ARG VITE_AUTH0_DOMAIN
-# ARG VITE_AUTH0_CLIENT
-# ARG VITE_AUTH0_AUDIENCE
-# ARG VITE_AUTH0_CALLBACK_URL
-
-# ENV VITE_AUTH0_DOMAIN=$VITE_AUTH0_DOMAIN
-# ENV VITE_AUTH0_CLIENT=$VITE_AUTH0_CLIENT
-# ENV VITE_AUTH0_AUDIENCE=$VITE_AUTH0_AUDIENCE
-# ENV VITE_AUTH0_CALLBACK_URL=$VITE_AUTH0_CALLBACK_URL
-
 # We will perform some environment variable substitution in the Nginx configuration.
 # NGINX does not allow using environment variables in the configuration files.
 # However, NGINX allows creating a template file (notice client/nginx/default.conf.template)
 # that can be used to generate the actual configuration file. Here we will set
 # an NGINX-specific environment variable that will be used to specify the output directory,
 # which is the default NGINX config directory.
-ENV NGINX_ENVSUBST_OUTPUT_DIR '/etc/nginx/conf.d'
+ENV NGINX_ENVSUBST_OUTPUT_DIR='/etc/nginx/conf.d'
 
 # Copy the Nginx configuration
 COPY client/nginx/default.conf.template /etc/nginx/templates/default.conf.template
