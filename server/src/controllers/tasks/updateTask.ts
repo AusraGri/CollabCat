@@ -2,7 +2,6 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { taskUpdateSchema, taskDataSchema } from '@server/entities/tasks'
-import { z } from 'zod'
 import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default authenticatedProcedure

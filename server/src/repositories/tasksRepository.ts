@@ -138,10 +138,6 @@ export function tasksRepository(db: Database) {
         query = query.limit(options.limit)
       }
 
-      if (options.groupId === undefined) {
-        query = query.where('groupId', 'is', null)
-      }
-
       return query.execute()
     },
 

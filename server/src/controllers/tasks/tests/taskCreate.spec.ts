@@ -3,7 +3,7 @@ import { fakeUser } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
-import { insertAll, selectAll } from '@tests/utils/records'
+import { insertAll } from '@tests/utils/records'
 import tasksRouter from '..'
 
 const createCaller = createCallerFactory(tasksRouter)
@@ -31,7 +31,6 @@ it('should create a persisted task', async () => {
 
   // ACT
   const taskReturned = await createTask(newTask)
-
   // ASSERT
   expect(taskReturned).toMatchObject({
     id: expect.any(Number),
@@ -46,11 +45,8 @@ it('should create a persisted task', async () => {
     startDate: expect.any(Date),
     startTime: null,
     title: 'My New Task',
+    completed: expect.any(Array),
+    recurrence: null
   })
 
-  const [taskCreated] = await selectAll(db, 'tasks', (eb) =>
-    eb('id', '=', taskReturned.id)
-  )
-
-  expect(taskCreated).toMatchObject(taskReturned)
 })

@@ -55,9 +55,9 @@ export const useTasksStore = defineStore('tasks', {
     async getPersonalTasks(userId: number) {
       try {
         const tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
-        this.tasks = tasks
+        this.tasks = tasks.filter((task)=> task.groupId === null)
 
-        return tasks
+        return this.tasks
       } catch (error) {
         throw new Error('Failed to fetch group tasks')
       }
