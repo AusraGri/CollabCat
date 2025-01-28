@@ -37,7 +37,7 @@ export const useRewardStore = defineStore('reward', {
   actions: {
     async manageGroupRewards(groupId: number) {
       try {
-        const data = await trpc.groups.getGroupData.query({ groupId })
+        const data = await trpc.groups.getGroupMembersAndRewards.query({ groupId })
 
         if (!data) throw new Error('Failed to initialize group rewards')
         this.groupId = data.id
@@ -87,7 +87,8 @@ export const useRewardStore = defineStore('reward', {
       }
       try {
         const reward = await trpc.rewards.create.mutate(newReward)
-        this.rewards?.push(reward)
+
+        this.rewards = this.rewards ? [...this.rewards, reward] : [reward]
       } catch (error) {
         console.error('Failed to create new reward:', error)
       }

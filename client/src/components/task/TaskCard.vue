@@ -100,8 +100,7 @@ const updateTask = async (updatedTask: TaskData) => {
     recurrence,
   }
   try {
-    const [task] = await taskStore.updateTask(updateTaskData)
-    emit('task:updated', task)
+    await taskStore.updateTask(updateTaskData)
   } catch (error) {
     console.log(error)
   }
@@ -110,17 +109,14 @@ const updateTask = async (updatedTask: TaskData) => {
 const deleteTask = async () => {
   const taskId = props.task.id
   try {
-    const result = await taskStore.deleteTask(taskId)
+    await taskStore.deleteTask(taskId)
 
-    if (result) {
-      emit('task:deleted', taskId)
-    }
   } catch (error) {
     console.log(error)
   }
 }
 
-const updateTaskStatus = (value: boolean) => {
+const updateTaskStatus = async (value: boolean) => {
   const taskData = {
     isCompleted: value,
     id: props.task.id,

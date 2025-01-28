@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import { FwbButton, FwbSelect } from 'flowbite-vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import { useTasksStore, useUserGroupsStore, usePointsStore } from '@/stores'
+import { useTasksStore, useUserGroupsStore, usePointsStore} from '@/stores'
 import TaskCard from '@/components/task/TaskCard.vue'
 import moment from 'moment'
 import { type TaskData } from '@server/shared/types'
@@ -127,6 +127,10 @@ watch(
 onMounted(async () => {
   await fetchDueTasks(date.value)
   isLoading.value = false
+})
+
+watch(()=> groupId.value, async()=> {
+  await fetchDueTasks(date.value)
 })
 </script>
 

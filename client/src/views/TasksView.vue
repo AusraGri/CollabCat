@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useUserGroupsStore, useUserStore, usePointsStore, useTasksStore } from '@/stores'
 import CreateTask from '../components/task/CreateTask.vue'
 import CreateCategory from '@/components/categories/CreateCategory.vue'
@@ -49,36 +49,15 @@ const groups = computed(() => {
   return undefined
 })
 
-const allTasks = computed(() => {
-  if (isGroupTasks.value && userGroupStore.tasks) {
-    return userGroupStore.tasks
-  }
-  if (userStore.tasks) {
-    return userStore.tasks
-  }
-
-  return []
-})
-
+const allTasks = computed(() => taskStore.tasks)
 const tasks = computed(() => {
   const selectedCategoryId = selectedCategory.value ? selectedCategory.value : undefined
-  if (isGroupTasks.value && userGroupStore.tasks) {
-    const filteredTasks = filterTasksByCategoryId({
-      tasks: userGroupStore.tasks,
-      categoryId: selectedCategoryId,
-    })
-    return filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
-  }
+  const filteredTasks = filterTasksByCategoryId({
+    tasks: allTasks.value,
+    categoryId: selectedCategoryId,
+  })
 
-  if (userStore.tasks) {
-    const filteredTasks = filterTasksByCategoryId({
-      tasks: userStore.tasks,
-      categoryId: selectedCategoryId,
-    })
-    return filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
-  }
-
-  return []
+  return filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
 })
 
 function showCount(name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
@@ -100,34 +79,6 @@ const toggleCategoryModal = () => {
   isNewCategory.value = !isNewCategory.value
 }
 
-const updateTasksData = (updatedTask: TaskData) => {
-  if (userGroupStore.tasks && isGroupTasks.value) {
-    const index = userGroupStore.tasks?.findIndex((task) => task.id === updatedTask.id)
-
-    if (index !== -1) {
-      userGroupStore.tasks[index] = updatedTask
-    }
-
-    return
-  }
-  if (userStore.tasks && !isGroupTasks.value) {
-    const index = userStore.tasks?.findIndex((task) => task.id === updatedTask.id)
-
-    if (index !== -1) {
-      userStore.tasks[index] = updatedTask
-    }
-
-    return
-  }
-}
-
-const handleNewTask = (task: TaskData) => {
-  if (isGroupTasks.value) {
-    userGroupStore.tasks?.push(task)
-    return
-  }
-  userStore.tasks?.push(task)
-}
 const handleDefaultTypeTabClick = (tabTitle: string) => {
   const selected = selectedType.value
 
@@ -139,17 +90,11 @@ const handleDefaultTypeTabClick = (tabTitle: string) => {
   selectedType.value = tabTitle
 }
 
-const handleTaskDeletion = (taskId: number) => {
-  if (userGroupStore.tasks && isGroupTasks.value) {
-    userGroupStore.tasks = userGroupStore.tasks.filter((task) => task.id !== taskId)
-  }
-  if (userStore.tasks && !isGroupTasks.value) {
-    userStore.tasks = userStore.tasks.filter((task) => task.id !== taskId)
-  }
-}
-
 const toggleShowTypes = () => {
   toggle(isShowTypes)
+  if(!isShowTypes.value){
+     selectedType.value = ''
+  }
 }
 const handleTaskStatusChange = async (taskData: {
   id: number
@@ -189,6 +134,28 @@ const handleTaskStatusChange = async (taskData: {
     console.log('Failed to update task status', error)
   }
 }
+
+onMounted(async () => {
+  if (groupId.value) {
+    await taskStore.getGroupTasks(groupId.value)
+  } else if (userStore.user) {
+    await taskStore.getPersonalTasks(userStore.user.id)
+  }
+})
+
+watch(
+  () => groupId.value,
+  async (newValue) => {
+    if (newValue) {
+      await taskStore.getGroupTasks(newValue)
+      return
+    }
+
+    if (userStore.user && !newValue) {
+      await taskStore.getPersonalTasks(userStore.user.id)
+    }
+  }
+)
 </script>
 <template>
   <div class="flex flex-col justify-start">
@@ -272,6 +239,7 @@ const handleTaskStatusChange = async (taskData: {
           >{{ showCount('Scheduled') }}</TabRev
         >
         <TabRev
+          v-if="isGroupTasks"
           :title="'Not Assigned'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
@@ -287,7 +255,6 @@ const handleTaskStatusChange = async (taskData: {
       :group-members="members"
       :categories="categories"
       @close="toggleTaskModal"
-      @task:new="handleNewTask"
     />
     <CreateCategory
       :is-show-modal="isNewCategory"
@@ -296,7 +263,7 @@ const handleTaskStatusChange = async (taskData: {
       @close="toggleCategoryModal"
     />
   </div>
-  <div class="flex justify-between">
+  <div class="flex justify-between mt-3 ">
     <div v-if="tasks">
       <div v-for="task in tasks" :key="task.id">
         <TaskCard
@@ -305,13 +272,11 @@ const handleTaskStatusChange = async (taskData: {
           :group-members="members"
           :groups="groups"
           :is-checkbox="!task.startDate"
-          @task:updated="updateTasksData"
-          @task:deleted="handleTaskDeletion"
           @task:status="handleTaskStatusChange"
         />
       </div>
     </div>
-    <div v-if="categories">
+    <div v-if="categories" class="w-fit">
       <CategoryList :categories="categories" v-model:selected-category="selectedCategory" />
     </div>
   </div>

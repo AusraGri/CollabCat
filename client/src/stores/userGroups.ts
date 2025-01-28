@@ -26,10 +26,10 @@ interface GroupsState {
   activeGroup: ActiveGroup | null
   userMembership: GroupMember | null
   groupMembers: GroupMember[] | null
-  rewards: PublicReward[] | null
+  // rewards: PublicReward[] | null
   groupData: GroupData | null
   categories: CategoriesPublic[] | null
-  tasks: TaskData[] | null
+  // tasks: TaskData[] | null
 }
 
 export const useUserGroupsStore = defineStore('group', {
@@ -38,10 +38,10 @@ export const useUserGroupsStore = defineStore('group', {
     userMembership: null,
     activeGroup: null,
     groupMembers: null,
-    rewards: null,
+    // rewards: null,
     groupData: null,
     categories: null,
-    tasks: null,
+    // tasks: null,
   }),
 
   getters: {
@@ -67,14 +67,14 @@ export const useUserGroupsStore = defineStore('group', {
 
         if (!groupId) throw new Error('Missing group id')
 
-        const data = await trpc.groups.getGroupData.query({ groupId })
+        const data = await trpc.groups.getGroupMembersAndRewards.query({ groupId })
         this.categories = await trpc.categories.getGroupCategories.query({ groupId })
-        this.tasks = await trpc.tasks.getTasks.query({ groupId })
+        // this.tasks = await trpc.tasks.getTasks.query({ groupId })
 
         if (!data) return
         this.groupData = data
         this.groupMembers = data.members
-        this.rewards = data.rewards || null
+        // this.rewards = data.rewards || null
 
         return data
       } catch (error) {
@@ -94,20 +94,20 @@ export const useUserGroupsStore = defineStore('group', {
         console.error('Failed to create new group:', error)
       }
     },
-    async createNewReward(rewardData: InsertableReward) {
-      if (!this.activeGroup) throw new Error('Group id not provided')
+    // async createNewReward(rewardData: InsertableReward) {
+    //   if (!this.activeGroup) throw new Error('Group id not provided')
 
-      const newReward = {
-        groupId: this.activeGroup.id,
-        ...rewardData,
-      }
-      try {
-        const reward = await trpc.rewards.create.mutate(newReward)
-        this.rewards?.push(reward)
-      } catch (error) {
-        console.error('Failed to create new group:', error)
-      }
-    },
+    //   const newReward = {
+    //     groupId: this.activeGroup.id,
+    //     ...rewardData,
+    //   }
+    //   try {
+    //     const reward = await trpc.rewards.create.mutate(newReward)
+    //     this.rewards?.push(reward)
+    //   } catch (error) {
+    //     console.error('Failed to create new group:', error)
+    //   }
+    // },
     async removeUserFromGroup(userId?: number) {
       try {
         const userIdToRemove = userId || this.userMembership?.id

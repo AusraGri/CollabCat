@@ -10,7 +10,7 @@ interface UserState {
   user: UserPublic | null
   invitations: PublicInvitation[] | null
   categories: CategoriesPublic[] | null
-  tasks: TaskData[] | null
+  // tasks: TaskData[] | null
 }
 
 export const useUserStore = defineStore('user', {
@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', {
     user: null,
     invitations: null,
     categories: null,
-    tasks: null,
+    // tasks: null,
   }),
 
   getters: {
@@ -59,19 +59,19 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async fetchUserTasks() {
-      try {
-        const userId = this.user?.id
+    // async fetchUserTasks() {
+    //   try {
+    //     const userId = this.user?.id
 
-        if (!userId) throw new Error('Missing user info')
+    //     if (!userId) throw new Error('Missing user info')
 
-        const tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
+    //     const tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
 
-        this.tasks = tasks.filter((task) => task.groupId === null)
-      } catch (error) {
-        console.log(`Failed to fetch user tasks: ${error}`)
-      }
-    },
+    //     this.tasks = tasks.filter((task) => task.groupId === null)
+    //   } catch (error) {
+    //     console.log(`Failed to fetch user tasks: ${error}`)
+    //   }
+    // },
 
     updateUserName(newName: string) {
       if (!this.user) return

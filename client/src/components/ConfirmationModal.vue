@@ -24,7 +24,7 @@ function confirmAction(confirmed: boolean) {
     <template #body>
       <p>
         Do you really want to <span class="text-red-600">{{ action }}</span>
-        <span class="text-base font-extrabold">{{ object }}</span> ?
+        <span class="text-base font-extrabold pl-1">{{ object }}</span> ?
       </p>
     </template>
     <template #footer>

@@ -33,7 +33,7 @@ const isShowAmount = computed(() => {
 const isEnoughPoints = computed(() => {
   const userPoints = userInfo.points ? Number(userInfo.points) : 0
 
-  return reward.cost < userPoints
+  return reward.cost <= userPoints
 })
 
 const pointsBadgeColor = computed(() => (isEnoughPoints.value ? 'green' : 'red'))
@@ -119,13 +119,13 @@ const handleClaimConfirmation = (event: boolean) => {
     :is-show-modal="isDeletion"
     :action="'delete'"
     :object="reward.title"
-    @delete="handleDeleteConfirmation"
+    @confirmed="handleDeleteConfirmation"
   />
   <ConfirmationModal
     :is-show-modal="isClaim"
     :action="'claim'"
     :object="reward.title"
-    @delete="handleClaimConfirmation"
+    @confirmed="handleClaimConfirmation"
   />
 </template>
 

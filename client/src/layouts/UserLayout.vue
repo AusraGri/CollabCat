@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onMounted, watch, computed } from 'vue'
+import { onMounted, watch, computed, ref } from 'vue'
 import { FwbListGroupItem } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
-import { useUserStore, useUserGroupsStore, usePointsStore } from '@/stores'
+import { useUserStore, useUserGroupsStore, usePointsStore, useInvitationStore } from '@/stores'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
@@ -14,40 +14,46 @@ import GroupLayout from './GroupLayout.vue'
 const router = useRouter()
 const pointStore = usePointsStore()
 const userStore = useUserStore()
+const currentTabName = ref()
 const userGroupStore = useUserGroupsStore()
+const invitationStore = useInvitationStore()
 const activeGroupId = computed(() =>
   userGroupStore.activeGroup ? userGroupStore.activeGroup.id : undefined
 )
 const invitations = computed(() => userStore.invitations)
 
 onMounted(async () => {
-  if (userGroupStore.activeGroup) {
+  if (userGroupStore.activeGroup && activeGroupId.value) {
     await userGroupStore.fetchGroupData()
     await userGroupStore.fetchUserMembershipInfo()
   }
   await refreshInvitations()
-  await userStore.fetchUserTasks()
   await pointStore.managePoints(activeGroupId.value)
 })
 
 const refreshInvitations = async () => {
-  await userStore.fetchInvitations()
+  await invitationStore.fetchInvitations()
   await userGroupStore.fetchUserGroups()
 }
 
+const setTabName = (value: string) => {
+  currentTabName.value = value
+}
+
 watch(
-  () => userGroupStore.activeGroup?.name,
-  async (newGroupName, oldGroupName) => {
-    const isNewValue = newGroupName !== oldGroupName && newGroupName
-    if (userGroupStore.activeGroup === null) {
-      router.push({ name: 'PersonalCalendar' })
+  () => userGroupStore.activeGroup,
+  async (newGroup, oldGroup) => {
+    const isNewValue = newGroup?.id !== oldGroup?.id && !!newGroup
+    const tab = currentTabName.value || 'Calendar'
+
+    if (userGroupStore.activeGroup === null && userStore.user) {
+      router.push({ name: `Personal${tab}` })
     }
 
-    if (isNewValue && userGroupStore.activeGroup) {
-      const groupName = stringToUrl(newGroupName)
-      const currentTab = 'Calendar'
+    if (isNewValue && activeGroupId.value) {
+      const groupName = stringToUrl(newGroup.name)
 
-      router.push({ name: currentTab, params: { group: groupName } })
+      router.push({ name: tab, params: { group: groupName } })
 
       await userGroupStore.fetchGroupData()
       await userGroupStore.fetchUserMembershipInfo()
@@ -80,7 +86,7 @@ watch(
         </Notifications>
       </div>
     </div>
-    <GroupLayout />
+    <GroupLayout @tab:new="setTabName" />
     <main>
       <div class="container mx-auto w-full">
         <RouterView />

@@ -3,15 +3,15 @@ import { trpc } from '@/trpc'
 import type { InsertTaskData, TaskUpdateData, TaskData } from '@server/shared/types'
 
 interface TasksState {
-  tasks: TaskData[] | null
+  tasks: TaskData[]
 }
 export const useTasksStore = defineStore('tasks', {
   state: (): TasksState => ({
-    tasks: null,
+    tasks: [],
   }),
 
   getters: {
-    isTasks: (state: TasksState): boolean => !!state.tasks,
+    isTasks: (state: TasksState): boolean => !!state.tasks.length,
   },
   actions: {
     async getDueTasks(date: string) {
@@ -52,9 +52,20 @@ export const useTasksStore = defineStore('tasks', {
         throw new Error('Failed to fetch group tasks')
       }
     },
+    async getPersonalTasks(userId: number) {
+      try {
+        const tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
+        this.tasks = tasks
+
+        return tasks
+      } catch (error) {
+        throw new Error('Failed to fetch group tasks')
+      }
+    },
     async createTask(taskData: InsertTaskData) {
       try {
         const newTask = await trpc.tasks.createTask.mutate(taskData)
+        this.tasks.push(newTask)
 
         return newTask
       } catch (error) {
@@ -65,6 +76,14 @@ export const useTasksStore = defineStore('tasks', {
       try {
         const updatedTask = await trpc.tasks.update.mutate(taskData)
 
+        if (this.isTasks) {
+          const index = this.tasks?.findIndex((task) => task.id === updatedTask.id)
+
+          if (index && index !== -1) {
+            this.tasks[index] = updatedTask
+          }
+        }
+
         return updatedTask
       } catch (error) {
         throw new Error(`Failed to update task: ${error}`)
@@ -73,6 +92,10 @@ export const useTasksStore = defineStore('tasks', {
     async deleteTask(taskId: number) {
       try {
         const result = await trpc.tasks.deleteTask.mutate({ taskId })
+
+        if (result && this.isTasks) {
+          this.tasks  = this.tasks.filter((task) => task.id !== taskId)
+        }
 
         return result
       } catch (error) {
@@ -84,7 +107,7 @@ export const useTasksStore = defineStore('tasks', {
         await trpc.tasks.taskCompletion.mutate(taskData)
         const [updatedTask] = await trpc.tasks.getTasks.query({ id: taskData.id })
 
-        if (this.tasks) {
+        if (this.isTasks) {
           this.tasks = this.tasks.map(
             (task: TaskData): TaskData => (task.id === updatedTask.id ? updatedTask : task)
           )

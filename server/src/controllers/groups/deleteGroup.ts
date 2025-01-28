@@ -21,7 +21,7 @@ export default groupAuthProcedure
     if (!userGroup || userGroup.role !== 'Admin') {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'User does not have permission to delete this group',
+        message: 'Unauthorized. User does not have permission to delete this group',
       })
     }
 
@@ -30,7 +30,7 @@ export default groupAuthProcedure
       createdByUserId: authUser.id,
     })
 
-    if (!isGroupDeleted) {
+    if (!isGroupDeleted.numDeletedRows) {
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: 'Group failed to be deleted',

@@ -20,6 +20,7 @@ interface InvitationState {
   tokenData: TokenData | null
   groupData: GroupsPublic | null
   inviter: UserPublic | null
+  invitations: PublicInvitation[] | null
 }
 
 export const useInvitationStore = defineStore('invitations', {
@@ -28,6 +29,7 @@ export const useInvitationStore = defineStore('invitations', {
     tokenData: null,
     groupData: null,
     inviter: null,
+    invitations: null
   }),
 
   actions: {
@@ -49,6 +51,17 @@ export const useInvitationStore = defineStore('invitations', {
       }
     },
 
+    async fetchInvitations() {
+      try {
+        const data = await trpc.invitations.getGroupInvitations.query()
+        this.invitations = data
+
+        return data
+      } catch (error) {
+        console.error('Failed to fetch user groups data:', error)
+      }
+    },
+
     async getGroupData() {
       try {
         const groupId = this.tokenData?.invitation.groupId
@@ -63,13 +76,17 @@ export const useInvitationStore = defineStore('invitations', {
         throw new Error('Failed to fetch group info')
       }
     },
-    async acceptInvitation() {
+    async acceptInvitation(invitation?:PublicInvitation) {
       try {
-        const groupId = this.tokenData?.invitation.groupId
+        const groupId = this.tokenData?.invitation.groupId || invitation?.groupId
 
         if (!groupId) throw new Error('Missing group id')
 
         await trpc.groups.addUserToGroup.mutate({ groupId })
+
+        if(this.invitations){
+          this.invitations = this.invitations?.filter((inv) => inv.id != invitation?.id) || null
+        }
       } catch (error) {
         throw new Error('Failed to fetch group info')
       }
@@ -100,6 +117,17 @@ export const useInvitationStore = defineStore('invitations', {
         }
       } catch (error) {
         throw new Error('Failed to delete invitation')
+      }
+    },
+    async declineInvitation(invitation: PublicInvitation) {
+      try {
+        this.invitations = this.invitations?.filter((inv) => inv.id != invitation.id) || null
+
+        await trpc.invitations.deleteInvitation.mutate({
+          invitationToken: invitation.invitationToken,
+        })
+      } catch (error) {
+        console.log('error while deleting invitation')
       }
     },
   },

@@ -94,7 +94,7 @@ export const fakeGroup = <T extends Partial<Insertable<Groups>>>(
  * @param overrides groupId and any properties that should be different from default fake data.
  */
 export const fakeUserGroup = <T extends Partial<Insertable<UserGroups>>>(
-  overrides: T
+  overrides: T = {} as T
 ) =>
   ({
     groupId: randomId(),

@@ -10,6 +10,10 @@ import Rewards from '@/components/rewards/Rewards.vue'
 import GroupSettings from '@/components/groups/GroupSettings.vue'
 import Tab from '@/components/Tab.vue'
 
+const emit = defineEmits<{
+  (event: 'tab:new', value: string): void
+}>()
+
 const userGroupStore = useUserGroupsStore()
 const rewardStore = useRewardStore()
 const userStore = useUserStore()
@@ -65,6 +69,7 @@ const openGroupSettings = () => {
 
 function handleTabClick(tabName: string) {
   activeTab.value = tabName
+  emit('tab:new', tabName)
 
   if (isUserInGroupPage.value) {
     router
@@ -86,6 +91,8 @@ function handleTabClick(tabName: string) {
 onMounted(async () => {
   const tab = route.name ? route.name.toString().replace(/^Personal/, '') : 'Calendar'
   activeTab.value = tab
+
+  emit('tab:new', tab)
 
   if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
     await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)

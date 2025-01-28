@@ -2,7 +2,7 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { recurringPatternSchemaInput } from '@server/entities/recurrence'
-import { inputTaskSchema, taskSchemaOutput } from '@server/entities/tasks'
+import { inputTaskSchema, taskDataSchema } from '@server/entities/tasks'
 import z from 'zod'
 import { setDateToUTCmidnight } from '../utility/helpers'
 
@@ -29,7 +29,7 @@ export default authenticatedProcedure
       recurrence: recurringPatternSchemaInput.optional(),
     })
   )
-  .output(taskSchemaOutput)
+  .output(taskDataSchema)
   .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {
     const { startDate, endDate } = taskData.task
 
@@ -45,7 +45,7 @@ export default authenticatedProcedure
       recurrence: taskData.recurrence,
     }
 
-    const taskCreated = await repos.tasksRepository.createTask(newTaskData)
+    const taskCreated= await repos.tasksRepository.createTask(newTaskData)
 
     return taskCreated
   })
