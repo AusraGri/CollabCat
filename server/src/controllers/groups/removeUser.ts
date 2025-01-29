@@ -27,7 +27,7 @@ export default groupAuthProcedure
   .mutation(async ({ input: user, ctx: { authUser, userGroup, repos } }) => {
     const isAllowed = user.userId === authUser.id || userGroup?.role === 'Admin'
 
-    if (!userGroup || !isAllowed) {
+    if (!isAllowed) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message:
@@ -38,13 +38,6 @@ export default groupAuthProcedure
     const groupMembers = await repos.groupsRepository.getGroupMembers(
       userGroup.groupId
     )
-
-    if (groupMembers.length < 1) {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'No members found in the group',
-      })
-    }
 
     if (!groupMembers.some((member) => member.id === user.userId)) {
       throw new TRPCError({
@@ -58,7 +51,7 @@ export default groupAuthProcedure
       userId: user.userId,
     })
 
-    if (!isUserRemoved) {
+    if (!isUserRemoved.numDeletedRows) {
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: 'Failed to remove user from group',

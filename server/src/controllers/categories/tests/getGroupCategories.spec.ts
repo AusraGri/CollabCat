@@ -1,4 +1,4 @@
-import { requestContext, authGroupRepoContext } from '@tests/utils/context'
+import { requestContext, authGroupRepoContext} from '@tests/utils/context'
 import { fakeCategory, fakeAuthGroup } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
@@ -25,6 +25,7 @@ it('should throw an error if user is not authenticated', async () => {
    getGroupCategories({groupId: 1})
   ).rejects.toThrow(/unauthenticated/i)
 })
+
 
 it('find group categories by group id', async () => {
   // ARRANGE
