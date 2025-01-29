@@ -10,9 +10,6 @@ export default groupAuthProcedure
   .input(z.object({}))
   .output(z.undefined().or(groupDataSchema))
   .query(async ({ ctx: { repos, userGroup } }) => {
-    if (!userGroup?.groupId) {
-      throw new Error('Group ID is missing in the context.')
-    }
 
     const groupMembersAndRewards: GroupData | undefined =
       await repos.groupsRepository.getGroupMembersAndRewards(userGroup.groupId)

@@ -1,17 +1,12 @@
 import {
-  authContext,
   requestContext,
   authGroupRepoContext,
+  authGroupContext,
 } from '@tests/utils/context'
-import {
-  fakeGroup,
-  fakeUser,
-  fakeUserGroup,
-} from '@server/entities/tests/fakes'
+import { fakeAuthGroup, fakeUser } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
-import { insertAll } from '@tests/utils/records'
 import type { GroupRepository } from '@server/repositories/groupsRepository'
 import type { InvitationsRepository } from '@server/repositories/invitationRepository'
 import { sentInvitationMail } from '@server/emailer'
@@ -27,26 +22,44 @@ vi.mock('@server/emailer', () => ({
 
 const createCaller = createCallerFactory(groupsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
-const repos = {
+
+const groupRepos = (data: {
+  userByEmail?: any
+  groupMembers?: any
+  isUserInvited?: any
+  invitation?: any
+}) => ({
   userRepository: {
-    findByEmail: vi.fn(async () => undefined),
+    findByEmail: vi.fn(async () => data.userByEmail || undefined),
   } satisfies Partial<UserRepository>,
   groupsRepository: {
-    getGroupMembers: vi.fn(async () => []),
-    getRole: vi.fn(async () => ({ role: 'Admin' })),
+    getGroupMembers: vi.fn(async () =>
+      data.groupMembers ? [data.groupMembers] : []
+    ),
   } satisfies Partial<GroupRepository>,
 
   invitationsRepository: {
-    getInvitationByGroupAndEmail: vi.fn(async () => undefined),
-    createInvitation: vi.fn(async () => ({
-      id: 1,
-      email: 'email@mail.com',
-      groupId: 124,
-      invitationToken: 'token',
-      createdAt: new Date(),
-    })),
+    getInvitationByGroupAndEmail: vi.fn(
+      async () => data.isUserInvited || undefined
+    ),
+    createInvitation: vi.fn(async () => {
+      if (!data.invitation) throw new Error('Failed to save invitation')
+
+      return data.invitation
+    }),
+    deleteInvitation: vi.fn(async () => ({ numDeletedRows: BigInt(10) })),
   } satisfies Partial<InvitationsRepository>,
+})
+
+const invitation = {
+  id: 1,
+  email: 'email@mail.com',
+  groupId: 124,
+  invitationToken: 'token',
+  createdAt: new Date(),
 }
+
+const email = 'some@email.mail'
 
 it('should throw an error if user is not authenticated', async () => {
   // ARRANGE
@@ -55,7 +68,7 @@ it('should throw an error if user is not authenticated', async () => {
   // ACT & ASSERT
   await expect(
     inviteUser({
-      email: 'some@email.mail',
+      email,
       groupId: 1234,
     })
   ).rejects.toThrow(/unauthenticated/i)
@@ -63,93 +76,134 @@ it('should throw an error if user is not authenticated', async () => {
 
 it('should throw an error if user is has no permission to invite', async () => {
   // ARRANGE
-  const [user, otherUser] = await insertAll(db, 'user', [
-    fakeUser(),
-    fakeUser(),
-  ])
-  const [group] = await insertAll(
-    db,
-    'groups',
-    fakeGroup({ createdByUserId: otherUser.id })
+  const authGroup = fakeAuthGroup({ role: 'Member' })
+
+  const { inviteUser } = createCaller(
+    authGroupContext({ db }, undefined, authGroup)
   )
-  const { inviteUser } = createCaller(authContext({ db }, user))
 
   // ACT
   await expect(
     inviteUser({
-      groupId: group.id,
-      email: 'some@email.mail',
+      groupId: authGroup.groupId,
+      email,
     })
-  ).rejects.toThrow(/Unauthorized/i)
+  ).rejects.toThrow(/unauthorized/i)
 })
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 it('should throw an error if user is already in the group', async () => {
   // ARRANGE
-  const [user, userInGroup] = await insertAll(db, 'user', [
-    fakeUser(),
-    fakeUser(),
-  ])
-  const [group] = await insertAll(
-    db,
-    'groups',
-    fakeGroup({ createdByUserId: user.id })
+  const member = { email }
+  const authGroup = fakeAuthGroup()
+  const repo = groupRepos({ groupMembers: member })
+  const { inviteUser } = createCaller(
+    authGroupRepoContext(repo, undefined, authGroup)
   )
-  await insertAll(db, 'userGroups', [
-    fakeUserGroup({ userId: userInGroup.id, groupId: group.id }),
-    fakeUserGroup({ userId: user.id, groupId: group.id }),
-  ])
-  const { inviteUser } = createCaller(authContext({ db }, user))
 
   // ACT
   await expect(
     inviteUser({
-      groupId: group.id,
-      email: userInGroup.email,
+      groupId: 1,
+      email,
     })
   ).rejects.toThrow(/in the group/i)
-})
 
-it('should invite user to the group (using database) ', async () => {
-  // ARRANGE
-  const [user] = await insertAll(db, 'user', [fakeUser()])
-  const [group] = await insertAll(
-    db,
-    'groups',
-    fakeGroup({ createdByUserId: user.id })
+  expect(repo.groupsRepository.getGroupMembers).toHaveBeenCalledOnce()
+  expect(repo.groupsRepository.getGroupMembers).toHaveBeenCalledWith(
+    authGroup.groupId
   )
-  await insertAll(db, 'userGroups', [
-    fakeUserGroup({ userId: user.id, groupId: group.id }),
-  ])
-  const { inviteUser } = createCaller(authContext({ db }, user))
-  // ACT
-  const invitation = await inviteUser({
-    groupId: group.id,
-    email: 'some@email.mail',
-  })
-
-  expect(invitation).toHaveProperty('invitationToken')
 })
 
-it('should invite user to the group', async () => {
+it('should delete existing invitation if user is already invited and create new one', async () => {
   // ARRANGE
-  const { inviteUser } = createCaller(authGroupRepoContext(repos))
-
+  const invitationToken = { invitationToken: 'token' }
+  const authGroup = fakeAuthGroup()
+  const repo = groupRepos({ isUserInvited: invitationToken, invitation })
+  const { inviteUser } = createCaller(
+    authGroupRepoContext(repo, undefined, authGroup)
+  )
   // ACT
-  const invitation = await inviteUser({
-    groupId: 123,
-    email: 'some@email.mail',
+  const result = await inviteUser({
+    groupId: 1,
+    email,
   })
 
-  // ASSERT: Verify the invitation token and that the email was sent
-  expect(invitation).toHaveProperty('invitationToken')
-  expect(invitation.invitationToken).toBeDefined()
-
-  // Check if sentInvitationMail was called with the expected parameters
+  expect(result).toHaveProperty('invitationToken')
+  expect(repo.groupsRepository.getGroupMembers).toHaveBeenCalledOnce()
+  expect(repo.groupsRepository.getGroupMembers).toHaveBeenCalledWith(
+    authGroup.groupId
+  )
+  expect(
+    repo.invitationsRepository.getInvitationByGroupAndEmail
+  ).toHaveBeenLastCalledWith({ email, groupId: authGroup.groupId })
+  expect(repo.invitationsRepository.deleteInvitation).toHaveBeenCalledWith(
+    invitationToken.invitationToken
+  )
   expect(sentInvitationMail).toHaveBeenCalledWith(
     expect.anything(),
     expect.objectContaining({
-      email: 'some@email.mail',
+      email,
       inviteToken: expect.any(String),
     })
   )
+  expect(repo.invitationsRepository.createInvitation).toHaveBeenCalledWith({
+    email,
+    groupId: authGroup.groupId,
+    invitationToken: expect.any(String),
+  })
+})
+
+it('should invite user to the group by email', async () => {
+  // ARRANGE
+  const repo = groupRepos({ invitation })
+  const { inviteUser } = createCaller(authGroupRepoContext(repo))
+  // ACT
+  const result = await inviteUser({
+    groupId: 123,
+    email,
+  })
+
+  // ASSERT
+  expect(result).toHaveProperty('invitationToken')
+  expect(result.invitationToken).toBeDefined()
+  expect(repo.groupsRepository.getGroupMembers).toHaveBeenCalledOnce()
+  expect(
+    repo.invitationsRepository.getInvitationByGroupAndEmail
+  ).toHaveBeenCalledOnce()
+  expect(repo.invitationsRepository.deleteInvitation).not.toHaveBeenCalled()
+  expect(sentInvitationMail).toHaveBeenCalledWith(
+    expect.anything(),
+    expect.objectContaining({
+      email,
+      inviteToken: expect.any(String),
+    })
+  )
+  expect(repo.invitationsRepository.createInvitation).toHaveBeenCalledOnce()
+})
+
+it('should invite user to the group not by email if user already exists in the database', async () => {
+  // ARRANGE
+  const user = fakeUser()
+  const repo = groupRepos({ invitation, userByEmail: user })
+  const { inviteUser } = createCaller(authGroupRepoContext(repo))
+  // ACT
+  const result = await inviteUser({
+    groupId: 123,
+    email,
+  })
+
+  // ASSERT
+  expect(result).toHaveProperty('invitationToken')
+  expect(result.invitationToken).toBeDefined()
+  expect(repo.groupsRepository.getGroupMembers).toHaveBeenCalledOnce()
+  expect(
+    repo.invitationsRepository.getInvitationByGroupAndEmail
+  ).toHaveBeenCalledOnce()
+  expect(repo.invitationsRepository.deleteInvitation).not.toHaveBeenCalled()
+  expect(sentInvitationMail).not.toHaveBeenCalled()
+  expect(repo.invitationsRepository.createInvitation).toHaveBeenCalledOnce()
 })

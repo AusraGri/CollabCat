@@ -6,7 +6,7 @@ import removeUser from './removeUser'
 import getUserGroups from './getUserGroups'
 import getMembershipInfo from './getUserMembershipInfo'
 import getGroupMembers from './getGroupMembers'
-import getGroup from './getGroup'
+// import getGroup from './getGroup'
 import addUserToGroup from './addUserToGroup'
 import getGroupMembersAndRewards from './getGroupMembersAndRewards'
 
@@ -18,7 +18,7 @@ export default router({
   getUserGroups,
   getMembershipInfo,
   getGroupMembers,
-  getGroup,
+  // getGroup,
   addUserToGroup,
   getGroupMembersAndRewards,
 })

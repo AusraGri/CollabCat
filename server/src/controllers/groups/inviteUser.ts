@@ -34,10 +34,10 @@ export default groupAuthProcedure
   )
   .output(invitationSchema)
   .mutation(async ({ input: { email }, ctx: { userGroup, repos } }) => {
-    if (!userGroup || userGroup.role !== 'Admin') {
+    if (userGroup.role !== 'Admin') {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'User does not have permission to invite users to this group',
+        message: 'Unauthorized. User does not have permission to invite users to this group',
       })
     }
 
@@ -61,10 +61,9 @@ export default groupAuthProcedure
       })
 
     if (isUserInvited) {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        message: 'User is already invited to the group',
-      })
+      const existingToken = isUserInvited.invitationToken
+
+      await repos.invitationsRepository.deleteInvitation(existingToken)
     }
 
     const userHasAccount = await repos.userRepository.findByEmail(email)

@@ -1,6 +1,6 @@
 import type { Database } from '@server/database'
 import type { Groups, UserGroups } from '@server/database/types'
-import { groupsKeysPublic, type GroupsPublic } from '@server/entities/groups'
+import { groupsKeysPublic, type GroupMember, type GroupsPublic } from '@server/entities/groups'
 import { userKeysPublic, type UserPublic } from '@server/entities/user'
 import {
   userGroupsKeysPublic,
@@ -144,7 +144,7 @@ export function groupsRepository(db: Database) {
         .execute()
     },
 
-    async getUserGroupMembershipInfo(data: GroupUserData) {
+    async getUserGroupMembershipInfo(data: GroupUserData): Promise<GroupMember> {
       return db
         .selectFrom('userGroups')
         .innerJoin('user', 'userGroups.userId', 'user.id')
