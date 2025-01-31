@@ -11,7 +11,12 @@ export default authenticatedProcedure
     })
   )
   .mutation(async ({ input: { invitationToken }, ctx: { repos } }) => {
-    await repos.invitationsRepository.deleteInvitation(invitationToken)
+    const result = await repos.invitationsRepository.deleteInvitation(invitationToken)
 
-    return true
+    return {
+      success: true,
+      message: result?.numDeletedRows === 0n
+        ? "Invitation was not found (possibly already deleted)."
+        : "Invitation successfully deleted."
+    };
   })

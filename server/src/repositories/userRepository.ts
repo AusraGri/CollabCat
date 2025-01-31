@@ -59,12 +59,12 @@ export function userRepository(db: Database) {
       return user
     },
 
-    async findById(id: number): Promise<Selectable<User>> {
+    async findById(id: number): Promise<Selectable<User> | undefined> {
       const user = await db
         .selectFrom('user')
         .select(userKeysAll)
         .where('id', '=', id)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
 
       return user
     },

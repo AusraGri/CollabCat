@@ -150,6 +150,7 @@ it('should delete existing invitation if user is already invited and create new 
       inviteToken: expect.any(String),
     })
   )
+  
   expect(repo.invitationsRepository.createInvitation).toHaveBeenCalledWith({
     email,
     groupId: authGroup.groupId,

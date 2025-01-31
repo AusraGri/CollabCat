@@ -5,7 +5,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
-import { type InvitationData } from '../../entities/invitations'
+import { type InvitationData, invitationDataSchema } from '../../entities/invitations'
 
 export default authenticatedProcedure
   .use(
@@ -16,6 +16,7 @@ export default authenticatedProcedure
       invitationToken: z.string(),
     })
   )
+  .output(invitationDataSchema)
   .query(async ({ input: { invitationToken }, ctx: { repos } }) => {
     const invitation =
       await repos.invitationsRepository.getInvitationByToken(invitationToken)
@@ -31,7 +32,19 @@ export default authenticatedProcedure
       id: invitation.groupId,
     })
 
-    const user = await repos.userRepository.findById(group.createdByUserId)
+    const user = group
+      ? await repos.userRepository.findById(group.createdByUserId)
+      : null
+
+    if (!group || !user) {
+      await repos.invitationsRepository.deleteInvitation(invitationToken)
+
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message:
+          'Invitation is no longer valid: group or inviter not found. Invitation deleted.',
+      })
+    }
 
     const userData = {
       username: user.username,

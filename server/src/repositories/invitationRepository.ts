@@ -38,7 +38,7 @@ export function invitationsRepository(db: Database) {
         .selectFrom('invitations')
         .select(invitationsKeysAll)
         .where('invitationToken', '=', token)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
 
     async getInvitationByGroupAndEmail(
@@ -58,7 +58,7 @@ export function invitationsRepository(db: Database) {
       return db
         .deleteFrom('invitations')
         .where('invitationToken', '=', token)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
   }
 }
