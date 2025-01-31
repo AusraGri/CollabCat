@@ -14,8 +14,8 @@ export default authenticatedProcedure
       method: 'PATCH',
       path: '/points/alter',
       tags: ['points'],
-      summary: 'Add or remove points from the user Points',
-      description: 'Public procedure to alter any user points',
+      summary: 'Change user points value',
+      description: 'Authenticated procedure to alter user points',
     },
   })
   .input(alterPointsSchema)
@@ -31,13 +31,13 @@ export default authenticatedProcedure
     if (!currentPoints) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'User does not have points enabled',
+        message: 'Not found. User does not have points enabled',
       })
     }
 
     let points: PointAlterObject
 
-    if (pointsData.action === '-' && currentPoints.points < pointsData.points) {
+    if (pointsData.action === '-' && currentPoints.points <= pointsData.points) {
       points = {
         ...pointsData,
         userId: authUser.id,

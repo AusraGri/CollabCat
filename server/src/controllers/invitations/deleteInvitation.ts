@@ -1,6 +1,7 @@
 import { invitationsRepository } from '@server/repositories/invitationRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import z from 'zod'
+import { deleteOutputSchema } from '@server/entities/shared'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 
 export default authenticatedProcedure
@@ -10,6 +11,7 @@ export default authenticatedProcedure
       invitationToken: z.string(),
     })
   )
+  .output(deleteOutputSchema)
   .mutation(async ({ input: { invitationToken }, ctx: { repos } }) => {
     const result = await repos.invitationsRepository.deleteInvitation(invitationToken)
 

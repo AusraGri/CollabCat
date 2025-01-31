@@ -84,7 +84,7 @@ export function pointsRepository(db: Database) {
         query = query.where('groupId', 'is', null)
       }
 
-      return query.executeTakeFirstOrThrow()
+      return query.executeTakeFirst()
     },
 
     async alterPoints(object: PointAlterObject): Promise<PointsPublic> {

@@ -20,7 +20,7 @@ export default authenticatedProcedure
     z.object({
       taskId: idSchema,
       taskInstanceDate: z.date(),
-    })
+    }).strict()
   )
   .output(z.boolean())
   .query(

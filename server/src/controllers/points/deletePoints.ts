@@ -2,7 +2,7 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 import { pointsRepository } from '@server/repositories/pointsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import z from 'zod'
-import { idSchema } from '@server/entities/shared'
+import { idSchema, deleteOutputSchema } from '@server/entities/shared'
 
 export default authenticatedProcedure
   .use(provideRepos({ pointsRepository }))
@@ -18,14 +18,19 @@ export default authenticatedProcedure
   .input(
     z.object({
       groupId: idSchema.optional(),
-    })
+    }).strict()
   )
-  .output(z.boolean())
+  .output(deleteOutputSchema)
   .mutation(async ({ input: { groupId }, ctx: { authUser, repos } }) => {
     const deletedPoints = await repos.pointsRepository.deletePoints({
       userId: authUser.id,
       groupId,
     })
 
-    return !!deletedPoints.numDeletedRows
+    return {
+      success: true,
+      message: deletedPoints.numDeletedRows === 0n
+        ? "Points data was not found (possibly already deleted)."
+        : "Points data successfully deleted."
+    };
   })

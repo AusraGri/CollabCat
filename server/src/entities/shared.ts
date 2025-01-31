@@ -8,3 +8,9 @@ export const dateSchema = z
     message: 'Invalid date format',
   })
   .transform((dateStr) => new Date(dateStr))
+
+
+export const deleteOutputSchema = z.object({
+    success: z.boolean(),
+    message: z.string()
+  })
