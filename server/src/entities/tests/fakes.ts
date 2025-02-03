@@ -6,13 +6,14 @@ import type {
   RecurringPattern,
   UserGroups,
   CompletedTasks,
+  Rewards,
 } from '@server/database/types'
 import type { Insertable } from 'kysely'
 import { random } from '@tests/utils/random'
 import type { AuthUser } from '../user'
 import type { AuthGroup } from '../groups'
 
-const randomId = () =>
+export const randomId = () =>
   random.integer({
     min: 1,
     max: 1000000,
@@ -88,6 +89,23 @@ export const fakeGroup = <T extends Partial<Insertable<Groups>>>(
     createdByUserId: randomId(),
     ...overrides,
   }) satisfies Insertable<Groups>
+
+/**
+ * Generates a fake reward with some default test data.
+ * @param overrides createdByUserId and any properties that should be different from default fake data.
+ */
+export const fakeReward = <T extends Partial<Insertable<Rewards>>>(
+  overrides: T = {} as T
+) =>
+  ({
+    title: random.string(),
+    createdByUserId: randomId(),
+    amount: null,
+    cost: random.integer({ min: 1, max: 100} ),
+    targetUserIds: null,
+    groupId: null,
+    ...overrides,
+  }) satisfies Insertable<Rewards>
 
 /**
  * Generates a fake group with some default test data.

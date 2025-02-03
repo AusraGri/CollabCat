@@ -1,7 +1,7 @@
 import { invitationsRepository } from '@server/repositories/invitationRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import z from 'zod'
-import { deleteOutputSchema } from '@server/entities/shared'
+import { messageOutputSchema } from '@server/entities/shared'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 
 export default authenticatedProcedure
@@ -11,14 +11,14 @@ export default authenticatedProcedure
       invitationToken: z.string(),
     })
   )
-  .output(deleteOutputSchema)
+  .output(messageOutputSchema)
   .mutation(async ({ input: { invitationToken }, ctx: { repos } }) => {
     const result = await repos.invitationsRepository.deleteInvitation(invitationToken)
 
     return {
       success: true,
-      message: result?.numDeletedRows === 0n
-        ? "Invitation was not found (possibly already deleted)."
-        : "Invitation successfully deleted."
+      message: result?.numDeletedRows
+        ? "Invitation successfully deleted."
+        : "Invitation was not found (possibly already deleted)."
     };
   })

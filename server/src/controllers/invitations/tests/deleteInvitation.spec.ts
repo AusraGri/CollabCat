@@ -39,7 +39,7 @@ it('should delete invitation', async () => {
     deleteInvitation({
       invitationToken: token,
     })
-  ).resolves.toMatchObject({ success: true, message: /deleted/i})
+  ).resolves.toMatchObject({ success: true, message: / successfully deleted/i})
 
   expect(repo.invitationsRepository.deleteInvitation).toHaveBeenCalledOnce()
   expect(repo.invitationsRepository.deleteInvitation).toHaveBeenCalledWith(

@@ -1,8 +1,7 @@
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import provideRepos from '@server/trpc/provideRepos'
 import { rewardsRepository } from '@server/repositories/rewardsRepository'
-import { rewardsSchemaOutput } from '@server/entities/rewards'
-import { idSchema } from '@server/entities/shared'
+import { idSchema, messageOutputSchema } from '@server/entities/shared'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import { userRepository } from '@server/repositories/userRepository'
 import z from 'zod'
@@ -11,25 +10,26 @@ export default authenticatedProcedure
   .use(provideRepos({ rewardsRepository, userRepository, groupsRepository }))
   .meta({
     openapi: {
-      method: 'GET',
-      path: '/rewards/get',
+      method: 'DELETE',
+      path: '/rewards/delete',
       tags: ['rewards'],
-      summary: 'Get rewards by userID or groupID',
+      summary: 'Delete reward',
       protect: true,
     },
   })
   .input(
     z.object({
-      groupId: idSchema.optional(),
-    }).strict()
+      rewardId: idSchema,
+    })
   )
-  .output(z.array(rewardsSchemaOutput))
-  .query(async ({ input: searchData, ctx: { authUser, repos } }) => {
-    const searchBy = searchData.groupId
-      ? { groupId: searchData.groupId }
-      : { createdByUserId: authUser.id }
+  .output(messageOutputSchema)
+  .mutation(async ({ input: { rewardId }, ctx: { repos } }) => {
+    const result = await repos.rewardsRepository.deleteReward(rewardId)
 
-    const rewards = await repos.rewardsRepository.getRewards(searchBy)
-
-    return rewards
+    return {
+      success: true,
+      message: result.numDeletedRows
+        ? "Reward data successfully deleted."
+        : "Reward data was not found (possibly already deleted)."
+    };
   })

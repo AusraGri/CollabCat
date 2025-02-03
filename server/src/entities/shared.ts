@@ -10,7 +10,7 @@ export const dateSchema = z
   .transform((dateStr) => new Date(dateStr))
 
 
-export const deleteOutputSchema = z.object({
+export const messageOutputSchema = z.object({
     success: z.boolean(),
     message: z.string()
   })

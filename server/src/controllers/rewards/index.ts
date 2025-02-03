@@ -1,15 +1,14 @@
 import { router } from '@server/trpc'
-import create from './create'
+import createReward from './createReward'
 import getRewards from './getRewards'
-import deleteReward from './delete'
-import update from './update'
+import deleteReward from './deleteReward'
+import updateReward from './updateReward'
 import claimReward from './claimReward'
 
 export default router({
-  // routes for rewards
-  create,
+  createReward,
   getRewards,
   deleteReward,
-  update,
+  updateReward,
   claimReward,
 })
