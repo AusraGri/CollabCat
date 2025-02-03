@@ -111,7 +111,7 @@ export function rewardsRepository(db: Database) {
           .executeTakeFirstOrThrow()
 
         if (data.rewardAmount) {
-         await trx
+          await trx
             .updateTable('rewards')
             .set({
               amount: data.rewardAmount,
@@ -129,7 +129,7 @@ export function rewardsRepository(db: Database) {
           .returning('rewardClaims.id')
           .executeTakeFirstOrThrow()
 
-          return !!result
+        return !!result
       })
     },
   }

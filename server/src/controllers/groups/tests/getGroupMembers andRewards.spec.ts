@@ -38,7 +38,7 @@ it('should get group members and rewards information', async () => {
         username: 'Bob',
         email: 'some@mail.com',
         role: 'Member',
-        points: null
+        points: null,
       },
     ],
     rewards: [],
@@ -50,12 +50,14 @@ it('should get group members and rewards information', async () => {
   )
 
   // ACT & ASSERTs
-  const result = await getGroupMembersAndRewards({ groupId: group.groupId})
+  const result = await getGroupMembersAndRewards({ groupId: group.groupId })
 
   expect(result).toMatchObject(groupData)
   expect(repo.groupsRepository.getGroupMembersAndRewards).toHaveBeenCalledOnce()
-  expect(repo.groupsRepository.getGroupMembersAndRewards).toHaveBeenCalledWith(group.groupId)
-  await expect(repo.groupsRepository.getGroupMembersAndRewards()).resolves.toMatchObject(
-    groupData,
+  expect(repo.groupsRepository.getGroupMembersAndRewards).toHaveBeenCalledWith(
+    group.groupId
   )
+  await expect(
+    repo.groupsRepository.getGroupMembersAndRewards()
+  ).resolves.toMatchObject(groupData)
 })

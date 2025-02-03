@@ -5,7 +5,10 @@ import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
-import { type InvitationData, invitationDataSchema } from '../../entities/invitations'
+import {
+  type InvitationData,
+  invitationDataSchema,
+} from '../../entities/invitations'
 
 export default authenticatedProcedure
   .use(

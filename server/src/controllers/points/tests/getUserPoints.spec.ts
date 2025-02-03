@@ -9,18 +9,17 @@ import pointsRouter from '..'
 const createCaller = createCallerFactory(pointsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
-const mockRepo = (userPoints?: any,) => ({
+const mockRepo = (userPoints?: any) => ({
   pointsRepository: {
     getPoints: vi.fn(async () => userPoints || undefined),
   } satisfies Partial<PointsRepository>,
 })
 
 const userPoints = {
-    userId: 1,
-    groupId: null,
-    points: 55,
-  }
-
+  userId: 1,
+  groupId: null,
+  points: 55,
+}
 
 it('should throw an error if user is not authenticated', async () => {
   // ARRANGE
@@ -33,9 +32,9 @@ it('should throw an error if user is not authenticated', async () => {
 it('should throw error if input is not valid', async () => {
   // ARRANGE
   const repo = mockRepo()
-  const input = { groupId: 'cat'}
+  const input = { groupId: 'cat' }
   const inputTwo = undefined
-  const inputThreeValid= {anything: 'any'}
+  const inputThreeValid = { anything: 'any' }
   const { getUserPoints } = createCaller(authRepoContext(repo))
 
   // ACT & ASSERT
@@ -43,12 +42,11 @@ it('should throw error if input is not valid', async () => {
   // @ts-expect-error
   await expect(getUserPoints(input)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
-  await expect(getUserPoints(inputTwo)).rejects.toThrowError(
-    /invalid_type/i
-  )
+  await expect(getUserPoints(inputTwo)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
-  await expect(getUserPoints(inputThreeValid)).rejects.toThrowError(/unrecognized_keys/i)
-
+  await expect(getUserPoints(inputThreeValid)).rejects.toThrowError(
+    /unrecognized_keys/i
+  )
 })
 
 it('should return undefined if no points found', async () => {
@@ -65,8 +63,7 @@ it('should return undefined if no points found', async () => {
     userId: authUser.id,
   })
 
-  await expect(repo.pointsRepository.getPoints()).resolves.not.toThrowError();
-
+  await expect(repo.pointsRepository.getPoints()).resolves.not.toThrowError()
 })
 
 it('should return user points', async () => {
@@ -82,7 +79,6 @@ it('should return user points', async () => {
   expect(repo.pointsRepository.getPoints).toHaveBeenCalledWith({
     userId: authUser.id,
   })
-
 })
 
 it('should return user group points if groupId is provided', async () => {
@@ -94,11 +90,10 @@ it('should return user group points if groupId is provided', async () => {
 
   // ACT & ASSERT
 
-  await expect(getUserPoints({groupId})).resolves.toMatchObject(userPoints)
+  await expect(getUserPoints({ groupId })).resolves.toMatchObject(userPoints)
 
   expect(repo.pointsRepository.getPoints).toHaveBeenCalledWith({
     userId: authUser.id,
-    groupId
+    groupId,
   })
-
 })

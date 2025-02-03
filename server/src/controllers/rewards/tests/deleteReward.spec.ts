@@ -8,17 +8,18 @@ import rewardsRouter from '..'
 
 const createCaller = createCallerFactory(rewardsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
-const mockRepo = (
-  bigInt: BigInt = 0n) => ({
+const mockRepo = (bigInt: BigInt = 0n) => ({
   rewardsRepository: {
-    deleteReward: vi.fn(async () => ({numDeletedRows: bigInt}) as DeleteResult,
-  )} satisfies Partial<RewardsRepository>,
+    deleteReward: vi.fn(
+      async () => ({ numDeletedRows: bigInt }) as DeleteResult
+    ),
+  } satisfies Partial<RewardsRepository>,
 })
 
-const validInput = {rewardId: 1}
+const validInput = { rewardId: 1 }
 
-beforeEach(()=> {
-    vi.clearAllMocks()
+beforeEach(() => {
+  vi.clearAllMocks()
 })
 
 it('should throw an error if user is not authenticated', async () => {
@@ -39,11 +40,11 @@ it('should throw error if input is not valid', async () => {
   const { deleteReward } = createCaller(authRepoContext(repo))
 
   // ACT & ASSERT
-// @ts-expect-error
+  // @ts-expect-error
   await expect(deleteReward(input)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
   await expect(deleteReward(inputTwo)).rejects.toThrowError(/invalid_type/i)
- 
+
   await expect(deleteReward(inputThree)).rejects.toThrowError(/too_small/i)
   // @ts-expect-error
   await expect(deleteReward(inputFour)).rejects.toThrowError(/invalid_type/i)
@@ -53,36 +54,30 @@ it('should delete reward and return success message', async () => {
   // ARRANGE
   const repo = mockRepo(10n)
   const { deleteReward } = createCaller(authRepoContext(repo))
-  const {rewardId} = validInput
+  const { rewardId } = validInput
 
   // ACT & ASSERT
 
   await expect(deleteReward(validInput)).resolves.toMatchObject({
     success: true,
-    message: /deleted/i
+    message: /deleted/i,
   })
 
-  expect(repo.rewardsRepository.deleteReward).toHaveBeenCalledWith(
-    rewardId
-  )
-
+  expect(repo.rewardsRepository.deleteReward).toHaveBeenCalledWith(rewardId)
 })
 
 it('should delete reward and return message if no reward was found to delete', async () => {
   // ARRANGE
   const repo = mockRepo()
   const { deleteReward } = createCaller(authRepoContext(repo))
-  const {rewardId} = validInput
+  const { rewardId } = validInput
 
   // ACT & ASSERT
 
   await expect(deleteReward(validInput)).resolves.toMatchObject({
     success: true,
-    message: /not found/i
+    message: /not found/i,
   })
 
-  expect(repo.rewardsRepository.deleteReward).toHaveBeenCalledWith(
-    rewardId
-  )
-
+  expect(repo.rewardsRepository.deleteReward).toHaveBeenCalledWith(rewardId)
 })

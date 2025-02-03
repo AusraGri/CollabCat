@@ -18,10 +18,11 @@ export default groupAuthProcedure
   .input(z.object({}))
   .output(z.boolean())
   .mutation(async ({ ctx: { authUser, userGroup, repos } }) => {
-    if(userGroup.role !== 'Admin') {
+    if (userGroup.role !== 'Admin') {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'Unauthorized. User does not have permission to delete the group',
+        message:
+          'Unauthorized. User does not have permission to delete the group',
       })
     }
     const isGroupDeleted = await repos.groupsRepository.delete({

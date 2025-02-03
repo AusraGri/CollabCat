@@ -27,8 +27,8 @@ const mockRepo = (data: {
 
 const validInput = { amount: 1, cost: 5, title: 'New Reward', groupId: 1 }
 
-beforeEach(()=> {
-    vi.clearAllMocks()
+beforeEach(() => {
+  vi.clearAllMocks()
 })
 
 it('should throw an error if user is not authenticated', async () => {
@@ -119,16 +119,16 @@ it('should create new personal reward', async () => {
     createdByUserId: authUser.id,
     id: 1,
     targetUserIds: null,
-    amount: null
+    amount: null,
   }
   const group = { id: 2 }
   const repo = mockRepo({ reward, group })
   const { createReward } = createCaller(authRepoContext(repo, authUser))
-  const {groupId, ...input} = validInput
+  const { groupId, ...input } = validInput
 
   // ACT & ASSERT
 
-  await expect(createReward({...input})).resolves.toMatchObject({
+  await expect(createReward({ ...input })).resolves.toMatchObject({
     ...reward,
   })
 

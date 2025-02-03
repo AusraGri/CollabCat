@@ -29,7 +29,7 @@ export default authenticatedProcedure
     return {
       success: true,
       message: result.numDeletedRows
-        ? "Reward data successfully deleted."
-        : "Reward data was not found (possibly already deleted)."
-    };
+        ? 'Reward data successfully deleted.'
+        : 'Reward data was not found (possibly already deleted).',
+    }
   })

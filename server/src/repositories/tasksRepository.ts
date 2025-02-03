@@ -71,7 +71,7 @@ export function tasksRepository(db: Database) {
             throw new Error(`Failed to save recurrence pattern: ${error}`)
           }
         }
-        const [newTaskData] = await this.getTasks({id: newTask.id})
+        const [newTaskData] = await this.getTasks({ id: newTask.id })
 
         return newTaskData
       })

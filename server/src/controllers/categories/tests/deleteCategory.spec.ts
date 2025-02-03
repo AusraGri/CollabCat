@@ -11,7 +11,9 @@ const db = await wrapInRollbacks(createTestDatabase())
 
 const categoryRepos = (bigInt?: BigInt) => ({
   categoriesRepository: {
-    deleteCategory: vi.fn(async () => ({numDeletedRows: bigInt } as DeleteResult)),
+    deleteCategory: vi.fn(
+      async () => ({ numDeletedRows: bigInt }) as DeleteResult
+    ),
   } satisfies Partial<CategoriesRepository>,
 })
 
@@ -21,8 +23,8 @@ it('should throw an error if user is not authenticated', async () => {
 
   // ACT & ASSERT
   await expect(
-   deleteCategory({
-    categoryId: 1,
+    deleteCategory({
+      categoryId: 1,
     })
   ).rejects.toThrow(/unauthenticated/i)
 })
@@ -33,12 +35,10 @@ it('should delete the category', async () => {
   const categoryId = 1
   const { deleteCategory } = createCaller(authRepoContext(repo))
 
- // ACT & ASSERT
-  await expect(deleteCategory({categoryId})).resolves.toBe(true)
+  // ACT & ASSERT
+  await expect(deleteCategory({ categoryId })).resolves.toBe(true)
 
-  expect(repo.categoriesRepository.deleteCategory).toBeCalledWith(
-  categoryId
-  )
+  expect(repo.categoriesRepository.deleteCategory).toBeCalledWith(categoryId)
 })
 
 it('should return false if no category was deleted', async () => {
@@ -48,9 +48,7 @@ it('should return false if no category was deleted', async () => {
   const { deleteCategory } = createCaller(authRepoContext(repo))
 
   // ACT & ASSERT
-  await expect(deleteCategory({categoryId})).resolves.toBe(false)
+  await expect(deleteCategory({ categoryId })).resolves.toBe(false)
 
-  expect(repo.categoriesRepository.deleteCategory).toBeCalledWith(
-  categoryId
-  )
+  expect(repo.categoriesRepository.deleteCategory).toBeCalledWith(categoryId)
 })

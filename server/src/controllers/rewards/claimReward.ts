@@ -43,23 +43,24 @@ export default authenticatedProcedure
         if (!reward.targetUserIds.includes(authUser.id)) {
           throw new TRPCError({
             code: 'UNAUTHORIZED',
-            message: 'Unauthorized. User is restricted from claiming this reward',
+            message:
+              'Unauthorized. User is restricted from claiming this reward',
           })
         }
       }
 
       let updatedRewardAmount: number | undefined
 
-      if(reward.amount === 0) {
+      if (reward.amount === 0) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Reward amount is not sufficient',
-        });
+        })
       }
 
       if (reward.amount && reward.amount > 0) {
-          updatedRewardAmount = reward.amount - 1
-        }
+        updatedRewardAmount = reward.amount - 1
+      }
 
       const userPoints = await repos.pointsRepository.getPoints({
         userId: authUser.id,

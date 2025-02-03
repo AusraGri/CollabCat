@@ -1,7 +1,4 @@
-import {
-  authRepoContext,
-  requestContext,
-} from '@tests/utils/context'
+import { authRepoContext, requestContext } from '@tests/utils/context'
 import { fakeAuthUser } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
@@ -14,7 +11,7 @@ const createCaller = createCallerFactory(pointsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
 vi.mock('@server/controllers/utility/helpers', () => ({
-  setDateToUTCmidnight: vi.fn((date: Date)=> date)
+  setDateToUTCmidnight: vi.fn((date: Date) => date),
 }))
 
 const mockRepo = (pointClaim?: any) => ({
@@ -25,7 +22,7 @@ const mockRepo = (pointClaim?: any) => ({
 
 it('should throw an error if user is not authenticated', async () => {
   // ARRANGE
-  const { isUserClaimedPoints} = createCaller(requestContext({ db }))
+  const { isUserClaimedPoints } = createCaller(requestContext({ db }))
 
   // ACT & ASSERT
   await expect(
@@ -47,7 +44,6 @@ const claimedPoints = {
 const validInput = { taskId: 1, taskInstanceDate: new Date() }
 const authUser = fakeAuthUser()
 
-
 it('should throw error if input is not valid', async () => {
   // ARRANGE
   const repo = mockRepo()
@@ -55,7 +51,7 @@ it('should throw error if input is not valid', async () => {
   const inputTwo = { taskId: 1, taskInstanceDate: 'cat' }
   const inputThree = { taskInstanceDate: 'cat' }
   const inputFour = {}
-  const inputFive = {anything: 'any'}
+  const inputFive = { anything: 'any' }
   const { isUserClaimedPoints } = createCaller(authRepoContext(repo))
 
   // ACT & ASSERT
@@ -63,7 +59,9 @@ it('should throw error if input is not valid', async () => {
   // @ts-expect-error
   await expect(isUserClaimedPoints(input)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
-  await expect(isUserClaimedPoints(inputTwo)).rejects.toThrowError(/invalid_type/i)
+  await expect(isUserClaimedPoints(inputTwo)).rejects.toThrowError(
+    /invalid_type/i
+  )
   // @ts-expect-error
   await expect(isUserClaimedPoints(inputThree)).rejects.toThrowError(
     /invalid_type/i
@@ -88,7 +86,7 @@ it('should return true if user has claimed points', async () => {
   expect(setDateToUTCmidnight).toHaveBeenCalledWith(validInput.taskInstanceDate)
   expect(repo.pointsRepository.getPointClaims).toHaveBeenCalledWith({
     ...validInput,
-    userId: authUser.id
+    userId: authUser.id,
   })
 })
 
@@ -102,6 +100,6 @@ it('should return false if user has not claimed points', async () => {
   expect(setDateToUTCmidnight).toHaveBeenCalledWith(validInput.taskInstanceDate)
   expect(repo.pointsRepository.getPointClaims).toHaveBeenCalledWith({
     ...validInput,
-    userId: authUser.id
+    userId: authUser.id,
   })
 })

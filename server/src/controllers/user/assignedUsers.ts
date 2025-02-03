@@ -9,8 +9,7 @@ export default publicProcedure
       userRepository,
     })
   )
-  .input(z.number()
-  )
+  .input(z.number())
   .query(async ({ input, ctx: { repos } }) => {
     const users = await repos.userRepository.findAssignedUsersByTaskId(input)
 

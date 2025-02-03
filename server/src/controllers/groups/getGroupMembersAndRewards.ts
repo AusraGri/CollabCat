@@ -10,7 +10,6 @@ export default groupAuthProcedure
   .input(z.object({}))
   .output(z.undefined().or(groupDataSchema))
   .query(async ({ ctx: { repos, userGroup } }) => {
-
     const groupMembersAndRewards: GroupData | undefined =
       await repos.groupsRepository.getGroupMembersAndRewards(userGroup.groupId)
 

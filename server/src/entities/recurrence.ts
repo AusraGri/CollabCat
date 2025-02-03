@@ -24,7 +24,7 @@ export const recurringPatternSchemaInput = z.object({
     .array(z.number().int().positive().gte(1).lte(12))
     .nullable()
     .optional(),
-  recurringType: z.string(),
+  recurringType: z.string().trim().toLowerCase(),
   separationCount: z.number().int().min(0),
   weekOfMonth: z.array(z.number().int()).nullable().optional(),
 })

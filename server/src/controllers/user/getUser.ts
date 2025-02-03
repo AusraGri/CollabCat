@@ -10,11 +10,12 @@ export default publicProcedure
       userRepository,
     })
   )
-  .input(z.object({
-    userId: idSchema
-  })
+  .input(
+    z.object({
+      userId: idSchema,
+    })
   )
-  .query(async ({ input: {userId}, ctx: { repos } }) => {
+  .query(async ({ input: { userId }, ctx: { repos } }) => {
     const user = await repos.userRepository.findById(userId)
 
     return user

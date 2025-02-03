@@ -39,13 +39,12 @@ export default authenticatedProcedure
       endDate: endDate ? setDateToUTCmidnight(endDate) : undefined,
       createdByUserId: authUser.id,
     }
-
     const newTaskData = {
       task,
       recurrence: taskData.recurrence,
     }
 
-    const taskCreated= await repos.tasksRepository.createTask(newTaskData)
+    const taskCreated = await repos.tasksRepository.createTask(newTaskData)
 
     return taskCreated
   })

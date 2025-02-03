@@ -51,9 +51,7 @@ it('should throw an error if groupId is not provided', async () => {
 })
 
 it('should throw an error if user provides a non-existing groupId', async () => {
-  const notAuthenticated = createCaller(
-    authContext({ db }, userOne)
-  )
+  const notAuthenticated = createCaller(authContext({ db }, userOne))
   await expect(
     (notAuthenticated.testCall as any)({ groupId: 999 })
   ).rejects.toThrow(/group/i)

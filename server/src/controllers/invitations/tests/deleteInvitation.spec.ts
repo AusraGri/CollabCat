@@ -11,8 +11,9 @@ const db = await wrapInRollbacks(createTestDatabase())
 
 const invitationRepo = (bigInt: BigInt = BigInt(1)) => ({
   invitationsRepository: {
-    deleteInvitation: vi.fn(async () => ( { numDeletedRows: bigInt } as DeleteResult
-    )),
+    deleteInvitation: vi.fn(
+      async () => ({ numDeletedRows: bigInt }) as DeleteResult
+    ),
   } satisfies Partial<InvitationsRepository>,
 })
 
@@ -39,7 +40,7 @@ it('should delete invitation', async () => {
     deleteInvitation({
       invitationToken: token,
     })
-  ).resolves.toMatchObject({ success: true, message: / successfully deleted/i})
+  ).resolves.toMatchObject({ success: true, message: / successfully deleted/i })
 
   expect(repo.invitationsRepository.deleteInvitation).toHaveBeenCalledOnce()
   expect(repo.invitationsRepository.deleteInvitation).toHaveBeenCalledWith(
@@ -58,7 +59,7 @@ it('should return success if no rows were deleted with the message', async () =>
     deleteInvitation({
       invitationToken: token,
     })
-  ).resolves.toMatchObject({ success: true, message: /not found/i})
+  ).resolves.toMatchObject({ success: true, message: /not found/i })
 
   expect(repo.invitationsRepository.deleteInvitation).toHaveBeenCalledOnce()
   expect(repo.invitationsRepository.deleteInvitation).toHaveBeenCalledWith(

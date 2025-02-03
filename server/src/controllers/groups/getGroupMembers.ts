@@ -9,7 +9,6 @@ export default groupAuthProcedure
   .input(z.object({}))
   .output(z.array(userPublicSchema))
   .query(async ({ ctx: { repos, userGroup } }) => {
-
     const groupMembers = await repos.groupsRepository.getGroupMembers(
       userGroup.groupId
     )

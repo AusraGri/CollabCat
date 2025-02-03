@@ -17,10 +17,12 @@ export default authenticatedProcedure
     },
   })
   .input(
-    z.object({
-      taskId: idSchema,
-      taskInstanceDate: z.date(),
-    }).strict()
+    z
+      .object({
+        taskId: idSchema,
+        taskInstanceDate: z.date(),
+      })
+      .strict()
   )
   .output(z.boolean())
   .query(

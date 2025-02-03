@@ -9,18 +9,17 @@ import rewardsRouter from '..'
 
 const createCaller = createCallerFactory(rewardsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
-const mockRepo = (
-  reward?: Partial<PublicReward>) => ({
+const mockRepo = (reward?: Partial<PublicReward>) => ({
   rewardsRepository: {
-    getRewards: vi.fn(async () => (reward ? [reward] : []) as PublicReward[],
-  )} satisfies Partial<RewardsRepository>,
+    getRewards: vi.fn(async () => (reward ? [reward] : []) as PublicReward[]),
+  } satisfies Partial<RewardsRepository>,
 })
 
 const authUser = fakeAuthUser()
-const validInput = {groupId: 1}
+const validInput = { groupId: 1 }
 
-beforeEach(()=> {
-    vi.clearAllMocks()
+beforeEach(() => {
+  vi.clearAllMocks()
 })
 
 it('should throw an error if user is not authenticated', async () => {
@@ -41,12 +40,14 @@ it('should throw error if input is not valid', async () => {
   const { getRewards } = createCaller(authRepoContext(repo))
 
   // ACT & ASSERT
-// @ts-expect-error
+  // @ts-expect-error
   await expect(getRewards(input)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
   await expect(getRewards(inputTwo)).rejects.toThrowError(/invalid_type/i)
- // @ts-expect-error
-  await expect(getRewards(inputThree)).rejects.toThrowError(/unrecognized_keys/i)
+  // @ts-expect-error
+  await expect(getRewards(inputThree)).rejects.toThrowError(
+    /unrecognized_keys/i
+  )
   // @ts-expect-error
   await expect(getRewards(inputFour)).rejects.toThrowError(/unrecognized_keys/i)
 })
@@ -55,38 +56,32 @@ it('should return empty array if no rewards were found', async () => {
   // ARRANGE
   const repo = mockRepo()
   const { getRewards } = createCaller(authRepoContext(repo, authUser))
-  const {groupId} = validInput
+  const { groupId } = validInput
 
   // ACT & ASSERT
 
   await expect(getRewards(validInput)).resolves.toMatchObject([])
 
-  expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith(
-    {groupId}
-  )
-
+  expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith({ groupId })
 })
 
 it('should return rewards for group', async () => {
   // ARRANGE
-  const reward = fakeReward({id: 1})
+  const reward = fakeReward({ id: 1 })
   const repo = mockRepo(reward)
   const { getRewards } = createCaller(authRepoContext(repo, authUser))
-  const {groupId} = validInput
+  const { groupId } = validInput
 
   // ACT & ASSERT
 
   await expect(getRewards(validInput)).resolves.toMatchObject([reward])
 
-  expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith(
-    {groupId}
-  )
-
+  expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith({ groupId })
 })
 
 it('should return personal rewards', async () => {
   // ARRANGE
-  const reward = fakeReward({id: 1, createdByUserId: authUser.id})
+  const reward = fakeReward({ id: 1, createdByUserId: authUser.id })
   const repo = mockRepo(reward)
   const { getRewards } = createCaller(authRepoContext(repo, authUser))
 
@@ -94,8 +89,7 @@ it('should return personal rewards', async () => {
 
   await expect(getRewards({})).resolves.toMatchObject([reward])
 
-  expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith(
-   { createdByUserId: authUser.id}
-  )
-
+  expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith({
+    createdByUserId: authUser.id,
+  })
 })

@@ -1,7 +1,4 @@
-import {
-  authRepoContext,
-  requestContext,
-} from '@tests/utils/context'
+import { authRepoContext, requestContext } from '@tests/utils/context'
 import { fakeAuthUser } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
@@ -14,7 +11,7 @@ const createCaller = createCallerFactory(pointsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
 vi.mock('@server/controllers/utility/helpers', () => ({
-  setDateToUTCmidnight: vi.fn(()=> new Date())
+  setDateToUTCmidnight: vi.fn(() => new Date()),
 }))
 
 const mockRepo = (pointClaim?: any) => ({
@@ -88,17 +85,19 @@ it('should throw error if failed to add data to claimed points', async () => {
 
 it('should add point claim', async () => {
   // ARRANGE
-const authUser = fakeAuthUser()
+  const authUser = fakeAuthUser()
   const repo = mockRepo(claimedPoints)
   const { addClaimedPoints } = createCaller(authRepoContext(repo, authUser))
 
   // ACT & ASSERT
-  await expect(addClaimedPoints(validInput)).resolves.toMatchObject(claimedPoints)
+  await expect(addClaimedPoints(validInput)).resolves.toMatchObject(
+    claimedPoints
+  )
 
   expect(setDateToUTCmidnight).toHaveBeenCalledWith(validInput.taskInstanceDate)
   expect(repo.pointsRepository.addPointClaims).toHaveBeenCalledWith({
     userId: authUser.id,
     taskId: validInput.taskId,
-    taskInstanceDate: expect.any(Date)
+    taskInstanceDate: expect.any(Date),
   })
 })

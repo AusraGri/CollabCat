@@ -19,9 +19,11 @@ export default authenticatedProcedure
     },
   })
   .input(
-    z.object({
-      groupId: idSchema.optional(),
-    }).strict()
+    z
+      .object({
+        groupId: idSchema.optional(),
+      })
+      .strict()
   )
   .output(z.array(rewardsSchemaOutput))
   .query(async ({ input: searchData, ctx: { authUser, repos } }) => {

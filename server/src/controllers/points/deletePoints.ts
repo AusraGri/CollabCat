@@ -16,9 +16,11 @@ export default authenticatedProcedure
     },
   })
   .input(
-    z.object({
-      groupId: idSchema.optional(),
-    }).strict()
+    z
+      .object({
+        groupId: idSchema.optional(),
+      })
+      .strict()
   )
   .output(messageOutputSchema)
   .mutation(async ({ input: { groupId }, ctx: { authUser, repos } }) => {
@@ -30,7 +32,7 @@ export default authenticatedProcedure
     return {
       success: true,
       message: deletedPoints.numDeletedRows
-        ? "Points data successfully deleted."
-        : "Points data was not found (possibly already deleted)."
-    };
+        ? 'Points data successfully deleted.'
+        : 'Points data was not found (possibly already deleted).',
+    }
   })

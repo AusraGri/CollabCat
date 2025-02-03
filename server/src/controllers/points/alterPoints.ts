@@ -37,7 +37,10 @@ export default authenticatedProcedure
 
     let points: PointAlterObject
 
-    if (pointsData.action === '-' && currentPoints.points <= pointsData.points) {
+    if (
+      pointsData.action === '-' &&
+      currentPoints.points <= pointsData.points
+    ) {
       points = {
         ...pointsData,
         userId: authUser.id,

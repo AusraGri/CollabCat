@@ -30,7 +30,7 @@ it('should get invitations', async () => {
     email: 'some@email.com',
     groupId: 1,
     createdAt: new Date(),
-    id: 1
+    id: 1,
   }
   const repo = invitationRepo(invitation)
   const user = fakeAuthUser()

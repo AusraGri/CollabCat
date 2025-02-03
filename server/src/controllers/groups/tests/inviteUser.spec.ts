@@ -92,8 +92,8 @@ it('should throw an error if user is has no permission to invite', async () => {
 })
 
 beforeEach(() => {
-  vi.clearAllMocks();
-});
+  vi.clearAllMocks()
+})
 
 it('should throw an error if user is already in the group', async () => {
   // ARRANGE
@@ -150,7 +150,7 @@ it('should delete existing invitation if user is already invited and create new 
       inviteToken: expect.any(String),
     })
   )
-  
+
   expect(repo.invitationsRepository.createInvitation).toHaveBeenCalledWith({
     email,
     groupId: authGroup.groupId,

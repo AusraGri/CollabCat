@@ -17,7 +17,7 @@ export const groupAuthProcedure = authenticatedProcedure
     })
   )
   .use(async ({ input: { groupId }, ctx, next }) => {
-    const { authUser, repos} = ctx
+    const { authUser, repos } = ctx
 
     if (!ctx.userGroup) {
       const [isGroup] = await repos.groupsRepository.getGroup({ id: groupId })

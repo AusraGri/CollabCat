@@ -4,12 +4,8 @@ import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import type { InvitationsRepository } from '@server/repositories/invitationRepository'
 import { fakeAuthUser, fakeGroup, fakeUser } from '@server/entities/tests/fakes'
-import {
-    type GroupRepository,
-} from '@server/repositories/groupsRepository'
-import {
-    type UserRepository,
-} from '@server/repositories/userRepository'
+import { type GroupRepository } from '@server/repositories/groupsRepository'
+import { type UserRepository } from '@server/repositories/userRepository'
 import invitationsRouter from '..'
 
 const createCaller = createCallerFactory(invitationsRouter)

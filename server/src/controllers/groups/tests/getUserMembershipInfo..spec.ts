@@ -3,10 +3,7 @@ import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import type { GroupRepository } from '@server/repositories/groupsRepository'
-import {
-  fakeAuthGroup,
-  fakeAuthUser,
-} from '@server/entities/tests/fakes'
+import { fakeAuthGroup, fakeAuthUser } from '@server/entities/tests/fakes'
 import groupsRouter from '..'
 
 const createCaller = createCallerFactory(groupsRouter)
@@ -120,7 +117,9 @@ it('should throw error if no information about user found ', async () => {
 
   // ACT & ASSERTs
 
-  await expect(getMembershipInfo({ groupId: group.groupId, userId })).rejects.toThrowError('Not found')
+  await expect(
+    getMembershipInfo({ groupId: group.groupId, userId })
+  ).rejects.toThrowError('Not found')
 
   expect(
     repo.groupsRepository.getUserGroupMembershipInfo

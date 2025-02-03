@@ -42,9 +42,7 @@ const reposUserUndefined = {
 }
 
 const db = {} as any
-const authenticated = createCaller(
-  authContext({ db})
-)
+const authenticated = createCaller(authContext({ db }))
 
 it('should pass if user is already authenticated', async () => {
   const response = await authenticated.testCall()

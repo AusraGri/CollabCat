@@ -9,11 +9,11 @@ import pointsRouter from '..'
 const createCaller = createCallerFactory(pointsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
-const mockRepo = (points?: any,) => ({
+const mockRepo = (points?: any) => ({
   pointsRepository: {
     createPoints: vi.fn(async () => {
-        if(!points) throw new Error('failed to create')
-        return points
+      if (!points) throw new Error('failed to create')
+      return points
     }),
   } satisfies Partial<PointsRepository>,
 })
@@ -35,9 +35,9 @@ it('should throw an error if user is not authenticated', async () => {
 it('should throw error if input is not valid', async () => {
   // ARRANGE
   const repo = mockRepo()
-  const input = { groupId: 'cat'}
+  const input = { groupId: 'cat' }
   const inputTwo = undefined
-  const inputThreeValid= {anything: 'any'}
+  const inputThreeValid = { anything: 'any' }
   const { createPoints } = createCaller(authRepoContext(repo))
 
   // ACT & ASSERT
@@ -45,12 +45,11 @@ it('should throw error if input is not valid', async () => {
   // @ts-expect-error
   await expect(createPoints(input)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
-  await expect(createPoints(inputTwo)).rejects.toThrowError(
-    /invalid_type/i
-  )
+  await expect(createPoints(inputTwo)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
-  await expect(createPoints(inputThreeValid)).rejects.toThrowError(/unrecognized_keys/i)
-
+  await expect(createPoints(inputThreeValid)).rejects.toThrowError(
+    /unrecognized_keys/i
+  )
 })
 
 it('should throw error if failed to create points', async () => {
@@ -66,18 +65,17 @@ it('should throw error if failed to create points', async () => {
   expect(repo.pointsRepository.createPoints).toHaveBeenCalledWith({
     userId: authUser.id,
     groupId: undefined,
-    points: 0
+    points: 0,
   })
 
   await expect(repo.pointsRepository.createPoints()).rejects.toThrowError()
-
 })
 
 it('should create user points', async () => {
   // ARRANGE
 
   const authUser = fakeAuthUser()
-  const userPointsData = {...userPoints, userId: authUser.id }
+  const userPointsData = { ...userPoints, userId: authUser.id }
   const repo = mockRepo(userPointsData)
   const { createPoints } = createCaller(authRepoContext(repo, authUser))
 
@@ -88,31 +86,33 @@ it('should create user points', async () => {
   expect(repo.pointsRepository.createPoints).toHaveBeenCalledWith({
     userId: authUser.id,
     groupId: undefined,
-    points: 0
+    points: 0,
   })
 
-  await expect(repo.pointsRepository.createPoints()).resolves.toMatchObject(userPointsData)
-
+  await expect(repo.pointsRepository.createPoints()).resolves.toMatchObject(
+    userPointsData
+  )
 })
 
 it('should create user points for group', async () => {
   // ARRANGE
- const groupId = 123
+  const groupId = 123
   const authUser = fakeAuthUser()
-  const userPointsData = {...userPoints, userId: authUser.id, groupId }
+  const userPointsData = { ...userPoints, userId: authUser.id, groupId }
   const repo = mockRepo(userPointsData)
   const { createPoints } = createCaller(authRepoContext(repo, authUser))
 
   // ACT & ASSERT
 
-  await expect(createPoints({groupId})).resolves.toMatchObject(userPointsData)
+  await expect(createPoints({ groupId })).resolves.toMatchObject(userPointsData)
 
   expect(repo.pointsRepository.createPoints).toHaveBeenCalledWith({
     userId: authUser.id,
     groupId,
-    points: 0
+    points: 0,
   })
 
-  await expect(repo.pointsRepository.createPoints()).resolves.toMatchObject(userPointsData)
-
+  await expect(repo.pointsRepository.createPoints()).resolves.toMatchObject(
+    userPointsData
+  )
 })

@@ -10,12 +10,13 @@ import pointsRouter from '..'
 const createCaller = createCallerFactory(pointsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
-const mockRepo = (bigInt: BigInt = 0n,) => ({
+const mockRepo = (bigInt: BigInt = 0n) => ({
   pointsRepository: {
-    deletePoints: vi.fn(async () => ({numDeletedRows: bigInt} as DeleteResult)),
+    deletePoints: vi.fn(
+      async () => ({ numDeletedRows: bigInt }) as DeleteResult
+    ),
   } satisfies Partial<PointsRepository>,
 })
-
 
 it('should throw an error if user is not authenticated', async () => {
   // ARRANGE
@@ -28,9 +29,9 @@ it('should throw an error if user is not authenticated', async () => {
 it('should throw error if input is not valid', async () => {
   // ARRANGE
   const repo = mockRepo()
-  const input = { groupId: 'cat'}
+  const input = { groupId: 'cat' }
   const inputTwo = undefined
-  const inputThreeValid= {anything: 'any'}
+  const inputThreeValid = { anything: 'any' }
   const { deletePoints } = createCaller(authRepoContext(repo))
 
   // ACT & ASSERT
@@ -38,12 +39,11 @@ it('should throw error if input is not valid', async () => {
   // @ts-expect-error
   await expect(deletePoints(input)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
-  await expect(deletePoints(inputTwo)).rejects.toThrowError(
-    /invalid_type/i
-  )
+  await expect(deletePoints(inputTwo)).rejects.toThrowError(/invalid_type/i)
   // @ts-expect-error
-  await expect(deletePoints(inputThreeValid)).rejects.toThrowError(/unrecognized_keys/i)
-
+  await expect(deletePoints(inputThreeValid)).rejects.toThrowError(
+    /unrecognized_keys/i
+  )
 })
 
 it('should return message if no data was deleted', async () => {
@@ -56,7 +56,7 @@ it('should return message if no data was deleted', async () => {
 
   await expect(deletePoints({})).resolves.toMatchObject({
     success: true,
-    message: /not found/i
+    message: /not found/i,
   })
 
   expect(repo.pointsRepository.deletePoints).toHaveBeenCalledWith({
@@ -64,8 +64,7 @@ it('should return message if no data was deleted', async () => {
     groupId: undefined,
   })
 
-  await expect(repo.pointsRepository.deletePoints()).resolves.not.toThrowError();
-
+  await expect(repo.pointsRepository.deletePoints()).resolves.not.toThrowError()
 })
 
 it('should successfully delete user points', async () => {
@@ -78,7 +77,7 @@ it('should successfully delete user points', async () => {
 
   await expect(deletePoints({})).resolves.toMatchObject({
     success: true,
-    message: /successfully deleted/i
+    message: /successfully deleted/i,
   })
 
   expect(repo.pointsRepository.deletePoints).toHaveBeenCalledWith({
@@ -86,8 +85,7 @@ it('should successfully delete user points', async () => {
     groupId: undefined,
   })
 
-  await expect(repo.pointsRepository.deletePoints()).resolves.not.toThrowError();
-
+  await expect(repo.pointsRepository.deletePoints()).resolves.not.toThrowError()
 })
 
 it('should successfully delete user points for group', async () => {
@@ -99,16 +97,15 @@ it('should successfully delete user points for group', async () => {
 
   // ACT & ASSERT
 
-  await expect(deletePoints({groupId})).resolves.toMatchObject({
+  await expect(deletePoints({ groupId })).resolves.toMatchObject({
     success: true,
-    message: /successfully deleted/i
+    message: /successfully deleted/i,
   })
 
   expect(repo.pointsRepository.deletePoints).toHaveBeenCalledWith({
     userId: authUser.id,
-    groupId
+    groupId,
   })
 
-  await expect(repo.pointsRepository.deletePoints()).resolves.not.toThrowError();
-
+  await expect(repo.pointsRepository.deletePoints()).resolves.not.toThrowError()
 })

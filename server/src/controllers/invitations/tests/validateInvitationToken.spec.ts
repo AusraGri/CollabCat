@@ -5,18 +5,16 @@ import type { InvitationsRepository } from '@server/repositories/invitationRepos
 import * as validation from '../utils/tokenValidation'
 import invitationsRouter from '..'
 
-
 vi.mock('../utils/tokenValidation', () => ({
-  validateAndDecodeJWT: vi.fn()
+  validateAndDecodeJWT: vi.fn(),
 }))
-
 
 const createCaller = createCallerFactory(invitationsRouter)
 
 const mockRepo = (invitation?: any) => ({
   invitationsRepository: {
     getInvitationByToken: vi.fn(async () => invitation || undefined),
-  } satisfies Partial<InvitationsRepository>
+  } satisfies Partial<InvitationsRepository>,
 })
 
 const input = {
@@ -41,8 +39,12 @@ it('should throw an error if user does not have invitation', async () => {
   // ACT & ASSERT
   await expect(validateInvitationToken(input)).rejects.toThrow(/unauthorized/i)
 
-  expect(repo.invitationsRepository.getInvitationByToken).toHaveBeenCalledWith(input.invitationToken)
-  await expect(repo.invitationsRepository.getInvitationByToken()).resolves.toEqual(undefined)
+  expect(repo.invitationsRepository.getInvitationByToken).toHaveBeenCalledWith(
+    input.invitationToken
+  )
+  await expect(
+    repo.invitationsRepository.getInvitationByToken()
+  ).resolves.toEqual(undefined)
 })
 
 it('should throw error if invitation token is not valid', async () => {
@@ -70,10 +72,10 @@ it('should return invitation data', async () => {
   const { validateInvitationToken } = createCaller(repoContext(repo))
   const decoded = {
     user: {
-        email: 'some@email.com'
+      email: 'some@email.com',
     },
     iat: 123,
-    exp: 234
+    exp: 234,
   }
   tokenValidation.mockReturnValueOnce(decoded)
 
@@ -81,7 +83,7 @@ it('should return invitation data', async () => {
 
   await expect(validateInvitationToken(input)).resolves.toMatchObject({
     decoded,
-    invitation
+    invitation,
   })
 
   expect(tokenValidation).toHaveBeenCalledWith(invitation.invitationToken)

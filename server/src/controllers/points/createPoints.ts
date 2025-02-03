@@ -20,9 +20,11 @@ export default authenticatedProcedure
     },
   })
   .input(
-    z.object({
-      groupId: idSchema.optional(),
-    }).strict()
+    z
+      .object({
+        groupId: idSchema.optional(),
+      })
+      .strict()
   )
   .output(pointsSchemaOutput)
   .mutation(async ({ input: { groupId }, ctx: { authUser, repos } }) => {

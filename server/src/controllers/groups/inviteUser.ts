@@ -37,7 +37,8 @@ export default groupAuthProcedure
     if (userGroup.role !== 'Admin') {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'Unauthorized. User does not have permission to invite users to this group',
+        message:
+          'Unauthorized. User does not have permission to invite users to this group',
       })
     }
 

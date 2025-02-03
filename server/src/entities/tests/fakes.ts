@@ -101,7 +101,7 @@ export const fakeReward = <T extends Partial<Insertable<Rewards>>>(
     title: random.string(),
     createdByUserId: randomId(),
     amount: null,
-    cost: random.integer({ min: 1, max: 100} ),
+    cost: random.integer({ min: 1, max: 100 }),
     targetUserIds: null,
     groupId: null,
     ...overrides,
