@@ -2,7 +2,7 @@ import type { Database } from '@server/database'
 import type { RewardClaims, Rewards } from '@server/database/types'
 import type { DeleteResult, Insertable, Selectable, Updateable } from 'kysely'
 import { rewardsKeysAll, rewardClaimsKeysAll } from '@server/entities/rewards'
-
+import { pointsKeysPublic } from '@server/entities/points'
 
 export interface RewardUpdate {
   id: number
@@ -89,6 +89,48 @@ export function rewardsRepository(db: Database) {
         .values(data)
         .returning(rewardClaimsKeysAll)
         .executeTakeFirstOrThrow()
+    },
+    async claimReward(data: {
+      rewardId: number
+      userId: number
+      updatedPoints: number
+      groupId?: number
+      rewardAmount?: number
+    }): Promise<boolean> {
+      return db.transaction().execute(async (trx) => {
+        const { rewardId, userId, updatedPoints } = data
+
+        const groupId = data.groupId || null
+
+        await trx
+          .updateTable('points')
+          .set({ points: updatedPoints })
+          .where('points.userId', '=', data.userId)
+          .where('points.groupId', groupId ? '=' : 'is', groupId)
+          .returning(pointsKeysPublic)
+          .executeTakeFirstOrThrow()
+
+        if (data.rewardAmount) {
+         await trx
+            .updateTable('rewards')
+            .set({
+              amount: data.rewardAmount,
+            })
+            .where('rewards.id', '=', rewardId)
+            .executeTakeFirstOrThrow()
+        }
+
+        const result = await trx
+          .insertInto('rewardClaims')
+          .values({
+            rewardId,
+            userId,
+          })
+          .returning('rewardClaims.id')
+          .executeTakeFirstOrThrow()
+
+          return !!result
+      })
     },
   }
 }

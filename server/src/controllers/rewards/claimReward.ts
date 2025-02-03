@@ -43,12 +43,6 @@ export default authenticatedProcedure
         updatedRewardAmount = reward.amount - 1
       }
 
-      const { id, ...rewardData } = reward
-
-      const updatedReward = {
-        ...rewardData,
-        amount: updatedRewardAmount,
-      }
       const userPoints = await repos.pointsRepository.getPoints({
         userId: authUser.id,
         groupId,
@@ -61,23 +55,16 @@ export default authenticatedProcedure
         })
       }
 
-      await repos.pointsRepository.alterPoints({
+      const updatedPoints = userPoints.points - reward.cost
+
+      const result = await repos.rewardsRepository.claimReward({
         userId: authUser.id,
-        action: '-',
-        points: reward.cost,
-        groupId,
-      })
-
-      await repos.rewardsRepository.updateReward({
-        id,
-        reward: updatedReward,
-      })
-
-      await repos.rewardsRepository.addRewardClaim({
+        updatedPoints,
         rewardId,
-        userId: authUser.id,
+        groupId,
+        rewardAmount: updatedRewardAmount,
       })
 
-      return true
+      return result
     }
   )
