@@ -156,7 +156,6 @@ describe('update', () => {
     const task = await repository.updateTask({
       id: taskOne.id,
       task: updatedTask,
-      recurrence: null,
     })
     const [updated] = await repository.getTasks({ id: taskOne.id })
     // Then
@@ -176,7 +175,6 @@ describe('update', () => {
       repository.updateTask({
         id: taskId,
         task: { title: 'Update' },
-        recurrence: null,
       })
     ).rejects.toThrowError()
   })
