@@ -8,7 +8,7 @@ import type {
   CompletedTasks,
   Rewards,
 } from '@server/database/types'
-import type { Insertable } from 'kysely'
+import type { Insertable, Selectable } from 'kysely'
 import { random } from '@tests/utils/random'
 import type { AuthUser } from '../user'
 import type { AuthGroup } from '../groups'
@@ -49,10 +49,10 @@ export const fakeAuthGroup = <T extends Partial<AuthGroup>>(
 })
 
 /**
- * Generates a fake article with some default test data.
+ * Generates a fake task with some default test data.
  * @param overrides userId and any properties that should be different from default fake data.
  */
-export const fakeTask = <T extends Partial<Insertable<Tasks>>>(overrides: T) =>
+export const fakeTask = <T extends Partial<Insertable<Tasks>>>(overrides: T = {} as T) =>
   ({
     title: random.string().slice(1, 20),
     description: random.paragraph().slice(1, 100),
@@ -60,6 +60,31 @@ export const fakeTask = <T extends Partial<Insertable<Tasks>>>(overrides: T) =>
     startDate: random.date(),
     ...overrides,
   }) satisfies Insertable<Tasks>
+
+/**
+ * Generates a fake task data with some default test data.
+ * @param overrides userId and any properties that should be different from default fake data.
+ */
+export const fakeTaskData = <T extends Partial<Selectable<Tasks>>>(overrides: T = {} as T) =>
+  ({
+    title: random.string().slice(1, 20),
+    description: random.paragraph().slice(1, 100),
+    createdByUserId: randomId(),
+    startDate: null,
+    id: randomId(),
+    assignedUserId: null,
+    categoryId: null,
+    isCompleted: false,
+    completedAt: null,
+    groupId: null,
+    points: null,
+    endDate: null,
+    isRecurring: false,
+    startTime: null,
+    recurrence: null,
+    completed: [],
+    ...overrides,
+  }) satisfies Selectable<Tasks>
 
 /**
  * Generates a fake completed task with some default test data.

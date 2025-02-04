@@ -2,7 +2,6 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { taskUpdateSchema, taskDataSchema } from '@server/entities/tasks'
-import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
@@ -26,15 +25,8 @@ export default authenticatedProcedure
   .input(taskUpdateSchema)
   .output(taskDataSchema)
   .mutation(async ({ input: taskData, ctx: { repos } }) => {
-    const { startDate, endDate } = taskData.task
 
-    const task = {
-      ...taskData.task,
-      startDate: startDate ? setDateToUTCmidnight(startDate) : undefined,
-      endDate: endDate ? setDateToUTCmidnight(endDate) : undefined,
-    }
-
-    await repos.tasksRepository.updateTask({ ...taskData, task })
+    await repos.tasksRepository.updateTask({...taskData})
 
     const [updatedTask] = await repos.tasksRepository.getTasks({
       id: taskData.id,

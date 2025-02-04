@@ -5,11 +5,13 @@ export function setDateToUTCmidnight(date: Date | string) {
   return newDate
 }
 
-export function removeNullValues<T extends { [key: string]: any }>(
-  obj: T
-): Partial<T> {
-  return Object.fromEntries(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Object.entries(obj).filter(([_, value]) => value !== null)
-  ) as Partial<T>
+export function outputMessageForDelete (param: {objective: string, conditional: boolean}, outcome: boolean = true) {
+  const {objective, conditional} = param
+  const obj = objective.charAt(0).toUpperCase()
+  return {
+    success: outcome,
+    message: conditional
+      ? `${obj} successfully deleted.`
+      : `${obj} was not found (possibly already deleted).`
+  }
 }

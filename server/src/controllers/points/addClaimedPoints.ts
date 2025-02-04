@@ -4,7 +4,6 @@ import { pointsClaimedSchema } from '@server/entities/points'
 import { idSchema } from '@server/entities/shared'
 import z from 'zod'
 import { authenticatedProcedure } from '../../trpc/authenticatedProcedure/index'
-import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default authenticatedProcedure
   .use(provideRepos({ pointsRepository }))
@@ -28,12 +27,11 @@ export default authenticatedProcedure
       input: { taskId, taskInstanceDate },
       ctx: { authUser, repos },
     }) => {
-      const taskDate = setDateToUTCmidnight(taskInstanceDate)
 
       const claimed = await repos.pointsRepository.addPointClaims({
         userId: authUser.id,
         taskId,
-        taskInstanceDate: taskDate,
+        taskInstanceDate
       })
 
       return claimed

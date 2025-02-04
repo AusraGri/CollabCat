@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { Selectable } from 'kysely'
 import type { Points } from '@server/database/types'
-import { idSchema } from './shared'
+import { dateSchema, idSchema } from './shared'
 
 export const pointsSchema = z.object({
   userId: idSchema.describe('Owner of the points'),
@@ -14,7 +14,7 @@ export const pointsClaimedSchema = z.object({
   id: idSchema,
   taskId: idSchema.describe('Task for what points were given'),
   claimedAt: z.date(),
-  taskInstanceDate: z.date(),
+  taskInstanceDate: dateSchema,
 })
 
 export const deletePointsSchema = z.object({

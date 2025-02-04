@@ -3,8 +3,7 @@ import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { taskCompletionSchema } from '@server/entities/tasks'
 import { TRPCError } from '@trpc/server'
-import z from 'zod'
-import { setDateToUTCmidnight } from '../utility/helpers'
+import { messageOutputSchema } from '@server/entities/shared'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
@@ -18,7 +17,7 @@ export default authenticatedProcedure
     },
   })
   .input(taskCompletionSchema)
-  .output(z.boolean())
+  .output(messageOutputSchema)
   .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {
     const [isTask] = await repos.tasksRepository.getTasks({ id: taskData.id })
 
@@ -31,37 +30,39 @@ export default authenticatedProcedure
 
     const isTaskRecurring = isTask.isRecurring ? isTask.isRecurring : false
 
-    const instanceDate = setDateToUTCmidnight(taskData.instanceDate)
+    const { instanceDate, isCompleted, id } = taskData
+
+    let isTaskCompleted = isCompleted
 
     if (isTaskRecurring) {
-      if (taskData.isCompleted === true) {
+      if (isCompleted === true) {
         await repos.tasksRepository.addToCompletedTasks({
-          taskId: taskData.id,
+          taskId: id,
           instanceDate,
           completedBy: authUser.id,
         })
 
-        return true
+        isTaskCompleted = true
+      } else if (isCompleted === false) {
+        await repos.tasksRepository.removeCompletedTasks({
+          taskId: id,
+          instanceDate,
+        })
+        isTaskCompleted = false
       }
+    } else if (isTask.isCompleted !== isCompleted) {
+      await repos.tasksRepository.updateTaskCompletion({
+        id,
+        isCompleted,
+      })
 
-      if (taskData.isCompleted === false) {
-        const taskCompletion = await repos.tasksRepository.removeCompletedTasks(
-          {
-            taskId: taskData.id,
-            instanceDate,
-          }
-        )
-
-        return !!taskCompletion.numDeletedRows
-      }
+      isTaskCompleted = isCompleted
     }
 
-    if (isTask.isCompleted === taskData.isCompleted) return true
-
-    await repos.tasksRepository.updateTaskCompletion({
-      id: taskData.id,
-      isCompleted: taskData.isCompleted,
-    })
-
-    return true
+    return {
+      success: true,
+      message: isTaskCompleted
+        ? 'Task status: completed.'
+        : 'Task status: not completed.',
+    }
   })

@@ -5,7 +5,6 @@ import { dateSchema } from '@server/entities/shared'
 import isTaskDue from '@server/utils/isTaskDue'
 import { taskDataSchema } from '@server/entities/tasks'
 import z from 'zod'
-import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
@@ -18,7 +17,7 @@ export default authenticatedProcedure
       protect: true,
       example: {
         request: {
-          date: '2024-11-11',
+          date: new Date('2024-11-11')
         },
       },
     },
@@ -30,10 +29,9 @@ export default authenticatedProcedure
   )
   .output(taskDataSchema.array())
   .query(async ({ input: { date }, ctx: { authUser, repos } }) => {
-    const dateUTC = setDateToUTCmidnight(date)
 
     const tasks = await repos.tasksRepository.getPersonalTasksDue(
-      dateUTC,
+      date,
       authUser.id
     )
     if (tasks.length === 0) return []

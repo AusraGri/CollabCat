@@ -4,9 +4,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { dateSchema, idSchema } from '@server/entities/shared'
 import isTaskDue from '@server/utils/isTaskDue'
 import { taskDataSchema, type TaskData } from '@server/entities/tasks'
-import { TRPCError } from '@trpc/server'
 import z from 'zod'
-import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default groupAuthProcedure
   .use(provideRepos({ tasksRepository }))
@@ -33,19 +31,11 @@ export default groupAuthProcedure
   )
   .output(taskDataSchema.array())
   .query(async ({ input: { date, userId }, ctx: { userGroup, repos } }) => {
-    if (!userGroup) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: 'User is not authorized in the group',
-      })
-    }
-
-    const dateUTC = setDateToUTCmidnight(date)
 
     const tasks: TaskData[] = await repos.tasksRepository.getGroupTasksDue({
-      date: dateUTC,
+      date,
       userId,
-      groupId: userGroup?.groupId,
+      groupId: userGroup.groupId,
     })
 
     if (tasks.length === 0) return []

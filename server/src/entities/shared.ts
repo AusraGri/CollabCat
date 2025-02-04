@@ -1,13 +1,11 @@
 import { z } from 'zod'
+import { setDateToUTCmidnight } from '@server/controllers/utility/helpers'
 
 export const idSchema = z.number().int().positive()
 
 export const dateSchema = z
-  .string()
-  .refine((dateStr) => !Number.isNaN(Date.parse(dateStr)), {
-    message: 'Invalid date format',
-  })
-  .transform((dateStr) => new Date(dateStr))
+  .date()
+  .transform((date) => setDateToUTCmidnight(date))
 
 export const messageOutputSchema = z.object({
   success: z.boolean(),

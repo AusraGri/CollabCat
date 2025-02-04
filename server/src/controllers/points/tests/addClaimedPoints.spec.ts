@@ -11,7 +11,7 @@ const createCaller = createCallerFactory(pointsRouter)
 const db = await wrapInRollbacks(createTestDatabase())
 
 vi.mock('@server/controllers/utility/helpers', () => ({
-  setDateToUTCmidnight: vi.fn(() => new Date()),
+  setDateToUTCmidnight: vi.fn((date: Date) => date),
 }))
 
 const mockRepo = (pointClaim?: any) => ({
@@ -80,7 +80,6 @@ it('should throw error if failed to add data to claimed points', async () => {
 
   // ACT & ASSERT
   await expect(addClaimedPoints(validInput)).rejects.toThrowError(/failed/i)
-  expect(setDateToUTCmidnight).toHaveBeenCalledWith(validInput.taskInstanceDate)
 })
 
 it('should add point claim', async () => {

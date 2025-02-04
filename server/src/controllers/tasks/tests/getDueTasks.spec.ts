@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { authContext } from '@tests/utils/context'
+import { authContext, requestContext } from '@tests/utils/context'
 import {
   fakePattern,
   fakeTask,
@@ -10,31 +10,64 @@ import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
+import { setDateToUTCmidnight } from '@server/controllers/utility/helpers'
 import tasksRouter from '..'
+// import type { TaskData } from '@server/entities/tasks'
+// import type { TasksRepository } from '@server/repositories/tasksRepository'
 
 const createCaller = createCallerFactory(tasksRouter)
 const db = await wrapInRollbacks(createTestDatabase())
+
+// const mockRepo = (tasks: any[]) => ({
+//   tasksRepository: {
+//     getTasksDue: vi.fn(async () => tasks || [] as TaskData[] ),
+//   } satisfies Partial<TasksRepository>,
+// })
+
 const [user] = await insertAll(db, 'user', [fakeUser()])
+
+// const tasks = [
+//   fakeTask({
+//     createdByUserId: user.id,
+//     startDate: new Date(2024, 1, 1),
+//     isRecurring: true,
+//   }),
+//   fakeTask({
+//     createdByUserId: user.id,
+//     startDate: new Date(2055, 1, 1),
+//     isRecurring: true,
+//   }),
+//   fakeTask({
+//     createdByUserId: user.id,
+//     startDate: new Date(),
+//     isRecurring: true,
+//   }),
+//   fakeTask({
+//     createdByUserId: user.id,
+//     startDate: new Date(),
+//     isRecurring: false,
+//   }),
+// ]
 
 const [task, taskTwo, taskThree, taskFour] = await insertAll(db, 'tasks', [
   fakeTask({
     createdByUserId: user.id,
-    startDate: new Date(2024, 1, 1),
+    startDate: setDateToUTCmidnight(new Date(2024, 1, 1)) ,
     isRecurring: true,
   }),
   fakeTask({
     createdByUserId: user.id,
-    startDate: new Date(2055, 1, 1),
+    startDate: setDateToUTCmidnight(new Date(2055, 1, 1)),
     isRecurring: true,
   }),
   fakeTask({
     createdByUserId: user.id,
-    startDate: new Date(),
+    startDate: setDateToUTCmidnight(new Date()),
     isRecurring: true,
   }),
   fakeTask({
     createdByUserId: user.id,
-    startDate: new Date(),
+    startDate: setDateToUTCmidnight( new Date()),
     isRecurring: false,
   }),
 ])
@@ -44,7 +77,7 @@ const [taskCompleted] = await insertAll(
   'completedTasks',
   fakeCompletedTask({
     taskId: taskThree.id,
-    instanceDate: new Date(),
+    instanceDate: setDateToUTCmidnight( new Date()),
   })
 )
 
@@ -68,13 +101,24 @@ const [patternOne, patternTwo, patternThree] = await insertAll(
   ]
 )
 
-const { getDueTasks } = createCaller(authContext({ db }, user))
+const date = new Date()
+
+// const { getDueTasks } = createCaller(authContext({ db }, user))
+
+it('should throw an error if user is not authenticated', async () => {
+  // ARRANGE
+  const { getDueTasks } = createCaller(requestContext({ db }))
+
+  // ACT & ASSERT
+  await expect(getDueTasks({date})).rejects.toThrow(/unauthenticated/i)
+})
 
 it('should return a task for the given date', async () => {
-  const date = new Date().toISOString()
 
   // When (ACT)
+  const { getDueTasks } = createCaller(authContext({ db }, user))
   const taskResponse = await getDueTasks({ date })
+  
   // Then (ASSERT)
   expect(taskResponse).toHaveLength(3)
   const expectedIds = [task.id, taskThree.id, taskFour.id]
@@ -83,10 +127,11 @@ it('should return a task for the given date', async () => {
 })
 
 it('should return empty array id no tasks for the day', async () => {
-  const date = '2023-11-11'
+  const { getDueTasks } = createCaller(authContext({ db }, user))
+  const dateCheck = new Date('2023-11-11')
 
   // When (ACT)
-  const taskResponse = await getDueTasks({ date })
+  const taskResponse = await getDueTasks({ date: dateCheck })
 
   // Then (ASSERT)
   expect(taskResponse).toHaveLength(0)

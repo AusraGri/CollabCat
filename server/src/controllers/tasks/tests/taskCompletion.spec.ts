@@ -32,6 +32,37 @@ it('should trow an error if task id is invalid', async () => {
   expect(repos.tasksRepository.getTasks).toBeCalled()
 })
 
+it('should return same task status if task is already completed (not recurring)', async () => {
+  // When (ACT)
+  const task = {
+    id: 1,
+    isCompleted: true,
+    instanceDate: new Date(2024, 0, 1),
+  }
+
+  const repos = {
+    tasksRepository: {
+      getTasks: vi.fn(async () => [fakeTask({ id: 1, isCompleted: true })] as TaskData[]),
+      addToCompletedTasks: vi.fn(
+        async () => fakeCompletedTask({ taskId: 1 }) as SelectableCompletedTask
+      ),
+      updateTaskCompletion: vi.fn(async () => 'data' as any),
+    } satisfies Partial<TasksRepository>,
+  }
+
+  const { taskCompletion } = createCaller(authRepoContext(repos))
+
+  // Then (ASSERT)
+  const completedTask = await taskCompletion(task)
+  expect(repos.tasksRepository.getTasks).toBeCalled()
+  expect(repos.tasksRepository.addToCompletedTasks).not.toBeCalled()
+  expect(repos.tasksRepository.updateTaskCompletion).not.toBeCalled()
+  expect(completedTask).toMatchObject({
+    success: true,
+    message: /completed/i
+  })
+})
+
 it('should mark task as completed', async () => {
   // When (ACT)
   const task = {
@@ -57,7 +88,10 @@ it('should mark task as completed', async () => {
   expect(repos.tasksRepository.getTasks).toBeCalled()
   expect(repos.tasksRepository.addToCompletedTasks).not.toBeCalled()
   expect(repos.tasksRepository.updateTaskCompletion).toBeCalled()
-  expect(completedTask).toBe(true)
+  expect(completedTask).toMatchObject({
+    success: true,
+    message: /completed/i
+  })
 })
 it('should add task to completed tasks when task is recurring', async () => {
   // When (ACT)
@@ -90,7 +124,10 @@ it('should add task to completed tasks when task is recurring', async () => {
   expect(repos.tasksRepository.removeCompletedTasks).not.toBeCalled()
   expect(repos.tasksRepository.addToCompletedTasks).toBeCalled()
   expect(repos.tasksRepository.updateTaskCompletion).not.toBeCalled()
-  expect(completedTask).toBe(true)
+  expect(completedTask).toMatchObject({
+    success: true,
+    message: /completed/i
+  })
 })
 
 it('should remove task from completed', async () => {
@@ -125,5 +162,47 @@ it('should remove task from completed', async () => {
   expect(repos.tasksRepository.addToCompletedTasks).not.toBeCalled()
   expect(repos.tasksRepository.updateTaskCompletion).not.toBeCalled()
 
-  expect(completedTask).toBe(true)
+  expect(completedTask).toMatchObject({
+    success: true,
+    message: /not completed/i
+  })
+})
+
+it('should update task as not completed (not recurring)', async () => {
+  // When (ACT)
+  const task = {
+    id: 1,
+    isCompleted: false,
+    instanceDate: new Date(2024, 0, 1),
+  }
+
+  const repos = {
+    tasksRepository: {
+      getTasks: vi.fn(async () => [
+        fakeTask({ id: 1, isRecurring: false }) as TaskData,
+      ]),
+      removeCompletedTasks: vi.fn(
+        async () => ({ numDeletedRows: 1n }) as DeleteResult
+      ),
+      addToCompletedTasks: vi.fn(
+        async () => fakeCompletedTask({ taskId: 1 }) as SelectableCompletedTask
+      ),
+      updateTaskCompletion: vi.fn(async () => 'data' as any),
+    } satisfies Partial<TasksRepository>,
+  }
+
+  const { taskCompletion } = createCaller(authRepoContext(repos))
+
+  // Then (ASSERT)
+  const completedTask = await taskCompletion(task)
+  expect(repos.tasksRepository.getTasks).toBeCalled()
+  expect(repos.tasksRepository.removeCompletedTasks).not.toBeCalled()
+  expect(repos.tasksRepository.addToCompletedTasks).not.toBeCalled()
+  expect(repos.tasksRepository.updateTaskCompletion).toBeCalled()
+  expect(repos.tasksRepository.updateTaskCompletion).toBeCalledWith({id: task.id, isCompleted: task.isCompleted})
+
+  expect(completedTask).toMatchObject({
+    success: true,
+    message: /not completed/i
+  })
 })

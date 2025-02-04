@@ -10,17 +10,17 @@ import {
 
 export const taskSchema = z.object({
   id: idSchema,
-  assignedUserId: idSchema,
-  categoryId: idSchema,
+  assignedUserId: idSchema.nullable(),
+  categoryId: idSchema.nullable(),
   isCompleted: z.boolean(),
-  completedAt: z.date(),
+  completedAt: z.date().nullable(),
   createdByUserId: idSchema,
-  description: z.string().trim().max(300),
-  groupId: idSchema,
-  points: z.number().positive(),
+  description: z.string().trim().max(300).nullable(),
+  groupId: idSchema.nullable(),
+  points: z.number().min(0).nullable(),
   title: z.string().trim().min(3).max(100),
-  startDate: dateSchema.or(z.date()),
-  endDate: dateSchema.or(z.date()),
+  startDate: dateSchema.nullable(),
+  endDate: dateSchema.nullable(),
   startTime: z.string().nullable(),
   isRecurring: z.boolean().nullable(),
 })
@@ -120,32 +120,32 @@ export const createTaskSchema = z.object({
   startTime: z.date().optional(),
 })
 
-export const taskUpdateOptional = taskSchemaOutput
+export const taskUpdateOptional = taskSchema
   .omit({ id: true, createdByUserId: true })
   .partial()
 
 export const taskUpdateSchema = z.object({
   id: idSchema.describe('Task id to update'),
   task: taskUpdateOptional.describe('Task updated data to save/change'),
-  recurrence: recurringPatternSchemaInput.nullable(),
+  recurrence: recurringPatternSchemaInput.optional(),
 })
 
 export const taskCompletionSchema = z.object({
   id: idSchema.describe('Task id'),
-  instanceDate: z.date().describe('Task instance date'),
+  instanceDate: dateSchema.describe('Task instance date'),
   isCompleted: z
     .boolean()
     .describe('If you want to mark as completed - true, opposite - false'),
 })
 
-export const getTasksSchema = taskSchema
-  .pick({
-    title: true,
-    categoryId: true,
-    groupId: true,
-    assignedUserId: true,
-    createdByUserId: true,
-    id: true,
+export const getTasksSchema = z.object
+  ({
+    title: z.string().trim().min(3).max(100),
+    categoryId: idSchema,
+    groupId: idSchema,
+    assignedUserId: idSchema,
+    createdByUserId: idSchema,
+    id: idSchema,
   })
   .partial()
 

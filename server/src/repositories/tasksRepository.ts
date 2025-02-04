@@ -160,7 +160,7 @@ export function tasksRepository(db: Database) {
         return db.transaction().execute(async (trx) => {
           const { id, task, recurrence } = taskData
           if (task.isRecurring && !recurrence)
-            throw new Error('Missing task data')
+            throw new Error('Missing task recurrence data')
 
           if (!id || id <= 0) {
             throw new Error('Invalid task ID')
@@ -201,6 +201,7 @@ export function tasksRepository(db: Database) {
       return db
         .insertInto('completedTasks')
         .values(taskData)
+        .onConflict((oc) => oc.doNothing()) 
         .returning(taskCompletionKeysAll)
         .executeTakeFirstOrThrow()
     },
@@ -215,11 +216,11 @@ export function tasksRepository(db: Database) {
         .executeTakeFirstOrThrow()
     },
 
-    async delete(taskId: number): Promise<DeleteResult> {
+    async deleteTask(taskId: number): Promise<DeleteResult> {
       return db
         .deleteFrom('tasks')
         .where('id', '=', taskId)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
 
     async getTasksDue(date: Date, userId: number): Promise<TaskData[]> {

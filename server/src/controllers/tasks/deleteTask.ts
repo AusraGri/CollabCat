@@ -1,8 +1,7 @@
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { idSchema } from '@server/entities/shared'
-import { TRPCError } from '@trpc/server'
+import { idSchema, messageOutputSchema } from '@server/entities/shared'
 import { z } from 'zod'
 
 export default authenticatedProcedure
@@ -21,16 +20,14 @@ export default authenticatedProcedure
       taskId: idSchema,
     })
   )
-  .output(z.boolean())
+  .output(messageOutputSchema)
   .mutation(async ({ input: { taskId }, ctx: { repos } }) => {
-    const result = await repos.tasksRepository.delete(taskId)
+    const result = await repos.tasksRepository.deleteTask(taskId)
 
-    if (!result.numDeletedRows) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Tasks were not found. Failed to delete',
-      })
+    return {
+      success: true,
+      message: result?.numDeletedRows
+        ? 'Task successfully deleted.'
+        : 'Task was not found (possibly already deleted).',
     }
-
-    return true
   })
