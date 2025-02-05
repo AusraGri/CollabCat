@@ -3,7 +3,7 @@ import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
-import { sentInvitationMail, mailTransporter } from '@server/emailer'
+import { sentInvitationMail, getMailTransporter } from '@server/emailer'
 import jsonwebtoken from 'jsonwebtoken'
 import config from '@server/config'
 import { prepareInvitationTokenPayload } from '@server/trpc/tokenPayload'
@@ -74,6 +74,8 @@ export default groupAuthProcedure
     const inviteToken = jsonwebtoken.sign(payload, tokenKey, {
       expiresIn,
     })
+
+    const mailTransporter = getMailTransporter()
 
     if (!userHasAccount) {
       await sentInvitationMail(mailTransporter, { email, inviteToken })

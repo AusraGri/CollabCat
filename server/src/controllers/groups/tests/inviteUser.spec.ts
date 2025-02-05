@@ -14,10 +14,10 @@ import { type UserRepository } from '@server/repositories/userRepository'
 import groupsRouter from '..'
 
 vi.mock('@server/emailer', () => ({
-  sentInvitationMail: vi.fn().mockResolvedValue(undefined),
-  mailTransporter: {
-    send: vi.fn().mockResolvedValue('Email sent successfully'),
-  },
+  sentInvitationMail: vi.fn().mockResolvedValue(undefined), // Mocking the function directly
+  getMailTransporter: vi.fn(() => ({
+    sendMail: vi.fn().mockResolvedValue({ messageId: '12345' }),
+  })),
 }))
 
 const createCaller = createCallerFactory(groupsRouter)
