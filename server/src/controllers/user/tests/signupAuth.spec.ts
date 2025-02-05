@@ -54,6 +54,7 @@ describe('authProcedure', () => {
     const result = await signupAuth(mockUserInput)
 
     expect(result).toEqual(user)
+    expect(repository.userRepository.findByEmail).toBeCalledWith(mockUserInput.email)
     expect(repository.userRepository.create).toHaveBeenCalledWith({
       email: mockUser.email,
       auth0Id: 'auth0|12345',
@@ -131,5 +132,47 @@ describe('authProcedure', () => {
     } as Auth0TokenPayload)
 
     await expect(signupAuth(mockUserInput)).rejects.toThrow(/user/i)
+  })
+
+  it('should throw error if failed to create user', async () => {
+    const repository = {
+      userRepository: {
+        findByEmail: vi.fn(async () => undefined),
+        create: vi.fn(async () => {
+          throw new Error('failed to create')
+        }),
+      },
+    }
+    const { signupAuth } = createCaller(repoContext(repository))
+
+    vi.mocked(verifyAuth0Token).mockResolvedValue({
+      sub: 'auth0|12345',
+    } as Auth0TokenPayload)
+
+    await expect(signupAuth(mockUserInput)).rejects.toThrow(/failed/i)
+    expect(repository.userRepository.findByEmail).toBeCalledWith(mockUserInput.email)
+    expect(repository.userRepository.create).toBeCalled()
+  })
+
+  it('should throw error is auth0 token is not valid', async () => {
+    const repo = repos(user, undefined)
+    const { signupAuth } = createCaller(repoContext(repo))
+
+    vi.mocked(verifyAuth0Token).mockRejectedValue(new Error('validation failed'))
+
+    await expect(signupAuth(mockUserInput)).rejects.toThrow(/failed/i)
+    expect(repo.userRepository.findByEmail).not.toBeCalled()
+    expect(repo.userRepository.create).not.toBeCalled()
+  })
+
+  it('should throw error is there is no token validation result', async () => {
+    const repo = repos(user, undefined)
+    const { signupAuth } = createCaller(repoContext(repo))
+
+    vi.mocked(verifyAuth0Token).mockResolvedValue({} as Auth0TokenPayload)
+
+    await expect(signupAuth(mockUserInput)).rejects.toThrow(/invalid/i)
+    expect(repo.userRepository.findByEmail).not.toBeCalled()
+    expect(repo.userRepository.create).not.toBeCalled()
   })
 })

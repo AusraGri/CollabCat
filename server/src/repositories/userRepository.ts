@@ -1,6 +1,6 @@
 import type { Database } from '@server/database'
 import type { User } from '@server/database/types'
-import { userKeysAll, type UserBaseInfo } from '@server/entities/user'
+import { userKeysAll, userKeysPublic, type UserBaseInfo, type UserPublic } from '@server/entities/user'
 import type { DeleteResult, Insertable, Selectable } from 'kysely'
 
 export type UserUpdatables = {
@@ -30,13 +30,13 @@ export function userRepository(db: Database) {
 
     async findAssignedUsersByTaskId(
       taskId: number
-    ): Promise<Selectable<User>[]> {
+    ): Promise<UserPublic| undefined> {
       const user = await db
         .selectFrom('tasks')
         .where('tasks.id', '=', taskId)
         .innerJoin('user', 'user.id', 'tasks.assignedUserId')
-        .select(userKeysAll)
-        .execute()
+        .select(userKeysPublic)
+        .executeTakeFirst()
 
       return user
     },
@@ -93,20 +93,15 @@ export function userRepository(db: Database) {
       return user
     },
 
-    async update(
+    async updateUser(
       userId: number,
       userData: UserUpdatables
-    ): Promise<Selectable<User>> {
-      await db
+    ): Promise<UserPublic> {
+      const user = await db
         .updateTable('user')
         .set({ ...userData, updatedAt: new Date() })
         .where('id', '=', userId)
-        .executeTakeFirstOrThrow()
-
-      const user = await db
-        .selectFrom('user')
-        .select(userKeysAll)
-        .where('id', '=', userId)
+        .returning(userKeysPublic)
         .executeTakeFirstOrThrow()
 
       return user

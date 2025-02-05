@@ -16,7 +16,6 @@ import { tasksRepository } from '../tasksRepository'
 const db = await wrapInRollbacks(createTestDatabase())
 const repository = tasksRepository(db)
 
-// An example of repository tests with a database.
 const [userOne, userTwo, userThree] = await insertAll(db, 'user', [
   fakeUser(),
   fakeUser(),

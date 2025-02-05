@@ -7,7 +7,8 @@ export function setDateToUTCmidnight(date: Date | string) {
 
 export function outputMessageForDelete (param: {objective: string, conditional: boolean}, outcome: boolean = true) {
   const {objective, conditional} = param
-  const obj = objective.charAt(0).toUpperCase()
+
+  const obj = objective.replace(/\b\w/g, char => char.toUpperCase())
   return {
     success: outcome,
     message: conditional

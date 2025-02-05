@@ -47,7 +47,7 @@ export default publicProcedure
         `https://${config.auth0.issuerBaseURL}/`
       )
 
-      if (!userFromAuth0) {
+      if (!userFromAuth0.sub) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: 'Invalid Auth0 token',
@@ -60,7 +60,6 @@ export default publicProcedure
 
       const existingUser = await repos.userRepository.findByEmail(email)
       if (existingUser && existingUser.auth0Id === auth0Id) {
-        // res.setHeader('Set-Cookie', `authToken=${auth0Token}; HttpOnly; Secure; SameSite=Strict; Path=/;`);
         return existingUser
       }
 

@@ -43,6 +43,7 @@ export async function verifyAuth0Token(
       issuer,
       algorithms: ['RS256'],
     }) as Auth0TokenPayload
+
     return decoded
   } catch (error) {
     if (error instanceof jsonwebtoken.TokenExpiredError) {

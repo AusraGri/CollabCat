@@ -9,6 +9,7 @@ import { categoriesRepository } from './categoriesRepository'
 import { invitationsRepository } from './invitationRepository'
 
 export type RepositoryFactory = <T>(db: Database) => T
+
 const repositories = {
   userRepository,
   tasksRepository,

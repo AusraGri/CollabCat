@@ -1,9 +1,39 @@
 import config from '@server/config'
 import { createDatabase } from '@server/database'
 import { Kysely, sql } from 'kysely'
+import type { RepositoriesKeys, Repositories } from '@server/repositories'
 
 interface SequenceResult {
   sequence: string | null // `sequence` can be null if not found
+}
+
+/**
+ * Mocks a repository for testing purposes by providing mock implementations of its methods.
+ * This function allows you to selectively mock certain methods of the repository.
+ * It helps isolate tests by providing mocked versions of repository methods instead of hitting the actual database.
+ *
+ * @param {K} repositoryKey - The key of the repository to be mocked (e.g., 'userRepository').
+ * This key corresponds to one of the keys in the `Repositories` type.
+ * @param {Partial<Repositories[K]>} methods - A partial object where each key is a method name of the repository being mocked,
+ * and each value is a mock implementation of that method. Only the methods passed will be mocked, and others will be left as `undefined`.
+ *
+ * @returns {Object} An object where the key is the repository key (`repositoryKey`), and the value is an object of mocked methods.
+ * Each mocked method is wrapped in `vi.fn()` from Vitest, allowing you to track calls and customize behavior in tests.
+ */
+export const mockRepository = <K extends RepositoriesKeys>(
+  repositoryKey: K,
+  methods: Partial<Repositories[K]>
+) => {
+  const mockedMethods = Object.fromEntries(
+    Object.entries(methods).map(([method, implementation]) => [
+      method,
+      vi.fn(implementation as (...args: any[]) => any),
+    ])
+  ) as { [M in keyof typeof methods]: ReturnType<typeof vi.fn> }
+
+  return {
+    [repositoryKey]: mockedMethods,
+  } as { [key in K]: Pick<Repositories[K], keyof typeof mockedMethods> }
 }
 
 /**

@@ -12,8 +12,7 @@ export default authenticatedProcedure
   )
   .input(
     z.object({
-      username: z.string().min(1).max(15).optional(),
-      picture: z.string().optional(),
+      username: z.string().trim().min(1).max(15),
     })
   )
   .mutation(async ({ input: userData, ctx: { repos, authUser } }) => {
@@ -26,28 +25,21 @@ export default authenticatedProcedure
       })
     }
 
-    let updatedPicture: string | undefined
-    let updatedUser
+    const encodedUsername = encodeURIComponent(userData.username).replace(
+      /%20/g,
+      '+'
+    )
 
-    if (!userData.username) return user
+    const picture = `https://ui-avatars.com/api/?name=${encodedUsername}&size=128&background=random`
 
-    if (!user.provider.includes('google')) {
-      const encodedUsername = encodeURIComponent(userData.username).replace(
-        /%20/g,
-        '+'
-      )
-      updatedPicture = `https://ui-avatars.com/api/?name=${encodedUsername}&size=128&background=random`
-      updatedUser = await repos.userRepository.update(authUser.id, {
-        ...userData,
-        picture: updatedPicture,
-      })
+    const updatedUserData = user.provider.includes('google')
+      ? { ...userData }
+      : { ...userData, picture }
 
-      return updatedUser
-    }
-
-    updatedUser = await repos.userRepository.update(authUser.id, {
-      username: userData.username,
-    })
+    const updatedUser = await repos.userRepository.updateUser(
+      authUser.id,
+      updatedUserData
+    )
 
     return updatedUser
   })

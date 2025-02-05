@@ -9,9 +9,13 @@ import type {
   Rewards,
 } from '@server/database/types'
 import type { Insertable, Selectable } from 'kysely'
+
 import { random } from '@tests/utils/random'
-import type { AuthUser } from '../user'
+import type { AuthUser, UserPublic } from '../user'
 import type { AuthGroup } from '../groups'
+
+ 
+
 
 export const randomId = () =>
   random.integer({
@@ -32,6 +36,22 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(
     auth0Id: random.last(),
     ...overrides,
   }) satisfies Insertable<User>
+
+
+/**
+ * Generates a fake user with some default test data.
+ * @param overrides Any properties that should be different from default fake data.
+ */
+export const fakeUserPublic = <T extends Partial<Insertable<User>>>(
+  overrides: T = {} as T
+) =>
+  ({
+    email: random.email(),
+    username: random.first(),
+    picture: random.last(),
+    id: randomId(),
+    ...overrides,
+  }) satisfies UserPublic
 
 export const fakeAuthUser = <T extends Partial<AuthUser>>(
   overrides: T = {} as T
