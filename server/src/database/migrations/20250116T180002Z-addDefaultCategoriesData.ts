@@ -1,8 +1,8 @@
 import type { Kysely } from 'kysely'
-import { categories } from '../data/defaultCategories'
+import { defaultCategories } from '../data/defaultCategories'
 
 export async function up(db: Kysely<any>) {
-  await db.insertInto('categories').values(categories).execute()
+  await db.insertInto('categories').values(defaultCategories).execute()
 }
 
 export async function down(db: Kysely<any>) {

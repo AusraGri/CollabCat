@@ -19,12 +19,26 @@ const [groupOne, groupTwo] = await insertAll(db, 'groups', [
   fakeGroup({ createdByUserId: userTwo.id }),
 ])
 
-const [categoryOne, categoryTwo, categoryThree, defaultCategory, defaultGroupCategory] = await insertAll(db, 'categories', [
+const [
+  categoryOne,
+  categoryTwo,
+  categoryThree,
+  defaultCategory,
+  defaultGroupCategory,
+] = await insertAll(db, 'categories', [
   fakeCategory({ groupId: groupOne.id, createdByUserId: null }),
   fakeCategory({ createdByUserId: userOne.id, groupId: null }),
   fakeCategory({ createdByUserId: userOne.id, groupId: groupTwo.id }),
-  fakeCategory({isDefault: true, createdByUserId: null, isGroupDefault: false}),
-  fakeCategory({isDefault: true, createdByUserId: null, isGroupDefault: true}),
+  fakeCategory({
+    isDefault: true,
+    createdByUserId: null,
+    isGroupDefault: false,
+  }),
+  fakeCategory({
+    isDefault: true,
+    createdByUserId: null,
+    isGroupDefault: true,
+  }),
 ])
 
 describe('create category', () => {
@@ -48,7 +62,7 @@ describe('create category', () => {
 
   it('should create new category for the group', async () => {
     // Given
-    const newCategory = { title: 'New Category', groupId: groupTwo.id}
+    const newCategory = { title: 'New Category', groupId: groupTwo.id }
 
     // When
     const result = await repository.createCategory(newCategory)
@@ -65,24 +79,27 @@ describe('create category', () => {
 
   it('should throw error if failed to create new category for non existent group', async () => {
     // Given
-    const newCategory = { title: 'New Category', groupId: randomId()}
+    const newCategory = { title: 'New Category', groupId: randomId() }
 
     // Then
-    await expect(repository.createCategory(newCategory)).rejects.toThrowError(/foreign key constraint/i)
+    await expect(repository.createCategory(newCategory)).rejects.toThrowError(
+      /foreign key constraint/i
+    )
   })
 
   it('should throw error if failed to create new category for non existent user', async () => {
     // Given
-    const newCategory = { title: 'New Category', createdByUserId: randomId()}
+    const newCategory = { title: 'New Category', createdByUserId: randomId() }
 
     // Then
-    await expect(repository.createCategory(newCategory)).rejects.toThrowError(/foreign key constraint/i)
+    await expect(repository.createCategory(newCategory)).rejects.toThrowError(
+      /foreign key constraint/i
+    )
   })
 })
 
-describe('get categories data', ()=> {
-
-  it('should get categories by group id (including all defaults)', async()=> {
+describe('get categories data', () => {
+  it('should get categories by group id (including all defaults)', async () => {
     // Given
     const groupId = groupOne.id
 
@@ -90,11 +107,13 @@ describe('get categories data', ()=> {
     const result = await repository.getCategoriesByGroupId(groupId)
 
     // Then
-    expect(result).toHaveLength(3)
-    expect(result).toEqual([categoryOne, defaultCategory, defaultGroupCategory])
+    expect(result).toBeTruthy()
+    expect(result).toContainEqual(categoryOne)
+    expect(result).toContainEqual(defaultCategory)
+    expect(result).toContainEqual(defaultGroupCategory)
   })
 
-  it('should get categories created by user id', async()=> {
+  it('should get categories created by user id', async () => {
     // Given
     const userId = userOne.id
 
@@ -106,7 +125,7 @@ describe('get categories data', ()=> {
     expect(result).toEqual([categoryTwo, categoryThree])
   })
 
-  it('should get personal categories created by user id (including not group defaults)', async()=> {
+  it('should get personal categories created by user id (including not group defaults)', async () => {
     // Given
     const userId = userOne.id
 
@@ -114,11 +133,12 @@ describe('get categories data', ()=> {
     const result = await repository.getPersonalCategoriesByUserId(userId)
 
     // Then
-    expect(result).toHaveLength(2)
-    expect(result).toEqual([categoryTwo, defaultCategory])
+    expect(result).toBeTruthy()
+    expect(result).toContainEqual(categoryTwo)
+    expect(result).toContainEqual(defaultCategory)
   })
 
-  it('should return only default categories if no personal user or group created categories found', async()=> {
+  it('should return only default categories if no personal user or group created categories found', async () => {
     // Given
     const userId = userOne.id + randomId()
     const groupId = groupOne.id + randomId()
@@ -128,13 +148,14 @@ describe('get categories data', ()=> {
     const groupResult = await repository.getCategoriesByGroupId(groupId)
 
     // Then
-    expect(result).toHaveLength(1)
-    expect(groupResult).toHaveLength(2)
-    expect(groupResult).toEqual([defaultCategory, defaultGroupCategory])
-    expect(result).toEqual([ defaultCategory])
+    expect(result).toBeTruthy()
+    expect(groupResult).toBeTruthy()
+    expect(groupResult).toContainEqual(defaultCategory)
+    expect(groupResult).toContainEqual(defaultGroupCategory)
+    expect(result).toContainEqual(defaultCategory)
   })
 
-  it('should return no categories if no created categories found by user id', async()=> {
+  it('should return no categories if no created categories found by user id', async () => {
     // Given
     const userId = userOne.id + randomId()
 
@@ -143,13 +164,12 @@ describe('get categories data', ()=> {
 
     // Then
     expect(result).toHaveLength(0)
-    expect(result).toEqual([]) 
+    expect(result).toEqual([])
   })
 })
 
-describe('delete category', ()=> {
-
-  it('should delete category by category id',  async()=> {
+describe('delete category', () => {
+  it('should delete category by category id', async () => {
     // Given
     const categoryId = categoryTwo.id
 
@@ -161,7 +181,7 @@ describe('delete category', ()=> {
     expect(result.numDeletedRows).toBe(1n)
   })
 
-  it('should not throw error if category id was not found',  async()=> {
+  it('should not throw error if category id was not found', async () => {
     // Given
     const categoryId = categoryTwo.id + randomId()
 

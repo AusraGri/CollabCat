@@ -1,4 +1,4 @@
-export const categories = [
+export const defaultCategories = [
   { title: 'Routine', isDefault: true },
   { title: 'Someday', isDefault: true },
   { title: 'Scheduled', isDefault: true },

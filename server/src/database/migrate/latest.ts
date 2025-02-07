@@ -14,7 +14,7 @@ import { createDatabase } from '..'
 
 const MIGRATIONS_PATH = '../migrations'
 
-async function migrateLatest(db: Kysely<any>) {
+export async function migrateLatest(db: Kysely<any>) {
   const dirname = path.dirname(fileURLToPath(import.meta.url))
 
   const nodeProvider = new FileMigrationProvider({

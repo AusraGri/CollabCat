@@ -20,7 +20,7 @@ import type { AuthGroup } from '../groups'
 export const randomId = () =>
   random.integer({
     min: 1,
-    max: 1000000,
+    max: 10000000,
   })
 
 /**
