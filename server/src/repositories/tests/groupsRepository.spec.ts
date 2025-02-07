@@ -32,7 +32,7 @@ await insertAll(db, 'userGroups', [
   fakeUserGroup({ userId: userOne.id, groupId: groupTwo.id }),
 ])
 
-describe('create', () => {
+describe('create group', () => {
   it('should create a group', async () => {
     // Given
     const group = fakeGroup({ createdByUserId: userOne.id, name: 'New Group' })

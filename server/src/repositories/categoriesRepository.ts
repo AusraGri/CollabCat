@@ -58,7 +58,7 @@ export function categoriesRepository(db: Database) {
       return db
         .deleteFrom('categories')
         .where('id', '=', categoryId)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
   }
 }
