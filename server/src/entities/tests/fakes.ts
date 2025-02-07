@@ -7,6 +7,7 @@ import type {
   UserGroups,
   CompletedTasks,
   Rewards,
+  Invitations,
 } from '@server/database/types'
 import type { Insertable, Selectable } from 'kysely'
 
@@ -195,3 +196,17 @@ export const fakePattern = <T extends Partial<Insertable<RecurringPattern>>>(
     recurringType: 'daily',
     ...overrides,
   }) satisfies Insertable<RecurringPattern>
+
+/**
+ * Generates a fake invitation with some default test data.
+ * @param overrides createdByUserId and any properties that should be different from default fake data.
+ */
+export const fakeInvitation = <T extends Partial<Insertable<Invitations>>>(
+  overrides: T = {} as T
+) =>
+  ({
+    email: random.email(),
+    groupId: randomId,
+    invitationToken: random.string(),
+    ...overrides,
+  }) satisfies Insertable<Invitations>

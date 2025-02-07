@@ -2,7 +2,6 @@ import config from '@server/config'
 import { createDatabase } from '@server/database'
 import { Kysely, sql } from 'kysely'
 import type { RepositoriesKeys, Repositories } from '@server/repositories'
-import { migrateLatest } from '@server/database/migrate/latest'
 
 interface SequenceResult {
   sequence: string | null // `sequence` can be null if not found
