@@ -17,7 +17,6 @@ export type SelectableCompletedTask = Selectable<CompletedTasks>
 export interface GetTasksOptions {
   assignedUserId?: number
   categoryId?: number
-  limit?: number
   createdByUserId?: number
   groupId?: number
   id?: number
@@ -43,13 +42,13 @@ export interface CreateTaskData {
 
 export function tasksRepository(db: Database) {
   return {
-    async create(task: Insertable<Tasks>): Promise<TasksPublic> {
-      return db
-        .insertInto('tasks')
-        .values(task)
-        .returning(tasksKeysPublic)
-        .executeTakeFirstOrThrow()
-    },
+    // async create(task: Insertable<Tasks>): Promise<TasksPublic> {
+    //   return db
+    //     .insertInto('tasks')
+    //     .values(task)
+    //     .returning(tasksKeysPublic)
+    //     .executeTakeFirstOrThrow()
+    // },
     async createTask(taskData: CreateTaskData): Promise<TaskData> {
       return db.transaction().execute(async (trx) => {
         if (taskData.task.isRecurring && !taskData.recurrence)
@@ -134,10 +133,6 @@ export function tasksRepository(db: Database) {
         }
       })
 
-      if (options.limit !== undefined) {
-        query = query.limit(options.limit)
-      }
-
       return query.execute()
     },
 
@@ -156,43 +151,35 @@ export function tasksRepository(db: Database) {
     },
 
     async updateTask(taskData: TaskUpdateData): Promise<boolean> {
-      try {
-        return db.transaction().execute(async (trx) => {
-          const { id, task, recurrence } = taskData
-          if (task.isRecurring && !recurrence)
-            throw new Error('Missing task recurrence data')
+      return db.transaction().execute(async (trx) => {
+        const { id, task, recurrence } = taskData
+        if (task.isRecurring && !recurrence)
+          throw new Error('Missing task recurrence data')
 
-          if (!id || id <= 0) {
-            throw new Error('Invalid task ID')
-          }
+        await trx
+          .updateTable('tasks')
+          .set(task)
+          .where('id', '=', id)
+          .returningAll()
+          .executeTakeFirstOrThrow()
 
+        if (recurrence && task.isRecurring) {
           await trx
-            .updateTable('tasks')
-            .set(task)
-            .where('id', '=', id)
-            .returningAll()
-            .executeTakeFirstOrThrow()
+            .insertInto('recurringPattern')
+            .values({ ...recurrence, taskId: id })
+            .onConflict((oc) => oc.column('taskId').doUpdateSet(recurrence))
+            .execute()
+        }
 
-          if (recurrence && task.isRecurring) {
-            await trx
-              .insertInto('recurringPattern')
-              .values({ ...recurrence, taskId: id })
-              .onConflict((oc) => oc.column('taskId').doUpdateSet(recurrence))
-              .execute()
-          }
+        if (!task.isRecurring) {
+          await trx
+            .deleteFrom('recurringPattern')
+            .where('taskId', '=', id)
+            .executeTakeFirst()
+        }
 
-          if (!task.isRecurring) {
-            await trx
-              .deleteFrom('recurringPattern')
-              .where('taskId', '=', id)
-              .executeTakeFirst()
-          }
-
-          return true
-        })
-      } catch (error) {
-        throw new Error('Failed to update task. Please try again.')
-      }
+        return true
+      })
     },
 
     async addToCompletedTasks(
@@ -201,7 +188,7 @@ export function tasksRepository(db: Database) {
       return db
         .insertInto('completedTasks')
         .values(taskData)
-        .onConflict((oc) => oc.doNothing()) 
+        .onConflict((oc) => oc.doNothing())
         .returning(taskCompletionKeysAll)
         .executeTakeFirstOrThrow()
     },
@@ -213,14 +200,11 @@ export function tasksRepository(db: Database) {
         .deleteFrom('completedTasks')
         .where('completedTasks.taskId', '=', taskData.taskId)
         .where('completedTasks.instanceDate', '=', taskData.instanceDate)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
 
     async deleteTask(taskId: number): Promise<DeleteResult> {
-      return db
-        .deleteFrom('tasks')
-        .where('id', '=', taskId)
-        .executeTakeFirst()
+      return db.deleteFrom('tasks').where('id', '=', taskId).executeTakeFirst()
     },
 
     async getTasksDue(date: Date, userId: number): Promise<TaskData[]> {
@@ -291,6 +275,7 @@ export function tasksRepository(db: Database) {
           ).as('completed'),
         ])
         .where('t.createdByUserId', '=', userId)
+        .where('t.groupId', 'is', null)
         .where((eb) =>
           eb.or([
             eb('t.startDate', '<=', date).and(

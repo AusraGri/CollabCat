@@ -6,7 +6,7 @@ import { idSchema } from './shared'
 export const userSchema = z.object({
   id: idSchema,
   email: z.string().trim().toLowerCase().email(),
-  username: z.string().min(1).max(500).nullable(),
+  username: z.string().trim().min(1).max(51),
   auth0Id: z.string(),
   createdAt: z.date(),
   provider: z.string(),

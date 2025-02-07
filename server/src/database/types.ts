@@ -107,7 +107,7 @@ export interface User {
   picture: string | null
   provider: Generated<string>
   updatedAt: Generated<Timestamp>
-  username: string | null
+  username: string
 }
 
 export interface UserGroups {

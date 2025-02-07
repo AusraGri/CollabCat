@@ -7,7 +7,7 @@ export async function up(db: Kysely<any>) {
     .addColumn('id', 'integer', (c) =>
       c.primaryKey().generatedAlwaysAsIdentity()
     )
-    .addColumn('username', 'varchar(50)', (column) => column.unique())
+    .addColumn('username', 'varchar(50)', (c) => c.notNull())
     .addColumn('email', 'text', (c) => c.unique().notNull())
     .addColumn('auth0_id', 'text', (c) => c.unique().notNull())
     .addColumn('provider', 'text', (c) => c.notNull().defaultTo('email'))

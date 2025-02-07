@@ -187,7 +187,7 @@ export const fakeCategory = <T extends Partial<Insertable<Categories>>>(
  * @param overrides createdByUserId and any properties that should be different from default fake data.
  */
 export const fakePattern = <T extends Partial<Insertable<RecurringPattern>>>(
-  overrides: T
+  overrides: T = {} as T
 ) =>
   ({
     taskId: randomId(),
