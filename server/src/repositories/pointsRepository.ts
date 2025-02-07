@@ -88,6 +88,9 @@ export function pointsRepository(db: Database) {
     },
 
     async alterPoints(object: PointAlterObject): Promise<PointsPublic> {
+      if (!['+', '-', '='].includes(object.action))
+        throw new Error('Invalid action for altering points')
+
       let query = db
         .updateTable('points')
         .set((eb) => {

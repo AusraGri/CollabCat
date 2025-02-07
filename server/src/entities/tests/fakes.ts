@@ -8,6 +8,8 @@ import type {
   CompletedTasks,
   Rewards,
   Invitations,
+  Points,
+  PointClaims,
 } from '@server/database/types'
 import type { Insertable, Selectable } from 'kysely'
 
@@ -135,6 +137,36 @@ export const fakeGroup = <T extends Partial<Insertable<Groups>>>(
     createdByUserId: randomId(),
     ...overrides,
   }) satisfies Insertable<Groups>
+
+
+/**
+ * Generates a fake points with some default test data.
+ * @param overrides createdByUserId and any properties that should be different from default fake data.
+ */
+export const fakePoints = <T extends Partial<Insertable<Points>>>(
+  overrides: T = {} as T
+) =>
+  ({
+    points: random.integer({min: 1, max: 50}),
+    userId: randomId(),
+    groupId: randomId(),
+    ...overrides,
+  }) satisfies Insertable<Points>
+
+
+/**
+ * Generates a fake points claims with some default test data.
+ * @param overrides createdByUserId and any properties that should be different from default fake data.
+ */
+export const fakePointClaim = <T extends Partial<Insertable<PointClaims>>>(
+  overrides: T = {} as T
+) =>
+  ({
+    taskInstanceDate: random.date(),
+    userId: randomId(),
+    taskId: randomId(),
+    ...overrides,
+  }) satisfies Insertable<PointClaims>
 
 /**
  * Generates a fake reward with some default test data.
