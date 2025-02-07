@@ -8,7 +8,9 @@ import groupsRouter from '..'
 const createCaller = createCallerFactory(groupsRouter)
 const repos = (bigInt: BigInt = BigInt(10)) => ({
   groupsRepository: {
-    delete: vi.fn(async () => ({ numDeletedRows: bigInt }) as DeleteResult),
+    deleteGroup: vi.fn(
+      async () => ({ numDeletedRows: bigInt }) as DeleteResult
+    ),
   } satisfies Partial<GroupRepository>,
 })
 
@@ -39,10 +41,8 @@ it('should delete the group', async () => {
   const result = await deleteGroup({ groupId: group.groupId })
 
   expect(result).toBe(true)
-  expect(repo.groupsRepository.delete).toBeCalledWith({
-    id: group.groupId,
-    createdByUserId: user.id,
-  })
+  expect(repo.groupsRepository.deleteGroup).toBeCalledWith(group.groupId
+  )
 })
 
 it('should throw error if there was no group to delete', async () => {
@@ -55,8 +55,5 @@ it('should throw error if there was no group to delete', async () => {
   // ACT
   await expect(deleteGroup({ groupId: group.groupId })).rejects.toThrowError()
 
-  expect(repo.groupsRepository.delete).toBeCalledWith({
-    id: group.groupId,
-    createdByUserId: user.id,
-  })
+  expect(repo.groupsRepository.deleteGroup).toBeCalledWith(group.groupId)
 })

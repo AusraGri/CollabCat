@@ -46,7 +46,7 @@ export default groupAuthProcedure
       })
     }
 
-    const isUserRemoved = await repos.groupsRepository.removeUser({
+    const isUserRemoved = await repos.groupsRepository.removeUserFromGroup({
       groupId: userGroup.groupId,
       userId: user.userId,
     })

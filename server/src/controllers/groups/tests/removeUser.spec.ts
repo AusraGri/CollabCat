@@ -18,7 +18,7 @@ const db = await wrapInRollbacks(testDb)
 const groupRepo = (groupMember?: any, bigInt: BigInt = BigInt(10)) => ({
   groupsRepository: {
     getGroupMembers: vi.fn(async () => (groupMember ? [groupMember] : [])),
-    removeUser: vi.fn(async () => ({ numDeletedRows: bigInt }) as DeleteResult),
+    removeUserFromGroup: vi.fn(async () => ({ numDeletedRows: bigInt }) as DeleteResult),
   } satisfies Partial<GroupRepository>,
 })
 
@@ -63,7 +63,7 @@ it('should throw an error if user is authenticated, but tries to remove user tha
   expect(repo.groupsRepository.getGroupMembers()).resolves.toMatchObject([
     userToRemove,
   ])
-  expect(repo.groupsRepository.removeUser).not.toBeCalled()
+  expect(repo.groupsRepository.removeUserFromGroup).not.toBeCalled()
 })
 
 it('should throw an error if user is not successfully deleted', async () => {
@@ -84,7 +84,7 @@ it('should throw an error if user is not successfully deleted', async () => {
   expect(repo.groupsRepository.getGroupMembers()).resolves.toMatchObject([
     userToRemove,
   ])
-  expect(repo.groupsRepository.removeUser).toHaveBeenCalledOnce()
+  expect(repo.groupsRepository.removeUserFromGroup).toHaveBeenCalledOnce()
 })
 
 it('should delete user from group by user id', async () => {
@@ -104,5 +104,5 @@ it('should delete user from group by user id', async () => {
   expect(repo.groupsRepository.getGroupMembers()).resolves.toMatchObject([
     userToRemove,
   ])
-  expect(repo.groupsRepository.removeUser).toHaveBeenCalledOnce()
+  expect(repo.groupsRepository.removeUserFromGroup).toHaveBeenCalledOnce()
 })

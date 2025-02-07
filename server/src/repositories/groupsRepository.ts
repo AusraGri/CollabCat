@@ -29,11 +29,11 @@ export interface GroupUserData {
   groupId: number
 }
 
-type GroupsUpdate = Omit<GroupsPublic, 'createdByUserId'>
+// type GroupsUpdate = Omit<GroupsPublic, 'createdByUserId'>
 
 export function groupsRepository(db: Database) {
   return {
-    async create(group: Insertable<Groups>): Promise<GroupsPublic> {
+    async createGroup(group: Insertable<Groups>): Promise<GroupsPublic> {
       return db.transaction().execute(async (trx) => {
         const newGroup = await trx
           .insertInto('groups')
@@ -95,12 +95,11 @@ export function groupsRepository(db: Database) {
       return query.execute()
     },
 
-    async delete(groupData: GroupData): Promise<DeleteResult> {
+    async deleteGroup(groupId: number): Promise<DeleteResult> {
       return db
         .deleteFrom('groups')
-        .where('id', '=', groupData.id)
-        .where('createdByUserId', '=', groupData.createdByUserId)
-        .executeTakeFirstOrThrow()
+        .where('id', '=', groupId)
+        .executeTakeFirst()
     },
 
     async getUserGroupsByUserId(userId: number): Promise<GroupsPublic[]> {
@@ -111,14 +110,6 @@ export function groupsRepository(db: Database) {
         .where((eb) => eb.or([eb('userGroups.userId', '=', userId)]))
         .execute()
     },
-    async updateName(groupData: GroupsUpdate): Promise<GroupsPublic> {
-      return db
-        .updateTable('groups')
-        .set({ name: groupData.name })
-        .where('id', '=', groupData.id)
-        .returning(groupsKeysPublic)
-        .executeTakeFirstOrThrow()
-    },
 
     async addGroupMember(
       groupData: Insertable<UserGroups>
@@ -127,15 +118,6 @@ export function groupsRepository(db: Database) {
         .insertInto('userGroups')
         .values(groupData)
         .returning(userGroupsKeysPublic)
-        .executeTakeFirstOrThrow()
-    },
-
-    async removeGroupMember(groupData: GroupUserData): Promise<DeleteResult> {
-      return db
-        .deleteFrom('userGroups')
-        .where((eb) =>
-          eb.and({ groupId: groupData.groupId, userId: groupData.userId })
-        )
         .executeTakeFirstOrThrow()
     },
 
@@ -231,7 +213,7 @@ export function groupsRepository(db: Database) {
         .executeTakeFirst()
     },
 
-    async removeUser(data: GroupUserData): Promise<DeleteResult> {
+    async removeUserFromGroup(data: GroupUserData): Promise<DeleteResult> {
       return db
         .deleteFrom('userGroups')
         .where((eb) =>
@@ -241,7 +223,7 @@ export function groupsRepository(db: Database) {
             data.groupId
           )
         )
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
   }
 }

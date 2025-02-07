@@ -22,7 +22,7 @@ export default authenticatedProcedure
       createdByUserId: authUser.id,
     }
 
-    const groupCreated = await repos.groupsRepository.create(group)
+    const groupCreated = await repos.groupsRepository.createGroup(group)
 
     return groupCreated
   })
