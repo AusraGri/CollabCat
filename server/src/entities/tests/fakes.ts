@@ -174,7 +174,7 @@ export const fakePointClaim = <T extends Partial<Insertable<PointClaims>>>(
  */
 export const fakeReward = <T extends Partial<Insertable<Rewards>>>(
   overrides: T = {} as T
-) =>
+):  Insertable<Rewards>  =>
   ({
     title: random.string(),
     createdByUserId: randomId(),

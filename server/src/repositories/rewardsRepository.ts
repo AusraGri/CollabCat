@@ -13,7 +13,6 @@ export interface GetRewards {
   id?: number
   groupId?: number
   createdByUserId?: number
-  targetUserIds?: number[]
 }
 
 export function rewardsRepository(db: Database) {
@@ -29,37 +28,29 @@ export function rewardsRepository(db: Database) {
     },
 
     async getRewards(getOptions: GetRewards): Promise<Selectable<Rewards>[]> {
+      const { id, groupId, createdByUserId } = getOptions
       if (
-        getOptions.id === undefined &&
-        getOptions.groupId === undefined &&
-        getOptions.createdByUserId === undefined &&
-        (getOptions.targetUserIds === undefined ||
-          getOptions.targetUserIds.length === 0)
+        id === undefined &&
+        groupId === undefined &&
+        createdByUserId === undefined
       ) {
         return []
       }
 
       let query = db.selectFrom('rewards').select(rewardsKeysAll)
 
-      if (getOptions.id !== undefined) {
-        query = query.where('id', '=', getOptions.id)
+      if (id !== undefined) {
+        query = query.where('id', '=', id)
       }
 
-      if (getOptions.createdByUserId !== undefined) {
+      if (createdByUserId !== undefined) {
         query = query
-          .where('createdByUserId', '=', getOptions.createdByUserId)
+          .where('createdByUserId', '=', createdByUserId)
           .where('groupId', 'is', null)
       }
 
-      if (getOptions.groupId !== undefined) {
-        query = query.where('groupId', '=', getOptions.groupId)
-      }
-
-      if (
-        getOptions.targetUserIds !== undefined &&
-        getOptions.targetUserIds.length > 0
-      ) {
-        query = query.where('targetUserIds', 'in', getOptions.targetUserIds)
+      if (groupId !== undefined) {
+        query = query.where('groupId', '=', groupId)
       }
 
       return query.execute()
@@ -69,7 +60,7 @@ export function rewardsRepository(db: Database) {
       return db
         .deleteFrom('rewards')
         .where('id', '=', rewardId)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
     },
 
     async updateReward(reward: RewardUpdate): Promise<Selectable<Rewards>> {
@@ -80,6 +71,7 @@ export function rewardsRepository(db: Database) {
         .returning(rewardsKeysAll)
         .executeTakeFirstOrThrow()
     },
+
     async addRewardClaim(data: {
       rewardId: number
       userId: number
@@ -90,13 +82,14 @@ export function rewardsRepository(db: Database) {
         .returning(rewardClaimsKeysAll)
         .executeTakeFirstOrThrow()
     },
+
     async claimReward(data: {
       rewardId: number
       userId: number
       updatedPoints: number
       groupId?: number
       rewardAmount?: number
-    }): Promise<boolean> {
+    }): Promise<Selectable<RewardClaims>> {
       return db.transaction().execute(async (trx) => {
         const { rewardId, userId, updatedPoints } = data
 
@@ -110,7 +103,7 @@ export function rewardsRepository(db: Database) {
           .returning(pointsKeysPublic)
           .executeTakeFirstOrThrow()
 
-        if (data.rewardAmount) {
+        if (data.rewardAmount || data.rewardAmount === 0) {
           await trx
             .updateTable('rewards')
             .set({
@@ -126,10 +119,10 @@ export function rewardsRepository(db: Database) {
             rewardId,
             userId,
           })
-          .returning('rewardClaims.id')
+          .returning(rewardClaimsKeysAll)
           .executeTakeFirstOrThrow()
 
-        return !!result
+        return result
       })
     },
   }
