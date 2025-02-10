@@ -2,7 +2,7 @@ import type { Database } from '@server/database'
 import { userRepository } from './userRepository'
 import { tasksRepository } from './tasksRepository'
 import { groupsRepository } from './groupsRepository'
-import { recurringRepository } from './recurrenceRepository'
+import { recurrenceRepository } from './recurrenceRepository'
 import { rewardsRepository } from './rewardsRepository'
 import { pointsRepository } from './pointsRepository'
 import { categoriesRepository } from './categoriesRepository'
@@ -14,7 +14,7 @@ const repositories = {
   userRepository,
   tasksRepository,
   groupsRepository,
-  recurringRepository,
+  recurrenceRepository,
   pointsRepository,
   rewardsRepository,
   invitationsRepository,

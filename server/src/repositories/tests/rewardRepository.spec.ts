@@ -8,7 +8,8 @@ import {
 } from '@server/entities/tests/fakes'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
-import { DeleteResult } from 'kysely'
+import { DeleteResult, type Insertable } from 'kysely'
+import type { Rewards } from '@server/database'
 import { rewardsRepository } from '../rewardsRepository'
 
 const db = await wrapInRollbacks(createTestDatabase())
@@ -49,7 +50,7 @@ describe('create reward', () => {
     const newReward = fakeReward({
       createdByUserId: userOne.id,
       groupId: groupOne.id,
-    })
+    }) as Insertable<Rewards>
 
     // When
     const result = await repository.createReward(newReward)
@@ -195,7 +196,7 @@ describe('update reward', () => {
     const newRewardValues = fakeReward({
       createdByUserId: userTwo.id,
       amount: 4,
-    })
+    }) as Insertable<Rewards>
 
     // When
     const result = await repository.updateReward({

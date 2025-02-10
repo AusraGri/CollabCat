@@ -17,9 +17,6 @@ import { random } from '@tests/utils/random'
 import type { AuthUser, UserPublic } from '../user'
 import type { AuthGroup } from '../groups'
 
- 
-
-
 export const randomId = () =>
   random.integer({
     min: 1,
@@ -39,7 +36,6 @@ export const fakeUser = <T extends Partial<Insertable<User>>>(
     auth0Id: random.last(),
     ...overrides,
   }) satisfies Insertable<User>
-
 
 /**
  * Generates a fake user with some default test data.
@@ -75,7 +71,9 @@ export const fakeAuthGroup = <T extends Partial<AuthGroup>>(
  * Generates a fake task with some default test data.
  * @param overrides userId and any properties that should be different from default fake data.
  */
-export const fakeTask = <T extends Partial<Insertable<Tasks>>>(overrides: T = {} as T) =>
+export const fakeTask = <T extends Partial<Insertable<Tasks>>>(
+  overrides: T = {} as T
+) =>
   ({
     title: random.string().slice(1, 20),
     description: random.paragraph().slice(1, 100),
@@ -88,7 +86,9 @@ export const fakeTask = <T extends Partial<Insertable<Tasks>>>(overrides: T = {}
  * Generates a fake task data with some default test data.
  * @param overrides userId and any properties that should be different from default fake data.
  */
-export const fakeTaskData = <T extends Partial<Selectable<Tasks>>>(overrides: T = {} as T) =>
+export const fakeTaskData = <T extends Partial<Selectable<Tasks>>>(
+  overrides: T = {} as T
+) =>
   ({
     title: random.string().slice(1, 20),
     description: random.paragraph().slice(1, 100),
@@ -138,7 +138,6 @@ export const fakeGroup = <T extends Partial<Insertable<Groups>>>(
     ...overrides,
   }) satisfies Insertable<Groups>
 
-
 /**
  * Generates a fake points with some default test data.
  * @param overrides createdByUserId and any properties that should be different from default fake data.
@@ -147,12 +146,11 @@ export const fakePoints = <T extends Partial<Insertable<Points>>>(
   overrides: T = {} as T
 ) =>
   ({
-    points: random.integer({min: 1, max: 50}),
+    points: random.integer({ min: 1, max: 50 }),
     userId: randomId(),
     groupId: randomId(),
     ...overrides,
   }) satisfies Insertable<Points>
-
 
 /**
  * Generates a fake points claims with some default test data.
@@ -174,7 +172,7 @@ export const fakePointClaim = <T extends Partial<Insertable<PointClaims>>>(
  */
 export const fakeReward = <T extends Partial<Insertable<Rewards>>>(
   overrides: T = {} as T
-):  Insertable<Rewards>  =>
+) =>
   ({
     title: random.string(),
     createdByUserId: randomId(),
