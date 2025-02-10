@@ -1,7 +1,4 @@
-import {
-  requestContext,
-  authGroupRepoContext,
-} from '@tests/utils/context'
+import { requestContext, authGroupRepoContext } from '@tests/utils/context'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
@@ -16,7 +13,7 @@ const db = await wrapInRollbacks(createTestDatabase())
 
 const mockRepo = (tasks?: any[]) => ({
   tasksRepository: {
-    getGroupTasksDue: vi.fn(async () => tasks || [] as TaskData[]),
+    getGroupTasksDue: vi.fn(async () => tasks || ([] as TaskData[])),
   } satisfies Partial<TasksRepository>,
 })
 
@@ -57,7 +54,7 @@ it('should return due tasks for the group on the given date', async () => {
   expect(repo.tasksRepository.getGroupTasksDue).toHaveBeenCalledOnce()
   expect(repo.tasksRepository.getGroupTasksDue).toHaveBeenCalledWith({
     date: expect.any(Date),
-    groupId: authGroup.groupId
+    groupId: authGroup.groupId,
   })
 })
 
@@ -75,7 +72,7 @@ it('should return empty array if no due tasks found for the given date', async (
   expect(repo.tasksRepository.getGroupTasksDue).toHaveBeenCalledOnce()
   expect(repo.tasksRepository.getGroupTasksDue).toHaveBeenCalledWith({
     date: expect.any(Date),
-    groupId: authGroup.groupId
+    groupId: authGroup.groupId,
   })
 })
 
@@ -86,7 +83,7 @@ it('should return due tasks for the group on the given date and by user id', asy
   )
   const userId = 1
   // When (ACT)
-  const taskResponse = await getDueGroupTasks({...validInput, userId})
+  const taskResponse = await getDueGroupTasks({ ...validInput, userId })
   // Then (ASSERT)
   expect(taskResponse).toMatchObject(tasks)
   expect(setDateToUTCmidnight).toHaveBeenCalledOnce()
@@ -95,6 +92,6 @@ it('should return due tasks for the group on the given date and by user id', asy
   expect(repo.tasksRepository.getGroupTasksDue).toHaveBeenCalledWith({
     date: expect.any(Date),
     groupId: authGroup.groupId,
-    userId
+    userId,
   })
 })

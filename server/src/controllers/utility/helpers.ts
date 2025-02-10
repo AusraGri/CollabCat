@@ -5,14 +5,17 @@ export function setDateToUTCmidnight(date: Date | string) {
   return newDate
 }
 
-export function outputMessageForDelete (param: {objective: string, conditional: boolean}, outcome: boolean = true) {
-  const {objective, conditional} = param
+export function outputMessageForDelete(
+  param: { objective: string; conditional: boolean },
+  outcome: boolean = true
+) {
+  const { objective, conditional } = param
 
-  const obj = objective.replace(/\b\w/g, char => char.toUpperCase())
+  const obj = objective.replace(/\b\w/g, (char) => char.toUpperCase())
   return {
     success: outcome,
     message: conditional
       ? `${obj} successfully deleted.`
-      : `${obj} was not found (possibly already deleted).`
+      : `${obj} was not found (possibly already deleted).`,
   }
 }

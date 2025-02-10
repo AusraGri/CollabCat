@@ -26,7 +26,8 @@ export default groupAuthProcedure
       })
     }
     const isGroupDeleted = await repos.groupsRepository.deleteGroup(
-     userGroup.groupId)
+      userGroup.groupId
+    )
 
     if (!isGroupDeleted.numDeletedRows) {
       throw new TRPCError({

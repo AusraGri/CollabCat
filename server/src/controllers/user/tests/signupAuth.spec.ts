@@ -12,7 +12,7 @@ const createCaller = createCallerFactory(userRouter)
 const repos = (user?: any, createdUser?: any) => ({
   userRepository: {
     findByEmail: vi.fn(async () => user),
-    create: vi.fn(async () => createdUser),
+    createUser: vi.fn(async () => createdUser),
   },
 })
 
@@ -54,8 +54,10 @@ describe('authProcedure', () => {
     const result = await signupAuth(mockUserInput)
 
     expect(result).toEqual(user)
-    expect(repository.userRepository.findByEmail).toBeCalledWith(mockUserInput.email)
-    expect(repository.userRepository.create).toHaveBeenCalledWith({
+    expect(repository.userRepository.findByEmail).toBeCalledWith(
+      mockUserInput.email
+    )
+    expect(repository.userRepository.createUser).toHaveBeenCalledWith({
       email: mockUser.email,
       auth0Id: 'auth0|12345',
       username: mockUser.username,
@@ -90,7 +92,7 @@ describe('authProcedure', () => {
 
     await signupAuth({ ...mockUserInput, email: '    NEW@EMAIL.Com   ' })
 
-    expect(repository.userRepository.create).toHaveBeenCalledWith({
+    expect(repository.userRepository.createUser).toHaveBeenCalledWith({
       email: 'new@email.com',
       auth0Id: 'auth0|12345',
       username: mockUser.username,
@@ -113,7 +115,7 @@ describe('authProcedure', () => {
     expect(repository.userRepository.findByEmail).toBeCalledWith(
       mockUserInput.email
     )
-    expect(repository.userRepository.create).not.toBeCalled()
+    expect(repository.userRepository.createUser).not.toBeCalled()
   })
 
   it('should throw error is user email is already in the database', async () => {
@@ -138,7 +140,7 @@ describe('authProcedure', () => {
     const repository = {
       userRepository: {
         findByEmail: vi.fn(async () => undefined),
-        create: vi.fn(async () => {
+        createUser: vi.fn(async () => {
           throw new Error('failed to create')
         }),
       },
@@ -150,19 +152,23 @@ describe('authProcedure', () => {
     } as Auth0TokenPayload)
 
     await expect(signupAuth(mockUserInput)).rejects.toThrow(/failed/i)
-    expect(repository.userRepository.findByEmail).toBeCalledWith(mockUserInput.email)
-    expect(repository.userRepository.create).toBeCalled()
+    expect(repository.userRepository.findByEmail).toBeCalledWith(
+      mockUserInput.email
+    )
+    expect(repository.userRepository.createUser).toBeCalled()
   })
 
   it('should throw error is auth0 token is not valid', async () => {
     const repo = repos(user, undefined)
     const { signupAuth } = createCaller(repoContext(repo))
 
-    vi.mocked(verifyAuth0Token).mockRejectedValue(new Error('validation failed'))
+    vi.mocked(verifyAuth0Token).mockRejectedValue(
+      new Error('validation failed')
+    )
 
     await expect(signupAuth(mockUserInput)).rejects.toThrow(/failed/i)
     expect(repo.userRepository.findByEmail).not.toBeCalled()
-    expect(repo.userRepository.create).not.toBeCalled()
+    expect(repo.userRepository.createUser).not.toBeCalled()
   })
 
   it('should throw error is there is no token validation result', async () => {
@@ -173,6 +179,6 @@ describe('authProcedure', () => {
 
     await expect(signupAuth(mockUserInput)).rejects.toThrow(/invalid/i)
     expect(repo.userRepository.findByEmail).not.toBeCalled()
-    expect(repo.userRepository.create).not.toBeCalled()
+    expect(repo.userRepository.createUser).not.toBeCalled()
   })
 })

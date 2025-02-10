@@ -193,7 +193,7 @@ it('should successfully claim group reward', async () => {
     id: randomId(),
     userId,
     claimedAt: new Date(),
-    rewardId
+    rewardId,
   }
   const repo = mockRepo({ reward, points, claimed: rewardClaim })
   const { claimReward } = createCaller(authRepoContext(repo, authUser))
@@ -218,7 +218,9 @@ it('should successfully claim group reward', async () => {
     rewardAmount,
   })
 
-  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(rewardClaim)
+  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(
+    rewardClaim
+  )
 })
 
 it('should successfully claim personal reward', async () => {
@@ -234,7 +236,7 @@ it('should successfully claim personal reward', async () => {
     id: randomId(),
     userId,
     claimedAt: new Date(),
-    rewardId
+    rewardId,
   }
   const repo = mockRepo({ reward, points, claimed: rewardClaim })
   const { claimReward } = createCaller(authRepoContext(repo, authUser))
@@ -257,5 +259,7 @@ it('should successfully claim personal reward', async () => {
     rewardAmount,
   })
 
-  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(rewardClaim)
+  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(
+    rewardClaim
+  )
 })

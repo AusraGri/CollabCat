@@ -31,7 +31,6 @@ export default groupAuthProcedure
   )
   .output(taskDataSchema.array())
   .query(async ({ input: { date, userId }, ctx: { userGroup, repos } }) => {
-
     const tasks: TaskData[] = await repos.tasksRepository.getGroupTasksDue({
       date,
       userId,

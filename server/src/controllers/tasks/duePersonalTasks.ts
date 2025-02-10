@@ -17,7 +17,7 @@ export default authenticatedProcedure
       protect: true,
       example: {
         request: {
-          date: new Date('2024-11-11')
+          date: new Date('2024-11-11'),
         },
       },
     },
@@ -29,7 +29,6 @@ export default authenticatedProcedure
   )
   .output(taskDataSchema.array())
   .query(async ({ input: { date }, ctx: { authUser, repos } }) => {
-
     const tasks = await repos.tasksRepository.getPersonalTasksDue(
       date,
       authUser.id

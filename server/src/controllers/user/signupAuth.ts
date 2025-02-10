@@ -64,7 +64,7 @@ export default publicProcedure
       }
 
       const userCreated = await repos.userRepository
-        .create({
+        .createUser({
           email,
           auth0Id,
           username,

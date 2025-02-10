@@ -138,8 +138,8 @@ export const taskCompletionSchema = z.object({
     .describe('If you want to mark as completed - true, opposite - false'),
 })
 
-export const getTasksSchema = z.object
-  ({
+export const getTasksSchema = z
+  .object({
     title: z.string().trim().min(3).max(100),
     categoryId: idSchema,
     groupId: idSchema,

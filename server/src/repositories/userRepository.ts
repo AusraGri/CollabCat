@@ -1,6 +1,11 @@
 import type { Database } from '@server/database'
 import type { User } from '@server/database/types'
-import { userKeysAll, userKeysPublic, type UserBaseInfo, type UserPublic } from '@server/entities/user'
+import {
+  userKeysAll,
+  userKeysPublic,
+  type UserBaseInfo,
+  type UserPublic,
+} from '@server/entities/user'
 import type { DeleteResult, Insertable, Selectable } from 'kysely'
 
 export type UserUpdatables = {
@@ -10,7 +15,7 @@ export type UserUpdatables = {
 
 export function userRepository(db: Database) {
   return {
-    async create(user: Insertable<User>): Promise<Selectable<User>> {
+    async createUser(user: Insertable<User>): Promise<Selectable<User>> {
       return db
         .insertInto('user')
         .values(user)
@@ -30,19 +35,13 @@ export function userRepository(db: Database) {
 
     async findAssignedUsersByTaskId(
       taskId: number
-    ): Promise<UserPublic| undefined> {
+    ): Promise<UserPublic | undefined> {
       const user = await db
         .selectFrom('tasks')
         .where('tasks.id', '=', taskId)
         .innerJoin('user', 'user.id', 'tasks.assignedUserId')
-        .select(userKeysPublic)
+        .select(['user.id', 'user.email', 'user.picture', 'user.username'])
         .executeTakeFirst()
-
-      return user
-    },
-
-    async getAll(): Promise<Selectable<User>[] | undefined> {
-      const user = await db.selectFrom('user').select(userKeysAll).execute()
 
       return user
     },
@@ -68,7 +67,7 @@ export function userRepository(db: Database) {
 
       return user
     },
-    async findUserInfoById(id: number): Promise<UserBaseInfo> {
+    async findUserInfoById(id: number): Promise<UserBaseInfo | undefined> {
       return db
         .selectFrom('user')
         .leftJoin('points', 'points.userId', 'user.id')
@@ -80,15 +79,15 @@ export function userRepository(db: Database) {
           'points.points',
         ])
         .where('user.id', '=', id)
-        .where('points.groupId', '=', null)
-        .executeTakeFirstOrThrow()
+        .where('points.groupId', 'is', null)
+        .executeTakeFirst()
     },
 
     async deleteUser(userId: number): Promise<DeleteResult> {
       const user = await db
         .deleteFrom('user')
         .where('id', '=', userId)
-        .executeTakeFirstOrThrow()
+        .executeTakeFirst()
 
       return user
     },

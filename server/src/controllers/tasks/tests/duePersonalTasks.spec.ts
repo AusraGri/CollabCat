@@ -1,13 +1,10 @@
-import {
-  requestContext,
-  authRepoContext,
-} from '@tests/utils/context'
+import { requestContext, authRepoContext } from '@tests/utils/context'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import type { TasksRepository } from '@server/repositories/tasksRepository'
 import type { TaskData } from '@server/entities/tasks'
-import {fakeAuthUser, fakeTaskData } from '@server/entities/tests/fakes'
+import { fakeAuthUser, fakeTaskData } from '@server/entities/tests/fakes'
 import { setDateToUTCmidnight } from '@server/controllers/utility/helpers'
 import tasksRouter from '..'
 
@@ -16,14 +13,14 @@ const db = await wrapInRollbacks(createTestDatabase())
 
 const mockRepo = (tasks?: any[]) => ({
   tasksRepository: {
-    getPersonalTasksDue: vi.fn(async () => tasks || [] as TaskData[]),
+    getPersonalTasksDue: vi.fn(async () => tasks || ([] as TaskData[])),
   } satisfies Partial<TasksRepository>,
 })
 
 const tasks = [fakeTaskData()]
 
 const authUser = fakeAuthUser()
-const validInput = { date: new Date()}
+const validInput = { date: new Date() }
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -40,14 +37,14 @@ it('should throw an error if user is not authenticated', async () => {
   const { getDuePersonalTasks } = createCaller(requestContext({ db }))
 
   // ACT & ASSERT
-  await expect(getDuePersonalTasks(validInput)).rejects.toThrow(/unauthenticated/i)
+  await expect(getDuePersonalTasks(validInput)).rejects.toThrow(
+    /unauthenticated/i
+  )
 })
 
 it('should return personal due tasks on the given date', async () => {
   const repo = mockRepo(tasks)
-  const { getDuePersonalTasks } = createCaller(
-    authRepoContext(repo, authUser)
-  )
+  const { getDuePersonalTasks } = createCaller(authRepoContext(repo, authUser))
   // When (ACT)
   const taskResponse = await getDuePersonalTasks(validInput)
   // Then (ASSERT)
@@ -63,9 +60,7 @@ it('should return personal due tasks on the given date', async () => {
 
 it('should return personal due tasks as empty array on the given date if no task were found', async () => {
   const repo = mockRepo()
-  const { getDuePersonalTasks } = createCaller(
-    authRepoContext(repo, authUser)
-  )
+  const { getDuePersonalTasks } = createCaller(authRepoContext(repo, authUser))
   // When (ACT)
   const taskResponse = await getDuePersonalTasks(validInput)
   // Then (ASSERT)
@@ -78,4 +73,3 @@ it('should return personal due tasks as empty array on the given date if no task
     authUser.id
   )
 })
-

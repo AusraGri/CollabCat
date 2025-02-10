@@ -257,14 +257,18 @@ describe('get due tasks', () => {
     const userIdTwo = userTwo.id
     // When
     const task = await repository.getGroupTasksDue({ date, groupId, userId })
-    const taskUserTwo = await repository.getGroupTasksDue({ date, groupId, userId: userIdTwo })
+    const taskUserTwo = await repository.getGroupTasksDue({
+      date,
+      groupId,
+      userId: userIdTwo,
+    })
 
     // Then
     expect(task).toHaveLength(1)
     expect(task[0].id).toBe(taskOne.id)
     expect(task[0].recurrence).toMatchObject(patternOne)
 
-    expect (taskUserTwo).toHaveLength(0)
+    expect(taskUserTwo).toHaveLength(0)
   })
 })
 
@@ -296,15 +300,15 @@ describe('update task ', () => {
       title: 'Task One Updated',
       assignedUserId: userTwo.id,
       categoryId: categoryOne.id,
-      isRecurring: true
+      isRecurring: true,
     }
 
-    const recurrence = {recurringType: 'daily', separationCount: 1}
+    const recurrence = { recurringType: 'daily', separationCount: 1 }
     // When
     const task = await repository.updateTask({
       id: taskOne.id,
       task: updatedTask,
-      recurrence
+      recurrence,
     })
     const [updated] = await repository.getTasks({ id: taskOne.id })
     // Then
@@ -323,13 +327,15 @@ describe('update task ', () => {
       title: 'Task One Updated',
       assignedUserId: userTwo.id,
       categoryId: categoryTwo.id,
-      isRecurring: true
+      isRecurring: true,
     }
     // When
-     await expect(repository.updateTask({
-      id: taskOne.id,
-      task: updatedTask,
-    })).rejects.toThrowError(/missing task recurrence data/i)
+    await expect(
+      repository.updateTask({
+        id: taskOne.id,
+        task: updatedTask,
+      })
+    ).rejects.toThrowError(/missing task recurrence data/i)
     const [updated] = await repository.getTasks({ id: taskOne.id })
     // Then
     expect(updated.isCompleted).toBe(taskOne.isCompleted)

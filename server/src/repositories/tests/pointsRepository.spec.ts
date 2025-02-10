@@ -309,8 +309,10 @@ describe('alter user points', () => {
     }
 
     // Then
-    await expect(repository.alterPoints(alterPoints)).rejects.toThrowError(/no result/i)
-})
+    await expect(repository.alterPoints(alterPoints)).rejects.toThrowError(
+      /no result/i
+    )
+  })
 
   it('should throw error if user id is invalid', async () => {
     // Given
@@ -322,8 +324,10 @@ describe('alter user points', () => {
     }
 
     // Then
-    await expect(repository.alterPoints(alterPoints)).rejects.toThrowError(/no result/i)
-})
+    await expect(repository.alterPoints(alterPoints)).rejects.toThrowError(
+      /no result/i
+    )
+  })
 
   it('should throw error if action is invalid', async () => {
     // Given
@@ -336,9 +340,10 @@ describe('alter user points', () => {
 
     // Then
     // @ts-expect-error
-    await expect(repository.alterPoints(alterPoints)).rejects.toThrowError(/Invalid action/i)
-})
-
+    await expect(repository.alterPoints(alterPoints)).rejects.toThrowError(
+      /Invalid action/i
+    )
+  })
 })
 
 describe('delete points', () => {

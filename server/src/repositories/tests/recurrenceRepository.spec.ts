@@ -27,7 +27,7 @@ describe('create recurring pattern ', () => {
       maxNumOfOccurrences: null,
       weekOfMonth: null,
       monthOfYear: null,
-      dayOfMonth: null
+      dayOfMonth: null,
     })
   })
 
@@ -36,7 +36,9 @@ describe('create recurring pattern ', () => {
     const newPatternData = fakePattern({ taskId: taskOne.id + 1 })
 
     // Then
-    await expect(repository.createPattern(newPatternData)).rejects.toThrowError(/foreign key constraint/i)
+    await expect(repository.createPattern(newPatternData)).rejects.toThrowError(
+      /foreign key constraint/i
+    )
   })
 
   it('should throw error if input invalid', async () => {
@@ -44,6 +46,8 @@ describe('create recurring pattern ', () => {
     const newPatternData = fakePattern({ taskId: taskOne.id, anything: 'any' })
 
     // Then
-    await expect(repository.createPattern(newPatternData)).rejects.toThrowError(/does not exist/i)
+    await expect(repository.createPattern(newPatternData)).rejects.toThrowError(
+      /does not exist/i
+    )
   })
 })

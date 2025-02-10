@@ -18,7 +18,9 @@ const db = await wrapInRollbacks(testDb)
 const groupRepo = (groupMember?: any, bigInt: BigInt = BigInt(10)) => ({
   groupsRepository: {
     getGroupMembers: vi.fn(async () => (groupMember ? [groupMember] : [])),
-    removeUserFromGroup: vi.fn(async () => ({ numDeletedRows: bigInt }) as DeleteResult),
+    removeUserFromGroup: vi.fn(
+      async () => ({ numDeletedRows: bigInt }) as DeleteResult
+    ),
   } satisfies Partial<GroupRepository>,
 })
 

@@ -389,7 +389,9 @@ describe('reward claims', () => {
     }
 
     // Then
-    await expect(repository.claimReward(claimData)).rejects.toThrowError(/foreign key constraint/i)
+    await expect(repository.claimReward(claimData)).rejects.toThrowError(
+      /foreign key constraint/i
+    )
 
     const updatedPoints = await db
       .selectFrom('points')
@@ -411,7 +413,9 @@ describe('reward claims', () => {
     }
 
     // Then
-    await expect(repository.claimReward(claimData)).rejects.toThrowError(/no result/i)
+    await expect(repository.claimReward(claimData)).rejects.toThrowError(
+      /no result/i
+    )
 
     const updatedPoints = await db
       .selectFrom('points')
@@ -420,7 +424,7 @@ describe('reward claims', () => {
       .where('groupId', 'is', null)
       .executeTakeFirstOrThrow()
 
-      const updatedReward = await db
+    const updatedReward = await db
       .selectFrom('rewards')
       .select('rewards.amount')
       .where('rewards.id', '=', rewardOne.id)

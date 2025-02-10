@@ -25,8 +25,7 @@ export default authenticatedProcedure
   .input(taskUpdateSchema)
   .output(taskDataSchema)
   .mutation(async ({ input: taskData, ctx: { repos } }) => {
-
-    await repos.tasksRepository.updateTask({...taskData})
+    await repos.tasksRepository.updateTask({ ...taskData })
 
     const [updatedTask] = await repos.tasksRepository.getTasks({
       id: taskData.id,

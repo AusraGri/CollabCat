@@ -1,9 +1,7 @@
-import {
-  repoContext,
-} from '@tests/utils/context'
+import { repoContext } from '@tests/utils/context'
 import { randomId } from '@server/entities/tests/fakes'
 import { createCallerFactory } from '@server/trpc'
-import {  mockRepository } from '@tests/utils/database'
+import { mockRepository } from '@tests/utils/database'
 import type { Selectable } from 'kysely'
 import type { User } from '@server/database'
 import userRouter from '..'
@@ -12,7 +10,7 @@ const createCaller = createCallerFactory(userRouter)
 
 const mockedRepo = (user?: any) =>
   mockRepository('userRepository', {
-    findById: async () => user as Selectable<User> || undefined,
+    findById: async () => (user as Selectable<User>) || undefined,
   })
 
 describe('find user by user id', () => {

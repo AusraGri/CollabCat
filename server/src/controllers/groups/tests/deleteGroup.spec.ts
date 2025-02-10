@@ -41,8 +41,7 @@ it('should delete the group', async () => {
   const result = await deleteGroup({ groupId: group.groupId })
 
   expect(result).toBe(true)
-  expect(repo.groupsRepository.deleteGroup).toBeCalledWith(group.groupId
-  )
+  expect(repo.groupsRepository.deleteGroup).toBeCalledWith(group.groupId)
 })
 
 it('should throw error if there was no group to delete', async () => {

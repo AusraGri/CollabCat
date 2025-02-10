@@ -27,11 +27,10 @@ export default authenticatedProcedure
       input: { taskId, taskInstanceDate },
       ctx: { authUser, repos },
     }) => {
-
       const claimed = await repos.pointsRepository.addPointClaims({
         userId: authUser.id,
         taskId,
-        taskInstanceDate
+        taskInstanceDate,
       })
 
       return claimed

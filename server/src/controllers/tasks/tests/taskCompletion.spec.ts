@@ -42,7 +42,9 @@ it('should return same task status if task is already completed (not recurring)'
 
   const repos = {
     tasksRepository: {
-      getTasks: vi.fn(async () => [fakeTask({ id: 1, isCompleted: true })] as TaskData[]),
+      getTasks: vi.fn(
+        async () => [fakeTask({ id: 1, isCompleted: true })] as TaskData[]
+      ),
       addToCompletedTasks: vi.fn(
         async () => fakeCompletedTask({ taskId: 1 }) as SelectableCompletedTask
       ),
@@ -59,7 +61,7 @@ it('should return same task status if task is already completed (not recurring)'
   expect(repos.tasksRepository.updateTaskCompletion).not.toBeCalled()
   expect(completedTask).toMatchObject({
     success: true,
-    message: /completed/i
+    message: /completed/i,
   })
 })
 
@@ -90,7 +92,7 @@ it('should mark task as completed', async () => {
   expect(repos.tasksRepository.updateTaskCompletion).toBeCalled()
   expect(completedTask).toMatchObject({
     success: true,
-    message: /completed/i
+    message: /completed/i,
   })
 })
 it('should add task to completed tasks when task is recurring', async () => {
@@ -126,7 +128,7 @@ it('should add task to completed tasks when task is recurring', async () => {
   expect(repos.tasksRepository.updateTaskCompletion).not.toBeCalled()
   expect(completedTask).toMatchObject({
     success: true,
-    message: /completed/i
+    message: /completed/i,
   })
 })
 
@@ -164,7 +166,7 @@ it('should remove task from completed', async () => {
 
   expect(completedTask).toMatchObject({
     success: true,
-    message: /not completed/i
+    message: /not completed/i,
   })
 })
 
@@ -199,10 +201,13 @@ it('should update task as not completed (not recurring)', async () => {
   expect(repos.tasksRepository.removeCompletedTasks).not.toBeCalled()
   expect(repos.tasksRepository.addToCompletedTasks).not.toBeCalled()
   expect(repos.tasksRepository.updateTaskCompletion).toBeCalled()
-  expect(repos.tasksRepository.updateTaskCompletion).toBeCalledWith({id: task.id, isCompleted: task.isCompleted})
+  expect(repos.tasksRepository.updateTaskCompletion).toBeCalledWith({
+    id: task.id,
+    isCompleted: task.isCompleted,
+  })
 
   expect(completedTask).toMatchObject({
     success: true,
-    message: /not completed/i
+    message: /not completed/i,
   })
 })

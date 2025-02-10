@@ -31,7 +31,6 @@ export default authenticatedProcedure
   )
   .output(taskDataSchema)
   .mutation(async ({ input: taskData, ctx: { authUser, repos } }) => {
-
     const task = {
       ...taskData.task,
       createdByUserId: authUser.id,

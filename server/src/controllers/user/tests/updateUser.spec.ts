@@ -79,7 +79,7 @@ describe('update user info', () => {
     await expect(updateUser(validInput)).resolves.toMatchObject(updatedUser)
     expect(repo.userRepository.findById).toBeCalledWith(authUser.id)
     expect(repo.userRepository.updateUser).toBeCalledWith(authUser.id, {
-      ...validInput
+      ...validInput,
     })
   })
 })

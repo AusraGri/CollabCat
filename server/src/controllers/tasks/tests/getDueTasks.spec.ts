@@ -52,7 +52,7 @@ const [user] = await insertAll(db, 'user', [fakeUser()])
 const [task, taskTwo, taskThree, taskFour] = await insertAll(db, 'tasks', [
   fakeTask({
     createdByUserId: user.id,
-    startDate: setDateToUTCmidnight(new Date(2024, 1, 1)) ,
+    startDate: setDateToUTCmidnight(new Date(2024, 1, 1)),
     isRecurring: true,
   }),
   fakeTask({
@@ -67,7 +67,7 @@ const [task, taskTwo, taskThree, taskFour] = await insertAll(db, 'tasks', [
   }),
   fakeTask({
     createdByUserId: user.id,
-    startDate: setDateToUTCmidnight( new Date()),
+    startDate: setDateToUTCmidnight(new Date()),
     isRecurring: false,
   }),
 ])
@@ -77,7 +77,7 @@ const [taskCompleted] = await insertAll(
   'completedTasks',
   fakeCompletedTask({
     taskId: taskThree.id,
-    instanceDate: setDateToUTCmidnight( new Date()),
+    instanceDate: setDateToUTCmidnight(new Date()),
   })
 )
 
@@ -110,15 +110,14 @@ it('should throw an error if user is not authenticated', async () => {
   const { getDueTasks } = createCaller(requestContext({ db }))
 
   // ACT & ASSERT
-  await expect(getDueTasks({date})).rejects.toThrow(/unauthenticated/i)
+  await expect(getDueTasks({ date })).rejects.toThrow(/unauthenticated/i)
 })
 
 it('should return a task for the given date', async () => {
-
   // When (ACT)
   const { getDueTasks } = createCaller(authContext({ db }, user))
   const taskResponse = await getDueTasks({ date })
-  
+
   // Then (ASSERT)
   expect(taskResponse).toHaveLength(3)
   const expectedIds = [task.id, taskThree.id, taskFour.id]
