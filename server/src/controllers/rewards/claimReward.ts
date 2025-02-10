@@ -5,6 +5,7 @@ import { idSchema } from '@server/entities/shared'
 import { pointsRepository } from '@server/repositories/pointsRepository'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
+import { rewardClaimsSchema } from '@server/entities/rewards'
 
 export default authenticatedProcedure
   .use(provideRepos({ rewardsRepository, pointsRepository }))
@@ -25,7 +26,7 @@ export default authenticatedProcedure
       })
       .strict()
   )
-  .output(z.boolean())
+  .output(rewardClaimsSchema)
   .mutation(
     async ({ input: { rewardId, groupId }, ctx: { authUser, repos } }) => {
       const [reward] = await repos.rewardsRepository.getRewards({

@@ -1,5 +1,5 @@
 import { authRepoContext, requestContext } from '@tests/utils/context'
-import { fakeAuthUser } from '@server/entities/tests/fakes'
+import { fakeAuthUser, randomId } from '@server/entities/tests/fakes'
 import { createTestDatabase } from '@tests/utils/database'
 import { createCallerFactory } from '@server/trpc'
 import { wrapInRollbacks } from '@tests/utils/transactions'
@@ -14,7 +14,7 @@ const db = await wrapInRollbacks(createTestDatabase())
 const mockRepo = (data: {
   reward?: Partial<PublicReward>
   points?: Partial<PointsPublic>
-  claimed?: boolean
+  claimed?: any
 }) => ({
   pointsRepository: {
     getPoints: vi.fn(async () => (data.points as PointsPublic) || undefined),
@@ -189,12 +189,18 @@ it('should successfully claim group reward', async () => {
   const { groupId, rewardId } = validInput
   const updatedPoints = 50 - 20
   const rewardAmount = 3 - 1
-  const repo = mockRepo({ reward, points, claimed: true })
+  const rewardClaim = {
+    id: randomId(),
+    userId,
+    claimedAt: new Date(),
+    rewardId
+  }
+  const repo = mockRepo({ reward, points, claimed: rewardClaim })
   const { claimReward } = createCaller(authRepoContext(repo, authUser))
 
   // ACT & ASSERT
 
-  await expect(claimReward(validInput)).resolves.toEqual(true)
+  await expect(claimReward(validInput)).resolves.toEqual(rewardClaim)
 
   expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith({
     id: rewardId,
@@ -212,7 +218,7 @@ it('should successfully claim group reward', async () => {
     rewardAmount,
   })
 
-  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(true)
+  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(rewardClaim)
 })
 
 it('should successfully claim personal reward', async () => {
@@ -224,12 +230,18 @@ it('should successfully claim personal reward', async () => {
   const { rewardId } = validInput
   const updatedPoints = 50 - 20
   const rewardAmount = 3 - 1
-  const repo = mockRepo({ reward, points, claimed: true })
+  const rewardClaim = {
+    id: randomId(),
+    userId,
+    claimedAt: new Date(),
+    rewardId
+  }
+  const repo = mockRepo({ reward, points, claimed: rewardClaim })
   const { claimReward } = createCaller(authRepoContext(repo, authUser))
 
   // ACT & ASSERT
 
-  await expect(claimReward({ rewardId })).resolves.toEqual(true)
+  await expect(claimReward({ rewardId })).resolves.toEqual(rewardClaim)
 
   expect(repo.rewardsRepository.getRewards).toHaveBeenCalledWith({
     id: rewardId,
@@ -245,5 +257,5 @@ it('should successfully claim personal reward', async () => {
     rewardAmount,
   })
 
-  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(true)
+  await expect(repo.rewardsRepository.claimReward()).resolves.toEqual(rewardClaim)
 })
