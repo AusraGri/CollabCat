@@ -35,9 +35,11 @@ export default authenticatedProcedure
       ...taskData.task,
       createdByUserId: authUser.id,
     }
+
+    const recurrence = taskData.recurrence || undefined
     const newTaskData = {
       task,
-      recurrence: taskData.recurrence,
+      recurrence,
     }
 
     const taskCreated = await repos.tasksRepository.createTask(newTaskData)

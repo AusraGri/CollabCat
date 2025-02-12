@@ -29,7 +29,7 @@ export const useInvitationStore = defineStore('invitations', {
     tokenData: null,
     groupData: null,
     inviter: null,
-    invitations: null
+    invitations: null,
   }),
 
   actions: {
@@ -68,7 +68,7 @@ export const useInvitationStore = defineStore('invitations', {
 
         if (!groupId) throw new Error('Missing group id')
 
-        const [group] = await trpc.groups.getGroup.query({ groupId })
+        const [group] = await trpc.groups.getGroupInfo.query({ groupId })
         this.groupData = group
 
         return group
@@ -76,7 +76,7 @@ export const useInvitationStore = defineStore('invitations', {
         throw new Error('Failed to fetch group info')
       }
     },
-    async acceptInvitation(invitation?:PublicInvitation) {
+    async acceptInvitation(invitation?: PublicInvitation) {
       try {
         const groupId = this.tokenData?.invitation.groupId || invitation?.groupId
 
@@ -84,7 +84,7 @@ export const useInvitationStore = defineStore('invitations', {
 
         await trpc.groups.addUserToGroup.mutate({ groupId })
 
-        if(this.invitations){
+        if (this.invitations) {
           this.invitations = this.invitations?.filter((inv) => inv.id != invitation?.id) || null
         }
       } catch (error) {
@@ -97,8 +97,8 @@ export const useInvitationStore = defineStore('invitations', {
 
         if (!groupOwnerId) throw new Error('Missing inviter id')
 
-        const owner = await trpc.user.getUser.query({ userId: groupOwnerId })
-        this.inviter = owner
+        const owner = await trpc.user.getUserById.query({ userId: groupOwnerId })
+        this.inviter = owner || null
 
         return owner
       } catch (error) {

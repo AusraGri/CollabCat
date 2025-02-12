@@ -14,7 +14,7 @@ export const useTasksStore = defineStore('tasks', {
     isTasks: (state: TasksState): boolean => !!state.tasks.length,
   },
   actions: {
-    async getDueTasks(date: string) {
+    async getDueTasks(date: Date) {
       try {
         const tasks = await trpc.tasks.getDueTasks.query({ date })
         this.tasks = tasks
@@ -23,7 +23,7 @@ export const useTasksStore = defineStore('tasks', {
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
-    async getDuePersonalTasks(date: string, noGroup?: boolean) {
+    async getDuePersonalTasks(date: Date, noGroup?: boolean) {
       try {
         const tasks = await trpc.tasks.getDuePersonalTasks.query({ date })
         if (noGroup) {
@@ -36,7 +36,7 @@ export const useTasksStore = defineStore('tasks', {
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
-    async getDueGroupTasks(date: string, groupId: number, userId?: number) {
+    async getDueGroupTasks(date: Date, groupId: number, userId?: number) {
       try {
         const tasks = await trpc.tasks.getDueGroupTasks.query({ groupId, date, userId })
         this.tasks = tasks
@@ -55,7 +55,7 @@ export const useTasksStore = defineStore('tasks', {
     async getPersonalTasks(userId: number) {
       try {
         const tasks = await trpc.tasks.getTasks.query({ createdByUserId: userId })
-        this.tasks = tasks.filter((task)=> task.groupId === null)
+        this.tasks = tasks.filter((task) => task.groupId === null)
 
         return this.tasks
       } catch (error) {
@@ -74,7 +74,7 @@ export const useTasksStore = defineStore('tasks', {
     },
     async updateTask(taskData: TaskUpdateData) {
       try {
-        const updatedTask = await trpc.tasks.update.mutate(taskData)
+        const updatedTask = await trpc.tasks.updateTask.mutate(taskData)
 
         if (this.isTasks) {
           const index = this.tasks?.findIndex((task) => task.id === updatedTask.id)
@@ -94,7 +94,7 @@ export const useTasksStore = defineStore('tasks', {
         const result = await trpc.tasks.deleteTask.mutate({ taskId })
 
         if (result && this.isTasks) {
-          this.tasks  = this.tasks.filter((task) => task.id !== taskId)
+          this.tasks = this.tasks.filter((task) => task.id !== taskId)
         }
 
         return result

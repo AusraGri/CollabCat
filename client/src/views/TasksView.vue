@@ -3,7 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useUserGroupsStore, useUserStore, usePointsStore, useTasksStore } from '@/stores'
 import CreateTask from '../components/task/CreateTask.vue'
 import CreateCategory from '@/components/categories/CreateCategory.vue'
-import type { CategoriesPublic, TaskData } from '@server/shared/types'
+import type { CategoriesPublic } from '@server/shared/types'
 import CategoryList from '@/components/categories/CategoryList.vue'
 import TaskCard from '@/components/task/TaskCard.vue'
 import TabRev from '@/components/TabRev.vue'
@@ -92,8 +92,8 @@ const handleDefaultTypeTabClick = (tabTitle: string) => {
 
 const toggleShowTypes = () => {
   toggle(isShowTypes)
-  if(!isShowTypes.value){
-     selectedType.value = ''
+  if (!isShowTypes.value) {
+    selectedType.value = ''
   }
 }
 const handleTaskStatusChange = async (taskData: {
@@ -263,7 +263,7 @@ watch(
       @close="toggleCategoryModal"
     />
   </div>
-  <div class="flex justify-between mt-3 ">
+  <div class="mt-3 flex justify-between">
     <div v-if="tasks">
       <div v-for="task in tasks" :key="task.id">
         <TaskCard

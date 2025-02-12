@@ -12,7 +12,7 @@ const emit = defineEmits<{
 }>()
 
 function confirmAction(confirmed: boolean) {
-  emit('confirmed', confirmed) // Emit the confirmation result (true/false)
+  emit('confirmed', confirmed)
 }
 </script>
 
@@ -24,7 +24,7 @@ function confirmAction(confirmed: boolean) {
     <template #body>
       <p>
         Do you really want to <span class="text-red-600">{{ action }}</span>
-        <span class="text-base font-extrabold pl-1">{{ object }}</span> ?
+        <span class="pl-1 text-base font-extrabold">{{ object }}</span> ?
       </p>
     </template>
     <template #footer>

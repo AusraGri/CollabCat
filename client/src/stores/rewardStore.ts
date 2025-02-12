@@ -64,7 +64,7 @@ export const useRewardStore = defineStore('reward', {
 
     async updateReward(reward: RewardUpdateable) {
       try {
-        const updatedReward = await trpc.rewards.update.mutate(reward)
+        const updatedReward = await trpc.rewards.updateReward.mutate(reward)
 
         this.rewards =
           this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
@@ -86,7 +86,7 @@ export const useRewardStore = defineStore('reward', {
         ...rewardData,
       }
       try {
-        const reward = await trpc.rewards.create.mutate(newReward)
+        const reward = await trpc.rewards.createReward.mutate(newReward)
 
         this.rewards = this.rewards ? [...this.rewards, reward] : [reward]
       } catch (error) {

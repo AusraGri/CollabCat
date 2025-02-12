@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 import { useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import GroupMembers from '@/components/groups/GroupMembers.vue'
-// import { RouterView } from 'vue-router'
 import { useRewardStore } from '@/stores/rewardStore'
 import Rewards from '@/components/rewards/Rewards.vue'
 import GroupSettings from '@/components/groups/GroupSettings.vue'
@@ -23,13 +22,6 @@ const route = useRoute()
 const isShowGroupSettings = ref(false)
 const activeTab = ref<any>(route.name?.toString().replace(/^Personal/, ''))
 const isUserInGroupPage = computed(() => route.meta.group)
-// const isAdmin = computed(() => {
-//   if (isUserInGroupPage.value) {
-//     return userGroupStore.isAdmin
-//   }
-
-//   return true
-// })
 
 watchEffect(async () => {
   if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
@@ -147,9 +139,6 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-  <!-- <div class="container mx-auto">
-    <RouterView />
-  </div> -->
 </template>
 
 <style scoped></style>

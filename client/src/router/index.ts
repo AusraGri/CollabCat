@@ -35,14 +35,7 @@ const router = createRouter({
         {
           path: ':group',
           name: 'Group',
-          // component: () => import('../layouts/GroupLayout.vue'),
           children: [
-            // {
-            //   path: '',
-            //   name: 'GroupPage',
-            //   component: () => import('../views/GroupView.vue'),
-            //   meta: { group: true }
-            // },
             {
               path: 'tasks',
               name: 'Tasks',
@@ -60,7 +53,6 @@ const router = createRouter({
         {
           path: '',
           name: 'Profile',
-          // component: GroupLayout,
           meta: { personal: true },
           children: [
             {

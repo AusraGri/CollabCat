@@ -67,8 +67,8 @@ export const newTaskSchema = z.object({
   groupId: idSchema.optional(),
   points: z.number().positive().optional(),
   title: z.string().trim().min(3).max(100),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
   startTime: z.string().nullable().optional(),
   isRecurring: z.boolean().nullable().optional(),
 })

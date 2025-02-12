@@ -12,7 +12,7 @@ const props = defineProps({
 const users = ref()
 
 onMounted(async () => {
-  users.value = await trpc.user.getAssignedUsers.query(props.taskId)
+  users.value = await trpc.user.getAssignedUserByTaskId.query({ taskId: props.taskId })
 })
 </script>
 

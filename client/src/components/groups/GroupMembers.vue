@@ -29,9 +29,6 @@ const handleInvitation = async (email: string) => {
   <div class="w-full">
     <FwbDropdown>
       <template #trigger>
-        <!-- <span class=" self-center p-3 bg-slate-300 rounded cursor-pointer hover:bg-blue-100">
-        Members
-      </span> -->
         <slot name="trigger"></slot>
       </template>
       <fwb-list-group>

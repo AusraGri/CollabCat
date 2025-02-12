@@ -64,14 +64,17 @@ const weekdays = [
   { value: 0, name: 'Sunday' },
 ]
 
-const recurrencePatternNew = computed<Partial<RecurrencePattern>>(() => ({
-  recurringType: recurringType.value,
-  separationCount: everyXCount.value === '1' ? 0 : Number(everyXCount.value) - 1,
-  dayOfWeek:
-    selectedDaysOfWeek.value.length && recurringType.value === 'weekly'
-      ? selectedDaysOfWeek.value
-      : null,
-}))
+const recurrencePatternNew = computed<Partial<RecurrencePattern> | null>(() => {
+  if (!isRecurring) return null
+  return {
+    recurringType: recurringType.value,
+    separationCount: everyXCount.value ? Number(everyXCount.value) - 1 : undefined,
+    dayOfWeek:
+      selectedDaysOfWeek.value.length && recurringType.value === 'weekly'
+        ? selectedDaysOfWeek.value
+        : null,
+  }
+})
 
 const formatDate = (date: Date) => {
   return date.toLocaleDateString('en-CA')
@@ -93,7 +96,7 @@ const endDateMin = computed(() => {
 watch(
   () => recurrencePatternNew.value,
   (newPattern) => {
-    if (!areObjectsEqual(newPattern, recurrencePattern.value)) {
+    if (!areObjectsEqual(newPattern, recurrencePattern.value) && isRecurring) {
       recurrencePattern.value = newPattern
     }
   },
@@ -108,9 +111,9 @@ watch(
       selectedDaysOfWeek.value = newValue.dayOfWeek || []
       everyXCount.value = newValue.separationCount ? String(newValue.separationCount + 1) : '1'
     } else {
-      recurringType.value = 'daily'
+      recurringType.value = ''
       selectedDaysOfWeek.value = []
-      everyXCount.value = '1'
+      everyXCount.value = ''
     }
   }
 )
@@ -118,11 +121,11 @@ watch(
 watch(
   () => isRecurring,
   () => {
-    startDate.value = ''
-    endDate.value = ''
-    selectedDaysOfWeek.value = []
-    everyXCount.value = '1'
-    recurringType.value = 'daily'
+    if (!isRecurring) {
+      recurrencePattern.value = null
+    } else if (!recurrencePattern.value) {
+      recurrencePattern.value = recurrencePatternNew.value
+    }
   }
 )
 

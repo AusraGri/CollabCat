@@ -1,5 +1,5 @@
 import type { Database } from '@server/database'
-import type { Tasks, CompletedTasks } from '@server/database/types'
+import type { Tasks, CompletedTasks, DB } from '@server/database/types'
 import type { RecurrencePatternInsertable } from '@server/entities/recurrence'
 import {
   type TasksPublic,
@@ -9,7 +9,13 @@ import {
   taskCompletionKeysAll,
 } from '@server/entities/tasks'
 import { recurringPatternKeysAll } from '@server/entities/recurrence'
-import type { DeleteResult, Insertable, Updateable, Selectable } from 'kysely'
+import type {
+  DeleteResult,
+  Insertable,
+  Updateable,
+  Selectable,
+  Transaction,
+} from 'kysely'
 import { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres'
 
 export type SelectableCompletedTask = Selectable<CompletedTasks>
@@ -42,13 +48,6 @@ export interface CreateTaskData {
 
 export function tasksRepository(db: Database) {
   return {
-    // async create(task: Insertable<Tasks>): Promise<TasksPublic> {
-    //   return db
-    //     .insertInto('tasks')
-    //     .values(task)
-    //     .returning(tasksKeysPublic)
-    //     .executeTakeFirstOrThrow()
-    // },
     async createTask(taskData: CreateTaskData): Promise<TaskData> {
       return db.transaction().execute(async (trx) => {
         if (taskData.task.isRecurring && !taskData.recurrence)
@@ -59,8 +58,10 @@ export function tasksRepository(db: Database) {
           .values(taskData.task)
           .returning(tasksKeysPublic)
           .executeTakeFirstOrThrow()
-
-        if (newTask && taskData.recurrence) {
+          .catch((error) => {
+            throw new Error(`Failed to create task: ${error.message}`)
+          })
+        if (newTask && taskData.recurrence && taskData.task.isRecurring) {
           try {
             await trx
               .insertInto('recurringPattern')
@@ -70,14 +71,16 @@ export function tasksRepository(db: Database) {
             throw new Error(`Failed to save recurrence pattern: ${error}`)
           }
         }
-        const [newTaskData] = await this.getTasks({ id: newTask.id })
-
+        const [newTaskData] = await this.getTasks({ id: newTask.id }, trx)
         return newTaskData
       })
     },
 
-    async getTasks(options: GetTasksOptions): Promise<TaskData[] | []> {
-      let query = db
+    async getTasks(
+      options: GetTasksOptions,
+      trx?: Transaction<DB>
+    ): Promise<TaskData[] | []> {
+      let query = (trx ?? db)
         .selectFrom('tasks')
         .select((eb) => [
           ...tasksKeysPublic,

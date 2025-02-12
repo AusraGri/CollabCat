@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
 import { trpc } from '@/trpc'
-import { useUserStore, useInvitationStore } from '@/stores'
+import { useInvitationStore } from '@/stores'
 import { type PublicInvitation, type InvitationData } from '@server/shared/types'
 import { FwbListGroup, FwbListGroupItem, FwbAvatar, FwbButton } from 'flowbite-vue'
 
@@ -13,7 +13,6 @@ const emit = defineEmits<{
   (e: 'invitation:action'): void
 }>()
 
-const userStore = useUserStore()
 const invitationStore = useInvitationStore()
 const invitationData = ref<InvitationData>()
 
@@ -35,10 +34,8 @@ const confirmInvitation = async (value: boolean) => {
   try {
     if (value) {
       await invitationStore.acceptInvitation(invitation)
-      // await trpc.groups.addUserToGroup.mutate({ groupId: invitation.groupId })
     }
 
-    // await userStore.deleteInvitation(invitation)
     await invitationStore.declineInvitation(invitation)
     invitationData.value = undefined
     emit('invitation:action')

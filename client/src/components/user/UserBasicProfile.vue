@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { FwbAvatar } from 'flowbite-vue'
-import { type UserPublic } from '@server/shared/types'
+import { type GroupMember, type UserPublic } from '@server/shared/types'
 const { user } = defineProps<{
-  user: UserPublic
+  user: UserPublic | GroupMember
 }>()
 </script>
 
@@ -19,9 +19,6 @@ const { user } = defineProps<{
         {{ user.username }}
       </div>
     </div>
-
-    <!-- Username -->
-    <!-- <span class="ml-1">{{ user.username }}</span> -->
   </div>
 </template>
 <style scoped>

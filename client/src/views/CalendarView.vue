@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import { FwbButton, FwbSelect } from 'flowbite-vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
-import { useTasksStore, useUserGroupsStore, usePointsStore} from '@/stores'
+import { useTasksStore, useUserGroupsStore, usePointsStore } from '@/stores'
 import TaskCard from '@/components/task/TaskCard.vue'
 import moment from 'moment'
 import { type TaskData } from '@server/shared/types'
@@ -60,11 +60,11 @@ async function fetchDueTasks(date: Date) {
   if (isGroupTasks.value) {
     if (!groupId.value) return
     const userId = tasksFor.value === 'all' ? undefined : Number(tasksFor.value)
-    tasks.value = await taskStore.getDueGroupTasks(date.toString(), groupId.value, userId)
+    tasks.value = await taskStore.getDueGroupTasks(date, groupId.value, userId)
     return
   }
   const noGroup = tasksFor.value === 'all' ? false : true
-  tasks.value = await taskStore.getDuePersonalTasks(date.toString(), noGroup)
+  tasks.value = await taskStore.getDuePersonalTasks(date, noGroup)
 }
 
 const handleTaskStatusChange = async (taskData: {
@@ -129,9 +129,12 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-watch(()=> groupId.value, async()=> {
-  await fetchDueTasks(date.value)
-})
+watch(
+  () => groupId.value,
+  async () => {
+    await fetchDueTasks(date.value)
+  }
+)
 </script>
 
 <template>

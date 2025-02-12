@@ -6,10 +6,6 @@ import { useRewardStore } from '@/stores'
 import NewRewardModule from './NewRewardModule.vue'
 import RewardItem from './RewardItem.vue'
 
-// const { isShowRewards } = defineProps<{
-//   isShowRewards: boolean
-// }>()
-
 const emit = defineEmits<{
   (event: 'reward:claimed', value: { cost: number }): void
   (event: 'closed'): void
@@ -74,8 +70,6 @@ const handleRewardChange = async ({
   <div v-if="isShowRewards" class="flex flex-col flex-nowrap">
     <FwbDropdown align-to-end @hide="emit('closed')">
       <template #trigger>
-        <!-- <span class="cursor-pointer self-center rounded bg-slate-300 p-3 hover:bg-blue-100">
-        </span> -->
         <slot name="trigger"></slot>
       </template>
       <fwb-list-group class="w-fit">

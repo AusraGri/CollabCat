@@ -97,7 +97,7 @@ const updateTask = async (updatedTask: TaskData) => {
   const updateTaskData = {
     id,
     task: { ...task },
-    recurrence,
+    recurrence: recurrence || undefined,
   }
   try {
     await taskStore.updateTask(updateTaskData)
@@ -110,7 +110,6 @@ const deleteTask = async () => {
   const taskId = props.task.id
   try {
     await taskStore.deleteTask(taskId)
-
   } catch (error) {
     console.log(error)
   }

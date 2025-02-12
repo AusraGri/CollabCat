@@ -31,7 +31,7 @@ const tasksStore = useTasksStore()
 
 const selectedCategory = ref<string | undefined>()
 const selectedMembers = ref<number[]>([])
-const recurringPattern = ref<RecurrencePatternInsertable>()
+const recurringPattern = ref<RecurrencePatternInsertable | undefined>()
 const startDate = ref<Date | string>()
 const endDate = ref<Date | string>()
 const points = ref<string>('')
@@ -49,8 +49,8 @@ const taskData = computed(() => {
     title: taskForm.value.title,
     categoryId: selectedCategory.value ? Number(selectedCategory.value) : undefined,
     description: taskForm.value.description ? taskForm.value.description : undefined,
-    endDate: endDate.value ? endDate.value.toString() : undefined,
-    startDate: startDate.value ? startDate.value.toString() : undefined,
+    endDate: endDate.value ? new Date(endDate.value) : undefined,
+    startDate: startDate.value ? new Date(startDate.value) : undefined,
     isRecurring: taskForm.value.isRecurring,
     startTime: taskForm.value.isTime ? taskTime : undefined,
     groupId: groupId ? groupId : undefined,
@@ -87,9 +87,10 @@ async function confirmAction(confirmed: boolean) {
 
     const newTaskData = {
       task: taskData.value,
-      recurrence: recurringPattern.value,
+      recurrence: recurringPattern.value || undefined,
     }
     const newTask = await tasksStore.createTask(newTaskData)
+    resetForm()
     emit('task:new', newTask)
   } catch (error) {
     console.log('Error while saving task', error)

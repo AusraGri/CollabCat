@@ -32,13 +32,6 @@ const noChanges = computed(() => {
   return areObjectsEqual(originalRecurrence.value, current.value)
 })
 
-// const saveChanges = (newPatternValues: any) => {
-//   recurrencePattern.value = {
-//     ...recurrencePattern.value,
-//     ...newPatternValues,
-//   }
-// }
-
 const closeRecurrenceModal = () => {
   originalRecurrence.value = current.value
   emit('closeRecurrence')

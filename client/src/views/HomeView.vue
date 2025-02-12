@@ -94,7 +94,7 @@ watch(
     <div class="m-7 flex flex-col items-center space-x-2 sm:flex-row">
       <FwbAvatar :img="collabCatLogo" rounded size="lg" bordered />
       <FwbHeading>CollabCat</FwbHeading>
-      <span class="whitespace-nowrap"> Best way to share task!</span>
+      <span class="whitespace-nowrap"> Best way to share tasks!</span>
     </div>
     <div class="mt-1 space-x-2 p-3">
       <FwbButton @click="join('signup')" color="alternative">SignUp</FwbButton>

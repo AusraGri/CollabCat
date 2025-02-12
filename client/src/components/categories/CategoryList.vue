@@ -32,7 +32,7 @@ const isSelected = (id: number) => {
         ]"
         hover
       >
-        <template v-if="isSelected(category.id)"  #prefix>
+        <template v-if="isSelected(category.id)" #prefix>
           <svg
             class="h-5 w-5 text-gray-800 dark:text-white"
             aria-hidden="true"
