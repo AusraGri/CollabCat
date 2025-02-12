@@ -30,19 +30,6 @@ export default function createApp(db: Database) {
     res.status(200).send('OK')
   })
 
-  // log requests to the API
-  app.use((req, res, next) => {
-    // console.log("REQUEST START:")
-    // console.log('Incoming Request Method:', req.method);
-    // console.log('Incoming Request URL:',req.url);
-    // console.log('Incoming Request Header:', req.headers);
-    // console.log('Incoming Request Header:', req.body);
-    next()
-  })
-
-  // validation applied to all endpoints
-  // app.use(validateAccessToken)
-
   app.use(
     '/api/v1/trpc',
     createExpressMiddleware({
@@ -55,17 +42,6 @@ export default function createApp(db: Database) {
       router: appRouter,
     })
   )
-
-  // if (config.env === 'development') {
-  //   app.use('/api/v1/trpc-panel', (_, res) =>
-  //     res.send(
-  //       renderTrpcPanel(appRouter, {
-  //         url: `http://localhost:${config.port}/api/v1/trpc`,
-  //         transformer: 'superjson',
-  //       })
-  //     )
-  //   )
-  // }
 
   app.use(
     '/api',

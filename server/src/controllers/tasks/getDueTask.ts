@@ -26,7 +26,6 @@ export default authenticatedProcedure
   .output(taskDataSchema.array())
   .query(async ({ input: { date }, ctx: { authUser, repos } }) => {
     const tasks = await repos.tasksRepository.getTasksDue(date, authUser.id)
-
     if (tasks.length === 0) return []
 
     const dueTasks = tasks.filter((task) => isTaskDue(task, date))

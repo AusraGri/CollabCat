@@ -1,4 +1,5 @@
 import { router } from '../trpc'
+import health from './health'
 import user from './user'
 import tasks from './tasks'
 import groups from './groups'
@@ -8,7 +9,6 @@ import invitations from './invitations'
 import categories from './categories'
 
 export const appRouter = router({
-  // provide controllers
   user,
   tasks,
   groups,
@@ -16,6 +16,7 @@ export const appRouter = router({
   rewards,
   invitations,
   categories,
+  health,
 })
 
 export type AppRouter = typeof appRouter

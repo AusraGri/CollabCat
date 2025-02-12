@@ -36,5 +36,6 @@ export default authenticatedProcedure
     if (tasks.length === 0) return []
 
     const dueTasks = tasks.filter((task) => isTaskDue(task, date))
+
     return dueTasks
   })

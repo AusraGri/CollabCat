@@ -44,7 +44,7 @@ export default publicProcedure
       const userFromAuth0 = await verifyAuth0Token(
         auth0Token,
         config.auth0.audience,
-        `https://${config.auth0.issuerBaseURL}/`
+        config.auth0.issuerBaseURL
       )
 
       if (!userFromAuth0.sub) {

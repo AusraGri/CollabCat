@@ -13,7 +13,6 @@ export const validateAccessTokenMiddleware = middleware(
         'Request and response objects are required in the context.'
       )
     }
-    // pass the validation
 
     await new Promise<void>((resolve, reject) => {
       validateAccessToken(req as Request, res as Response, (err?: unknown) => {
