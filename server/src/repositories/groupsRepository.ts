@@ -53,7 +53,7 @@ export function groupsRepository(db: Database) {
         return newGroup
       })
     },
-    async getGroup(options: GetGroupsOptions): Promise<GroupsPublic[] | GroupsPublic> {
+    async getGroup(options: GetGroupsOptions): Promise<GroupsPublic[]> {
       if (
         options.createdByUserId === undefined &&
         options.id === undefined &&

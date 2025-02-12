@@ -111,6 +111,7 @@ describe('get groups', () => {
     const groups = await repository.getGroup({ userId: userOne.id })
 
     // Then
+    expect(groups.length).toBeTruthy()
     expect(groups.length).toBe(2)
     expect(groups).toMatchObject([
       expect.objectContaining(
