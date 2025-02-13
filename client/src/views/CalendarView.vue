@@ -32,6 +32,7 @@ const personalOptions = ref([
 
 const isGroupTasks = computed(() => route.meta.group || false)
 const groupId = computed(() => userGroupStore.activeGroup?.id)
+const userGroups = computed(() => userGroupStore.userGroups || undefined)
 const date = ref(new Date())
 const startDate = ref(new Date())
 const tasks = ref<TaskData[]>([])
@@ -64,7 +65,9 @@ async function fetchDueTasks(date: Date) {
     return
   }
   const noGroup = tasksFor.value === 'all' ? false : true
-  tasks.value = await taskStore.getDuePersonalTasks(date, noGroup)
+  tasks.value = noGroup
+    ? await taskStore.getDuePersonalTasks(date, noGroup)
+    : await taskStore.getDueTasks(date)
 }
 
 const handleTaskStatusChange = async (taskData: {
@@ -160,6 +163,7 @@ watch(
           <div v-for="task in tasks" :key="task.id">
             <TaskCard
               :task="task"
+              :groups="userGroups"
               :is-task-info="false"
               :is-checkbox-enabled="isCheckboxEnabled"
               @task:status="handleTaskStatusChange"

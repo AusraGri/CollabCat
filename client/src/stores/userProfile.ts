@@ -1,19 +1,16 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type { PublicInvitation, CategoriesPublic, UserPublic } from '@server/shared/types'
+import type { PublicInvitation, UserPublic } from '@server/shared/types'
 
 interface UserState {
   user: UserPublic | null
   invitations: PublicInvitation[] | null
-  categories: CategoriesPublic[] | null
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     user: null,
     invitations: null,
-    categories: null,
-    // tasks: null,
   }),
 
   getters: {
@@ -28,7 +25,6 @@ export const useUserStore = defineStore('user', {
         if (!data) throw new Error('Failed to find user data')
 
         this.user = data
-        this.categories = await trpc.categories.getUserCategories.query()
 
         return data
       } catch (error) {

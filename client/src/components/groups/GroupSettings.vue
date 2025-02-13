@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { useUserGroupsStore, usePointsStore } from '@/stores'
+import { useUserGroupsStore, usePointsStore, useCategoriesStore } from '@/stores'
 import { FwbCheckbox, FwbModal, FwbButton } from 'flowbite-vue'
 import ConfirmationModal from '../ConfirmationModal.vue'
 import { useRouter } from 'vue-router'
@@ -17,13 +17,15 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const userGroupStore = useUserGroupsStore()
+const categoryStory = useCategoriesStore()
 const pointStore = usePointsStore()
 const isPointsEnabled = ref(pointStore.isPointsEnabled)
 const isShowConfirmation = ref(false)
 const isManageCategories = ref(false)
 const isAdmin = computed(() => userGroupStore.isAdmin)
 const categories = computed(() => {
-  const groupCategories = userGroupStore.categories?.filter((cat) => cat.isDefault === false) || []
+  const groupCategories =
+    categoryStory.groupCategories.filter((cat) => cat.isDefault === false) || []
 
   if (isAdmin.value) return groupCategories
 

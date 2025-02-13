@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { trpc } from '@/trpc'
+import { useCategoriesStore } from '@/stores'
 import type { CategoriesPublic } from '@server/shared/types'
 import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
 import { ref } from 'vue'
@@ -14,6 +14,7 @@ const emit = defineEmits<{
   (event: 'close'): void
 }>()
 
+const categoryStore = useCategoriesStore()
 const title = ref<string>('')
 
 async function confirmAction(confirmed: boolean) {
@@ -24,7 +25,7 @@ async function confirmAction(confirmed: boolean) {
   }
 
   try {
-    const category = await trpc.categories.createCategory.mutate({
+    const category = await categoryStore.createCategory({
       title: title.value,
       groupId: groupId || null,
     })

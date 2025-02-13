@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useUserGroupsStore, useUserStore, usePointsStore, useTasksStore } from '@/stores'
+import {
+  useUserGroupsStore,
+  useCategoriesStore,
+  useUserStore,
+  usePointsStore,
+  useTasksStore,
+} from '@/stores'
 import CreateTask from '../components/task/CreateTask.vue'
 import CreateCategory from '@/components/categories/CreateCategory.vue'
-import type { CategoriesPublic } from '@server/shared/types'
 import CategoryList from '@/components/categories/CategoryList.vue'
 import TaskCard from '@/components/task/TaskCard.vue'
 import TabRev from '@/components/TabRev.vue'
@@ -17,6 +22,7 @@ import {
 } from '@/utils/tasks'
 
 const userGroupStore = useUserGroupsStore()
+const categoryStore = useCategoriesStore()
 const userStore = useUserStore()
 const pointsStore = usePointsStore()
 const taskStore = useTasksStore()
@@ -33,9 +39,9 @@ const groupId = computed(() => userGroupStore.activeGroup?.id)
 const members = computed(() => userGroupStore.groupMembers || undefined)
 const categories = computed(() => {
   if (groupId.value) {
-    return userGroupStore.categories?.filter((cat) => cat.isDefault === false) || undefined
+    return categoryStore.groupCategories || undefined
   }
-  return userStore.categories?.filter((cat) => cat.isDefault === false) || undefined
+  return categoryStore.userCategories || undefined
 })
 
 const filterTitle = computed(() => {
@@ -62,13 +68,6 @@ const tasks = computed(() => {
 
 function showCount(name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
   return countTasksOfDefaultType(allTasks.value, name)
-}
-
-const handleNewCategory = (category: CategoriesPublic) => {
-  if (category.groupId) {
-    userGroupStore.categories?.push(category)
-  }
-  userStore.categories?.push(category)
 }
 
 const toggleTaskModal = () => {
@@ -259,7 +258,6 @@ watch(
     <CreateCategory
       :is-show-modal="isNewCategory"
       :group-id="groupId"
-      @create:category="handleNewCategory"
       @close="toggleCategoryModal"
     />
   </div>

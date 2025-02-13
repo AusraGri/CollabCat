@@ -178,6 +178,14 @@ const resetForm = () => {
             ></VueDatePicker>
           </div>
         </div>
+        <div v-if="startDate" class="flex h-11 items-center space-x-3 whitespace-nowrap">
+          <div>
+            <FwbCheckbox v-model="taskForm.isTime" label="Tasks Time" />
+          </div>
+          <div v-if="taskForm.isTime" class="grow">
+            <VueDatePicker v-model="time" time-picker auto-apply />
+          </div>
+        </div>
         <div v-if="categories">
           <CategorySelect
             v-model:selected-category="selectedCategory"
@@ -193,14 +201,7 @@ const resetForm = () => {
             :max-selections="1"
           />
         </div>
-        <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
-          <div>
-            <FwbCheckbox v-model="taskForm.isTime" label="Tasks Time" />
-          </div>
-          <div v-if="taskForm.isTime" class="grow">
-            <VueDatePicker v-model="time" time-picker auto-apply />
-          </div>
-        </div>
+
         <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
           <div>
             <FwbCheckbox v-model="taskForm.isPoints" label="Task Points" />

@@ -5,6 +5,7 @@ import {
   fakeGroup,
   randomId,
   fakeCategory,
+  fakeUserGroup,
 } from '@server/entities/tests/fakes'
 import { wrapInRollbacks } from '@tests/utils/transactions'
 import { insertAll } from '@tests/utils/records'
@@ -19,16 +20,22 @@ const [groupOne, groupTwo] = await insertAll(db, 'groups', [
   fakeGroup({ createdByUserId: userTwo.id }),
 ])
 
+await insertAll(db, 'userGroups', [
+  fakeUserGroup({ groupId: groupOne.id, userId: userOne.id }),
+  fakeUserGroup({ groupId: groupTwo.id, userId: userOne.id }),
+])
 const [
   categoryOne,
   categoryTwo,
   categoryThree,
+  categoryFour,
   defaultCategory,
   defaultGroupCategory,
 ] = await insertAll(db, 'categories', [
   fakeCategory({ groupId: groupOne.id, createdByUserId: null }),
   fakeCategory({ createdByUserId: userOne.id, groupId: null }),
   fakeCategory({ createdByUserId: userOne.id, groupId: groupTwo.id }),
+  fakeCategory({ createdByUserId: userTwo.id, groupId: groupOne.id }),
   fakeCategory({
     isDefault: true,
     createdByUserId: null,
@@ -153,6 +160,25 @@ describe('get categories data', () => {
     expect(groupResult).toContainEqual(defaultCategory)
     expect(groupResult).toContainEqual(defaultGroupCategory)
     expect(result).toContainEqual(defaultCategory)
+  })
+
+  it('should return all user related categories (including user group categories and defaults)', async () => {
+    // Given
+    const userId = userOne.id
+    // When
+    const result = await repository.getAllRelatedCategoriesByUserId(userId)
+
+    // Then
+    expect(result).toBeTruthy()
+    expect(result.length).toBe(4)
+    expect(result).toEqual(
+      expect.arrayContaining([
+        categoryOne,
+        categoryTwo,
+        categoryThree,
+        categoryFour,
+      ])
+    )
   })
 
   it('should return no categories if no created categories found by user id', async () => {

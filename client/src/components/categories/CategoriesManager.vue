@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { FwbListGroup, FwbListGroupItem, FwbModal, FwbButton } from 'flowbite-vue'
-import { useUserStore } from '@/stores'
+import { useCategoriesStore } from '@/stores'
 import type { CategoriesPublic } from '@server/shared/types'
 import DeleteIcon from '../svg/DeleteIcon.vue'
 import ConfirmationModal from '../ConfirmationModal.vue'
-import { trpc } from '@/trpc'
 
 const { categories, isShowCategories } = defineProps<{
   categories: CategoriesPublic[]
@@ -22,7 +21,7 @@ const closeModal = () => {
 
 const isDeletionRequired = ref(false)
 const categoryToDelete = ref()
-const userStore = useUserStore()
+const categoryStore = useCategoriesStore()
 
 const confirmCategoryDeletion = (categoryId: number) => {
   categoryToDelete.value = categoryId
@@ -32,8 +31,7 @@ const confirmCategoryDeletion = (categoryId: number) => {
 const deleteCategory = async (confirmed: boolean) => {
   const categoryId = categoryToDelete.value
   if (confirmed && categoryId) {
-    await trpc.categories.deleteCategory.mutate({ categoryId })
-    userStore.fetchUserData()
+    await categoryStore.deleteCategory(categoryId)
   }
 
   isDeletionRequired.value = false

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { useUserStore, usePointsStore } from '@/stores'
+import { useUserStore, usePointsStore, useCategoriesStore } from '@/stores'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import ConfirmationModal from '../ConfirmationModal.vue'
@@ -20,13 +20,14 @@ const emit = defineEmits<{
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const pointStore = usePointsStore()
+const categoryStore = useCategoriesStore()
 const username = ref()
 const isPoints = ref(pointStore.isEnabled)
 const isShowConfirmation = ref(false)
 const isShowCategoriesManager = ref(false)
 const router = useRouter()
 const userCategories = computed(() =>
-  userStore.categories?.filter((cat) => cat.isDefault === false)
+  categoryStore.userCategories.filter((cat) => cat.isDefault === false)
 )
 
 async function changeName() {

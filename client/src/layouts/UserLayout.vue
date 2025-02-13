@@ -3,7 +3,13 @@ import { onMounted, watch, computed, ref } from 'vue'
 import { FwbListGroupItem } from 'flowbite-vue'
 import UserAvatarMenu from '@/components/user/UserAvatarMenu.vue'
 import { RouterView } from 'vue-router'
-import { useUserStore, useUserGroupsStore, usePointsStore, useInvitationStore } from '@/stores'
+import {
+  useUserStore,
+  useCategoriesStore,
+  useUserGroupsStore,
+  usePointsStore,
+  useInvitationStore,
+} from '@/stores'
 import GroupSelection from '@/components/groups/GroupSelection.vue'
 import Invitations from '@/components/invitations/Invitations.vue'
 import Notifications from '@/components/user/Notifications.vue'
@@ -15,6 +21,7 @@ const router = useRouter()
 const pointStore = usePointsStore()
 const userStore = useUserStore()
 const currentTabName = ref()
+const categoryStore = useCategoriesStore()
 const userGroupStore = useUserGroupsStore()
 const invitationStore = useInvitationStore()
 const activeGroupId = computed(() =>
@@ -23,10 +30,14 @@ const activeGroupId = computed(() =>
 const invitations = computed(() => userStore.invitations)
 
 onMounted(async () => {
+  await categoryStore.fetchAllCategories()
+
   if (userGroupStore.activeGroup && activeGroupId.value) {
     await userGroupStore.fetchGroupData()
     await userGroupStore.fetchUserMembershipInfo()
+    await categoryStore.getGroupCategories(activeGroupId.value)
   }
+  await categoryStore.getUserCategories()
   await refreshInvitations()
   await pointStore.managePoints(activeGroupId.value)
 })
@@ -56,6 +67,7 @@ watch(
       router.push({ name: tab, params: { group: groupName } })
 
       await userGroupStore.fetchGroupData()
+      await categoryStore.getGroupCategories(activeGroupId.value)
       await userGroupStore.fetchUserMembershipInfo()
     }
 

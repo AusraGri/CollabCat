@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watchEffect, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
+import { useUserGroupsStore, useUserStore, usePointsStore, useCategoriesStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import GroupMembers from '@/components/groups/GroupMembers.vue'
 import { useRewardStore } from '@/stores/rewardStore'
@@ -14,6 +14,7 @@ const emit = defineEmits<{
 }>()
 
 const userGroupStore = useUserGroupsStore()
+const categoryStore = useCategoriesStore()
 const rewardStore = useRewardStore()
 const userStore = useUserStore()
 const pointsStore = usePointsStore()
@@ -26,6 +27,7 @@ const isUserInGroupPage = computed(() => route.meta.group)
 watchEffect(async () => {
   if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
     await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)
+    await categoryStore.getGroupCategories(userGroupStore.activeGroup?.id)
     return
   }
 
@@ -36,6 +38,7 @@ watchEffect(async () => {
       role: 'Admin',
     }
     await rewardStore.managePersonalRewards(userInfo)
+    await categoryStore.getUserCategories()
   }
 })
 

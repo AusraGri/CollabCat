@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type { GroupData, GroupMember, CategoriesPublic, ActiveGroup } from '@server/shared/types'
+import type { GroupData, GroupMember, ActiveGroup } from '@server/shared/types'
 type GroupsPublic = {
   id: number
   name: string
@@ -19,7 +19,6 @@ interface GroupsState {
   userMembership: GroupMember | null
   groupMembers: GroupMember[] | null
   groupData: GroupData | null
-  categories: CategoriesPublic[] | null
 }
 
 export const useUserGroupsStore = defineStore('group', {
@@ -28,10 +27,7 @@ export const useUserGroupsStore = defineStore('group', {
     userMembership: null,
     activeGroup: null,
     groupMembers: null,
-    // rewards: null,
     groupData: null,
-    categories: null,
-    // tasks: null,
   }),
 
   getters: {
@@ -44,7 +40,7 @@ export const useUserGroupsStore = defineStore('group', {
     async fetchUserGroups() {
       try {
         const data = await trpc.groups.getUserGroups.query()
-        this.userGroups = data
+        this.userGroups = data.length ? data : null
 
         return data
       } catch (error) {
@@ -58,7 +54,6 @@ export const useUserGroupsStore = defineStore('group', {
         if (!groupId) throw new Error('Missing group id')
 
         const data = await trpc.groups.getGroupMembersAndRewards.query({ groupId })
-        this.categories = await trpc.categories.getGroupCategories.query({ groupId })
 
         if (!data) return
         this.groupData = data
