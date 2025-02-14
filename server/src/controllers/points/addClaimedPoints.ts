@@ -1,7 +1,7 @@
 import { pointsRepository } from '@server/repositories/pointsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { pointsClaimedSchema } from '@server/entities/points'
-import { idSchema } from '@server/entities/shared'
+import { dateSchema, idSchema } from '@server/entities/shared'
 import z from 'zod'
 import { authenticatedProcedure } from '../../trpc/authenticatedProcedure/index'
 
@@ -18,7 +18,7 @@ export default authenticatedProcedure
   .input(
     z.object({
       taskId: idSchema,
-      taskInstanceDate: z.date(),
+      taskInstanceDate: dateSchema,
     })
   )
   .output(pointsClaimedSchema)

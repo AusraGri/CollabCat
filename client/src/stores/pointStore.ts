@@ -78,6 +78,23 @@ export const usePointsStore = defineStore('points', {
         console.error('Failed to set user points:', error)
       }
     },
+
+    async claimPoints(param: { taskId: number; taskInstanceDate: Date; points: number }) {
+      const { taskId, taskInstanceDate, points } = param
+      try {
+        if (!this.isPointsEnabled) return
+
+        const isClaimed = await trpc.points.isUserClaimedPoints.query({ taskId, taskInstanceDate })
+
+        if (isClaimed) return
+
+        await this.alterPoints('+', points)
+
+        await trpc.points.addClaimedPoints.mutate({ taskId, taskInstanceDate })
+      } catch (error) {
+        console.error('Failed to update user points', error)
+      }
+    },
   },
 })
 

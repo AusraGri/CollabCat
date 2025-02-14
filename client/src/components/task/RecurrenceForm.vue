@@ -111,9 +111,9 @@ watch(
       selectedDaysOfWeek.value = newValue.dayOfWeek || []
       everyXCount.value = newValue.separationCount ? String(newValue.separationCount + 1) : '1'
     } else {
-      recurringType.value = ''
+      recurringType.value = 'daily'
       selectedDaysOfWeek.value = []
-      everyXCount.value = ''
+      everyXCount.value = '1'
     }
   }
 )
@@ -164,7 +164,6 @@ onMounted(() => {
           :min-date="endDateMin"
           name="Task End Date"
           auto-apply
-          required
         />
       </div>
     </div>

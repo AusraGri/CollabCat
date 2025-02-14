@@ -209,7 +209,6 @@ export const fakeCategory = <T extends Partial<Insertable<Categories>>>(
     createdByUserId: randomId(),
     groupId: null,
     isDefault: false,
-    isGroupDefault: false,
     ...overrides,
   }) satisfies Insertable<Categories>
 

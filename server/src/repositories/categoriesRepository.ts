@@ -49,17 +49,15 @@ export function categoriesRepository(db: Database) {
           'categories.groupId',
           'categories.id',
           'categories.title',
-          'categories.isDefault',
-          'categories.isGroupDefault',
+          'categories.isDefault'
         ])
         .where(({ eb, or, and, not }) =>
           and([
             or([
-              eb('categories.createdByUserId', '=', userId), // Categories created by user
-              eb('userGroups.userId', '=', userId), // Categories from groups the user is in
+              eb('categories.createdByUserId', '=', userId),
+              eb('userGroups.userId', '=', userId),
             ]),
-            not(eb('categories.isDefault', '=', true)), // Exclude default categories
-            not(eb('categories.isGroupDefault', '=', true)), // Exclude group default categories
+            not(eb('categories.isDefault', '=', true)),
           ])
         )
         .execute()
@@ -71,7 +69,6 @@ export function categoriesRepository(db: Database) {
         .selectFrom('categories')
         .select(categoriesKeysAll)
         .where('categories.groupId', 'is', null)
-        .where('categories.isGroupDefault', 'is', false)
         .where((eb) =>
           eb.or([
             eb('categories.createdByUserId', '=', userId),

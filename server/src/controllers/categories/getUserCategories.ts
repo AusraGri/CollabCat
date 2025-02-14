@@ -1,6 +1,6 @@
 import { categoriesRepository } from '@server/repositories/categoriesRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { categoriesSchema } from '@server/entities/categories'
+import { publicCategorySchema } from '@server/entities/categories'
 import z from 'zod'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 
@@ -16,7 +16,7 @@ export default authenticatedProcedure
     },
   })
   .input(z.void())
-  .output(z.array(categoriesSchema))
+  .output(z.array(publicCategorySchema))
   .query(async ({ ctx: { authUser, repos } }) => {
     const userCategories =
       await repos.categoriesRepository.getPersonalCategoriesByUserId(

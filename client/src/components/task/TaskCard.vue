@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from 'vue'
 import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
+import { UsersIcon, Squares2X2Icon, ClockIcon } from "@heroicons/vue/24/outline";
 import {
   type TaskData,
   type CategoriesPublic,
@@ -54,6 +55,18 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isGroupInfo: {
+    type: Boolean,
+    default: true,
+  },
+  isShowDates: {
+    type: Boolean,
+    default: true,
+  },
+  isShowRecurrence: {
+    type: Boolean,
+    default: true
+  }
 })
 
 const taskCategory = computed(() => {
@@ -67,6 +80,7 @@ const taskGroup = computed(() => {
   return props.groups.find((group) => group.id === props.task.groupId)
 })
 
+
 const assignedUserProfile = computed(() => {
   if (props.task.assignedUserId && props.groupMembers) {
     return props.groupMembers.find((member) => member.id === props.task.assignedUserId)
@@ -77,6 +91,15 @@ const assignedUserProfile = computed(() => {
 const showTaskInfo = ref(false)
 
 const check = ref(isTaskCompleted(props.task))
+
+const isCompletedTask = computed(()=> {
+  if(check.value && props.isCheckbox ) return true
+
+  if(!props.isCheckbox && props.task.isCompleted) return true
+
+  return false
+})
+
 
 const toggleTaskInfo = () => {
   toggle(showTaskInfo)
@@ -135,10 +158,13 @@ watch(
 
 <template>
   <div
-    class="m-1 flex h-fit w-fit items-stretch space-x-1 rounded rounded-s-2xl bg-slate-400 p-1"
+    :class="[
+      'border-grey-700 m-1 flex h-fit w-full space-x-1 rounded rounded-s-2xl border-2 p-2 shadow-md',
+      isCompletedTask ? 'bg-green-400' : 'bg-gray-400',
+    ]"
     aria-label="task item"
   >
-    <div v-if="isCheckbox" class="h-6 self-center">
+    <div v-if="isCheckbox" class="self-center">
       <FwbCheckbox
         v-model="check"
         :disabled="!isCheckboxEnabled"
@@ -147,50 +173,56 @@ watch(
     </div>
     <div
       @click="toggleTaskInfo"
-      class="flex h-full min-w-60 cursor-pointer flex-col items-center"
+      class="flex flex-1 min-w-60 cursor-pointer flex-col items-stretch rounded-l-md bg-slate-50"
       aria-label="task-info"
     >
       <div class="flex w-full justify-between rounded-t p-1">
         <div class="p-1">{{ task.title }}</div>
       </div>
       <div
-        v-if="task.startDate"
+        v-if="task.startDate && isShowDates"
         :class="[
           'flex',
           'w-full',
-          'justify-between',
-          'bg-orange-300',
+          'justify-around',
+          'items-middle',
+          ,
           'p-1',
-          { 'rounded-b': !task.assignedUserId },
+          { 'justify-between bg-orange-300': isShowDates },
+          {' rounded-bl' : !task.recurrence && !task.categoryId && !task.groupId }
         ]"
       >
-        <div v-if="task.startDate" class="p-1 text-sm">
-          {{ formatDateToLocal(task.startDate) }}
-          <span v-if="task.endDate">--> {{ formatDateToLocal(task.endDate) }}</span>
-        </div>
-        <div v-if="task.startTime && task.startDate">
-          {{ timeToLocalTime(task.startTime, task.startDate) }}
+        <div v-if="task.startDate" class=" text-sm" aria-label="task-dates">
+          <span>{{ formatDateToLocal(task.startDate) }}</span>
+          <span v-if="task.endDate"> --> {{ formatDateToLocal(task.endDate) }}</span>
         </div>
       </div>
-      <div v-if="task.recurrence">
+
+      <div v-if="task.recurrence && isShowRecurrence" class="text-sm p-1 text-center bg-orange-200">
         <RecurrenceCard :recurrence="task.recurrence" />
       </div>
-      <div v-if="taskCategory" class="text-sm" aria-label="category">
-        <span>Category:</span>
+      <div v-if="taskCategory" class="flex items-center space-x-2 text-sm pl-1" aria-label="category">
+        <Squares2X2Icon class="w-5 h-5 text-blue-500" />
         <span>{{ taskCategory?.title }}</span>
       </div>
-      <div v-if="taskGroup" class="text-sm" aria-label="category">
-        <span>Group:</span>
+      <div v-if="taskGroup && isGroupInfo" class="flex items-center space-x-2 text-sm pl-1" aria-label="group">
+        <UsersIcon class="w-5 h-5 text-blue-500" />
         <span>{{ taskGroup.name }}</span>
       </div>
-      <div v-if="assignedUserProfile" class="flex w-full">
-        <UserBasicProfile :user="assignedUserProfile" />
-      </div>
     </div>
-    <div aria-label="task options">
-      <div class="flex h-full w-fit flex-col space-y-1">
+    <div aria-label="task options" class="min-w-14">
+      <div class="flex h-full w-fit min-w-10 flex-col justify-between">
         <div class="min-w-10" aria-label="points">
-          <FwbBadge size="sm" class="w-full rounded-e-full p-0">{{ task.points }}</FwbBadge>
+          <FwbBadge size="sm" class="w-fit min-w-10 rounded-e-full p-0">{{ task.points }}</FwbBadge>
+        </div>
+        <div v-if="assignedUserProfile" class="flex w-full justify-center">
+          <UserBasicProfile :user="assignedUserProfile" />
+        </div>
+        <div v-if="task.startTime && task.startDate" class="flex items-center space-x-1 text-sm">
+          <ClockIcon class="w-5 h-5 text-blue-500"/>
+          <span class="text-xs tracking-wider">
+            {{ timeToLocalTime(task.startTime, task.startDate) }}</span
+          >
         </div>
       </div>
     </div>

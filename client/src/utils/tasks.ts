@@ -9,10 +9,10 @@ export function filterTasksByDefaultType(filter: {
   } else if (filter.title === 'Routine') {
     return filter.tasks.filter((task: TaskData): boolean => task.isRecurring === true)
   } else if (filter.title === 'Someday') {
-    return filter.tasks.filter((task: TaskData): boolean => task.startDate === null)
+    return filter.tasks.filter((task: TaskData): boolean => task.startDate === null && task.isCompleted === false)
   } else if (filter.title === 'Scheduled') {
     return filter.tasks.filter(
-      (task: TaskData): boolean => task.isRecurring === false && task.startDate !== null
+      (task: TaskData): boolean => task.isRecurring === false && task.startDate !== null && task.isCompleted === false
     )
   } else if (filter.title === 'Not Assigned') {
     return filter.tasks.filter((task: TaskData): boolean => task.assignedUserId === null)
@@ -37,3 +37,32 @@ export function countTasksOfDefaultType(
 ): number {
   return filterTasksByDefaultType({ tasks, title: count }).length
 }
+
+export const sortTasks = (tasks : TaskData[]) => {
+  return tasks.sort((a, b) => {
+    const aIsCompleted = a.completed.length > 0;
+    const bIsCompleted = b.completed.length > 0;
+
+    if (aIsCompleted && !bIsCompleted) return 1;
+    if (!aIsCompleted && bIsCompleted) return -1;
+
+    if (a.startTime && b.startTime) {
+      return a.startTime.localeCompare(b.startTime);
+    }
+    if (a.startTime && !b.startTime) return -1;
+    if (!a.startTime && b.startTime) return 1;
+
+    return 0;
+  });
+};
+export const sortTasksByCompleted = (tasks : TaskData[]) => {
+  return tasks.sort((a, b) => {
+    const aIsCompleted = a.isCompleted;
+    const bIsCompleted = b.isCompleted;
+
+    if (aIsCompleted && !bIsCompleted) return 1;
+    if (!aIsCompleted && bIsCompleted) return -1;
+
+    return 0;
+  });
+};

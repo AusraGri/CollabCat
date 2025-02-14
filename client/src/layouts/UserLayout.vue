@@ -100,7 +100,7 @@ watch(
     </div>
     <GroupLayout @tab:new="setTabName" />
     <main>
-      <div class="container mx-auto w-full">
+      <div class="container mx-auto ">
         <RouterView />
       </div>
     </main>

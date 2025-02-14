@@ -30,7 +30,6 @@ const [
   categoryThree,
   categoryFour,
   defaultCategory,
-  defaultGroupCategory,
 ] = await insertAll(db, 'categories', [
   fakeCategory({ groupId: groupOne.id, createdByUserId: null }),
   fakeCategory({ createdByUserId: userOne.id, groupId: null }),
@@ -39,14 +38,9 @@ const [
   fakeCategory({
     isDefault: true,
     createdByUserId: null,
-    isGroupDefault: false,
+    groupId: null
   }),
-  fakeCategory({
-    isDefault: true,
-    createdByUserId: null,
-    isGroupDefault: true,
-  }),
-])
+]) 
 
 describe('create category', () => {
   it('should create new category', async () => {
@@ -62,7 +56,6 @@ describe('create category', () => {
       title,
       groupId: null,
       isDefault: false,
-      isGroupDefault: false,
       createdByUserId: null,
     })
   })
@@ -79,7 +72,6 @@ describe('create category', () => {
       ...newCategory,
       id: expect.any(Number),
       isDefault: false,
-      isGroupDefault: false,
       createdByUserId: null,
     })
   })
@@ -116,8 +108,6 @@ describe('get categories data', () => {
     // Then
     expect(result).toBeTruthy()
     expect(result).toContainEqual(categoryOne)
-    expect(result).toContainEqual(defaultCategory)
-    expect(result).toContainEqual(defaultGroupCategory)
   })
 
   it('should get categories created by user id', async () => {
@@ -132,7 +122,7 @@ describe('get categories data', () => {
     expect(result).toEqual([categoryTwo, categoryThree])
   })
 
-  it('should get personal categories created by user id (including not group defaults)', async () => {
+  it('should get personal categories created by user id (including defaults)', async () => {
     // Given
     const userId = userOne.id
 
@@ -141,8 +131,7 @@ describe('get categories data', () => {
 
     // Then
     expect(result).toBeTruthy()
-    expect(result).toContainEqual(categoryTwo)
-    expect(result).toContainEqual(defaultCategory)
+    expect(result).toEqual(expect.arrayContaining([categoryTwo, defaultCategory]))
   })
 
   it('should return only default categories if no personal user or group created categories found', async () => {
@@ -158,11 +147,10 @@ describe('get categories data', () => {
     expect(result).toBeTruthy()
     expect(groupResult).toBeTruthy()
     expect(groupResult).toContainEqual(defaultCategory)
-    expect(groupResult).toContainEqual(defaultGroupCategory)
     expect(result).toContainEqual(defaultCategory)
   })
 
-  it('should return all user related categories (including user group categories and defaults)', async () => {
+  it('should return all user related categories (including user group categories, but not defaults)', async () => {
     // Given
     const userId = userOne.id
     // When

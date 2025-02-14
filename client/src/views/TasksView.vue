@@ -15,6 +15,7 @@ import TabRev from '@/components/TabRev.vue'
 import { useRoute } from 'vue-router'
 import { toggle } from '@/utils/helpers'
 import { trpc } from '@/trpc'
+import { sortTasksByCompleted } from '@/utils/tasks'
 import {
   filterTasksByCategoryId,
   filterTasksByDefaultType,
@@ -63,7 +64,9 @@ const tasks = computed(() => {
     categoryId: selectedCategoryId,
   })
 
-  return filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
+  const filteredByDefault = filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
+
+  return sortTasksByCompleted(filteredByDefault)
 })
 
 function showCount(name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
@@ -261,10 +264,11 @@ watch(
       @close="toggleCategoryModal"
     />
   </div>
-  <div class="mt-3 flex justify-between">
-    <div v-if="tasks">
+  <div class="mt-3 flex justify-around space-x-1">
+    <div v-if="tasks" class="flex flex-col">
       <div v-for="task in tasks" :key="task.id">
         <TaskCard
+          class="items-stretch"
           :task="task"
           :categories="categories"
           :group-members="members"
@@ -274,7 +278,7 @@ watch(
         />
       </div>
     </div>
-    <div v-if="categories" class="w-fit">
+    <div v-if="categories" class="w-fit whitespace-nowrap">
       <CategoryList :categories="categories" v-model:selected-category="selectedCategory" />
     </div>
   </div>

@@ -7,16 +7,16 @@ export const categoriesSchema = z.object({
   createdByUserId: idSchema.nullable(),
   id: idSchema,
   isDefault: z.boolean(),
-  isGroupDefault: z.boolean(),
   title: z.string().trim().min(3).max(50),
   groupId: idSchema.nullable(),
 })
+
+export const publicCategorySchema = categoriesSchema.omit({isDefault: true})
 
 export const insertCategorySchema = categoriesSchema.omit({
   id: true,
   createdByUserId: true,
   isDefault: true,
-  isGroupDefault: true,
 })
 export const categoriesKeysAll = Object.keys(
   categoriesSchema.shape
@@ -27,8 +27,6 @@ export const categoriesKeysPublic = [
   'title',
   'createdByUserId',
   'groupId',
-  'isDefault',
-  'isGroupDefault',
 ] as const
 
 export type CategoriesPublic = Pick<

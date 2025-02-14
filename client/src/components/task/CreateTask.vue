@@ -71,6 +71,7 @@ const taskForm = ref({
 
 function closeModal() {
   taskForm.value.isRecurring = false
+  resetForm()
   emit('close')
 }
 
@@ -83,7 +84,8 @@ async function confirmAction(confirmed: boolean) {
   try {
     if (!taskData.value) return
 
-    if (taskData.value.isRecurring && !recurringPattern.value) return
+    if (taskData.value.isRecurring && !recurringPattern.value && !taskData.value.points) return
+
 
     const newTaskData = {
       task: taskData.value,
