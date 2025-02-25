@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { CategoriesPublic } from '@server/shared/types'
 
-interface CategoriesState {
+export interface CategoriesState {
   categories: CategoriesPublic[]
   userCategories: CategoriesPublic[]
   groupCategories: CategoriesPublic[]

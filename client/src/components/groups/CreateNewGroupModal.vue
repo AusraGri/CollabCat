@@ -27,21 +27,43 @@ const closeModal = () => {
 </script>
 
 <template>
-  <FwbModal v-if="isShowModal" @close="closeModal">
+  <FwbModal v-if="isShowModal" @close="closeModal" data-test="create-group-modal">
     <template #header>
-      <div class="flex items-center text-lg">Create New Group</div>
+      <h2 class="text-lg font-semibold" data-test="modal-header">Create New Group</h2>
     </template>
     <template #body>
       <div>
         <form>
-          <FwbInput label="Group Name" placeholder="enter group name" v-model="name" />
+          <FwbInput
+            label="Group Name"
+            placeholder="enter group name"
+            v-model="name"
+            data-test="group-name-input"
+            aria-label="Enter group name"
+          />
         </form>
       </div>
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <fwb-button @click="confirmAction(false)" color="alternative"> Decline </fwb-button>
-        <fwb-button @click="confirmAction(true)" color="green"> I accept </fwb-button>
+        <FwbButton
+          @click="confirmAction(false)"
+          color="alternative"
+          data-test="decline-button"
+          aria-label="Decline group creation"
+        >
+          Decline
+        </FwbButton>
+        <FwbButton
+          @click="confirmAction(true)"
+          color="green"
+          type="submit"
+          :disabled="name.length < 3"
+          data-test="accept-button"
+          aria-label="Confirm group creation"
+        >
+          I accept
+        </FwbButton>
       </div>
     </template>
   </FwbModal>

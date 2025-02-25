@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { InsertTaskData, TaskUpdateData, TaskData } from '@server/shared/types'
 
-interface TasksState {
+export interface TasksState {
   tasks: TaskData[]
 }
 export const useTasksStore = defineStore('tasks', {

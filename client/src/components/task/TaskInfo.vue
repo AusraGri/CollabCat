@@ -2,16 +2,22 @@
 import { FwbModal, FwbButton } from 'flowbite-vue'
 import type { TaskData, CategoriesPublic, GroupMember } from '@server/shared/types'
 import { ref, computed, nextTick } from 'vue'
+import {
+  TrashIcon,
+  CalendarDaysIcon,
+  ClockIcon,
+  UsersIcon,
+  Squares2X2Icon,
+  StarIcon,
+  InformationCircleIcon,
+  ArrowPathRoundedSquareIcon,
+} from '@heroicons/vue/24/outline'
 import UserBasicProfile from '../user/UserBasicProfile.vue'
 import RecurrenceCard from './RecurrenceCard.vue'
 import { timeToLocalTime, formatDateToLocal, areObjectsEqual } from '@/utils/helpers'
 import CategorySelect from '../categories/CategorySelect.vue'
 import MembersSelection from '../groups/MembersSelection.vue'
 import TaskDateModal from './TaskDateModal.vue'
-import RepeatIcon from '../svg/RepeatIcon.vue'
-import DeleteIcon from '../svg/DeleteIcon.vue'
-import ClockIcon from '../svg/ClockIcon.vue'
-import CalendarIcon from '../svg/CalendarIcon.vue'
 import ConfirmationModal from '../ConfirmationModal.vue'
 import RecurrenceChangeModal from './RecurrenceChangeModal.vue'
 
@@ -237,10 +243,22 @@ const saveChanges = () => {
 }
 </script>
 <template>
-  <FwbModal v-if="isShowModal" @close="closeModal">
+  <FwbModal
+    v-if="isShowModal"
+    @close="closeModal"
+    role="dialog"
+    aria-labelledby="modalTitle"
+    aria-hidden="false"
+  >
     <template #header>
       <div class="flex w-fit flex-col justify-between text-lg">
-        <div @click="startEditingTitle" v-if="!isEditingTitle">
+        <div
+          @click="startEditingTitle"
+          v-if="!isEditingTitle"
+          role="heading"
+          aria-level="1"
+          id="modalTitle"
+        >
           {{ editableTask.title }}
         </div>
         <input
@@ -251,33 +269,48 @@ const saveChanges = () => {
           type="text"
           ref="titleInput"
           class="rounded border-0 p-1"
+          aria-label="Edit task title"
+          aria-describedby="titleError"
         />
-        <p v-if="errorMessage && isEditingTitle" class="text-sm text-red-500">
+        <p v-if="errorMessage && isEditingTitle" id="titleError" class="text-sm text-red-500">
           {{ errorMessage }}
         </p>
       </div>
     </template>
     <template #body>
       <div class="text-md flex w-full flex-col justify-between space-y-3 divide-y">
-        <div @click="isEditingCategory = true" class="flex cursor-pointer items-center space-x-3">
-          <span>Category:</span>
+        <div
+          @click="isEditingCategory = true"
+          class="flex cursor-pointer items-center space-x-3"
+          role="button"
+          aria-label="Edit category"
+        >
+          <Squares2X2Icon class="w-7 text-black" />
+          <label for="categorySelect" class="text-sm font-bold"> Category:</label>
           <CategorySelect
+            id="categorySelect"
             v-if="categories && isEditingCategory"
             :categories="categories"
             v-model:selected-category="selectedCategory"
+            aria-label="Select a category"
+            data-test="select-category"
           />
           <span v-else>{{ categoryLabel }}</span>
         </div>
         <div
           class="flex w-full items-center justify-between space-x-3 pt-3"
           @click="isEditingAssignment = true"
+          role="button"
+          aria-label="Edit task assignment"
+          data-test="edit-assignment"
         >
           <div class="flex items-center space-x-3">
-            <div>
+            <UsersIcon class="w-7" />
+            <div class="text-sm font-bold">
               {{ assignedText }}
             </div>
             <div v-if="assignedTo">
-              <UserBasicProfile :user="assignedTo" />
+              <UserBasicProfile :user="assignedTo" :aria-label="assignedTo.username" />
             </div>
           </div>
           <div v-if="isEditingAssignment">
@@ -286,12 +319,20 @@ const saveChanges = () => {
               :group-members="groupMembers"
               :max-selections="1"
               v-model:selected-members="selectedMember"
+              aria-label="Select a member"
+              data-test="select-member"
             />
           </div>
         </div>
         <div class="flex h-11 items-center space-x-3 pt-3">
-          <div @click="startEditingPoints" class="flex cursor-pointer space-x-3">
-            <div>{{ pointsLabel }}</div>
+          <div
+            @click="startEditingPoints"
+            class="flex cursor-pointer items-center space-x-3"
+            role="button"
+            aria-label="Edit task points"
+          >
+            <StarIcon class="w-7" />
+            <div class="text-sm font-bold">{{ pointsLabel }}</div>
             <div v-if="editableTask.points && !isEditingPoints">{{ editableTask.points }}</div>
           </div>
           <div>
@@ -304,22 +345,29 @@ const saveChanges = () => {
               min="1"
               ref="pointsInput"
               class="rounded border-0 p-1"
+              aria-label="Edit task points"
+              aria-describedby="pointsError"
             />
-            <p v-if="errorMessage && isEditingPoints" class="text-sm text-red-500">
+            <p v-if="errorMessage && isEditingPoints" id="pointsError" class="text-sm text-red-500">
               {{ errorMessage }}
             </p>
           </div>
         </div>
-        <div class="flex cursor-pointer flex-col pt-3 sm:flex-row sm:space-x-3" @click="editDate">
+        <div
+          class="flex cursor-pointer flex-col pt-3 sm:flex-row sm:space-x-3"
+          @click="editDate"
+          role="button"
+          aria-label="Edit task dates"
+        >
           <div class="flex items-center space-x-2">
             <div>
-              <CalendarIcon />
+              <CalendarDaysIcon class="w-7" />
             </div>
             <div class="flex flex-nowrap p-1 text-sm">
-              <div v-if="editableTask.startDate">
+              <div v-if="editableTask.startDate" aria-label="Task Start Date">
                 {{ formatDateToLocal(editableTask.startDate) }}
               </div>
-              <div v-if="editableTask.endDate">
+              <div v-if="editableTask.endDate" aria-label="Task End Date">
                 <span class="ml-2 mr-2">--></span>
                 <span>{{ formatDateToLocal(editableTask.endDate) }}</span>
               </div>
@@ -330,7 +378,7 @@ const saveChanges = () => {
             class="flex items-center space-x-3 text-sm"
           >
             <span>
-              <ClockIcon />
+              <ClockIcon class="w-7" />
             </span>
             <div>
               {{ timeToLocalTime(editableTask.startTime, editableTask.startDate) }}
@@ -343,14 +391,19 @@ const saveChanges = () => {
             v-model:end-date="editableTask.endDate"
             v-model:start-time="editableTask.startTime"
             @close-date="stopEditingDate"
+            aria-labelledby="taskDateModal"
+            aria-describedby="taskDateModalDescription"
           />
         </div>
         <div
           class="flex cursor-pointer items-center space-x-3 pt-3"
           @click="startEditingRecurrence"
+          role="button"
+          aria-label="Edit task recurrence"
+          data-test="edit-recurrence"
         >
-          <div class="flex items-center space-x-2 text-sm">
-            <RepeatIcon />
+          <div class="flex items-center space-x-2 text-sm font-bold">
+            <ArrowPathRoundedSquareIcon class="w-7" />
             <span v-if="!editableTask.recurrence">No Repeat</span>
           </div>
           <div v-if="editableTask.recurrence">
@@ -362,11 +415,22 @@ const saveChanges = () => {
             :is-show-recurrence="isEditingRecurrence"
             v-model:recurrence-pattern="editableTask.recurrence"
             @close-recurrence="stopEditingRecurrence"
+            aria-label="Recurrence Modal"
+            data-test="recurrence-modal"
           />
         </div>
         <div class="flex flex-col pt-3">
-          <div @click="startEditingDescription" class="space-y-2">
-            <div class="cursor-pointer">{{ descriptionLabel }}</div>
+          <div
+            @click="startEditingDescription"
+            class="space-y-2"
+            role="button"
+            aria-label="Edit task description"
+            data-test="edit-task-description"
+          >
+            <div class="flex w-fit items-center space-x-2 whitespace-nowrap">
+              <InformationCircleIcon class="w-7" />
+              <div class="cursor-pointer text-sm font-bold">{{ descriptionLabel }}</div>
+            </div>
             <p v-if="!isEditingDescription" class="text-sm">{{ editableTask.description }}</p>
             <div v-if="isEditingDescription">
               <textarea
@@ -378,8 +442,14 @@ const saveChanges = () => {
                 @blur="validateDescriptionAndSave"
                 @keydown.enter.prevent="validateDescriptionAndSave"
                 ref="descriptionInput"
+                aria-label="Edit task description"
+                aria-describedby="descriptionError"
               />
-              <p v-if="errorMessage && isEditingDescription" class="text-sm text-red-500">
+              <p
+                v-if="errorMessage && isEditingDescription"
+                class="text-sm text-red-500"
+                id="descriptionError"
+              >
                 {{ errorMessage }}
               </p>
             </div>
@@ -395,12 +465,24 @@ const saveChanges = () => {
           :object="editableTask.title"
           @confirmed="handleConfirmation"
         />
-        <FwbButton @click="deleteTask" color="red" size="xs">
-          <DeleteIcon :color="'white'" />
+        <FwbButton
+          @click="deleteTask"
+          color="red"
+          size="xs"
+          aria-label="Delete task"
+          data-test="delete-task"
+        >
+          <TrashIcon class="w-7 text-slate-50" />
         </FwbButton>
-        <fwb-button v-if="!noChanges && noEditing" @click="saveChanges" color="green">
+        <FwbButton
+          v-if="!noChanges && noEditing"
+          @click="saveChanges"
+          color="green"
+          aria-label="Save task changes"
+          data-test="save-task-changes"
+        >
           Save changes
-        </fwb-button>
+        </FwbButton>
       </div>
     </template>
   </FwbModal>

@@ -114,6 +114,8 @@ onMounted(async () => {
           'pr-3',
           { 'border-r-2 border-gray-300': isUserInGroupPage },
         ]"
+        role="tablist"
+        aria-label="Tabs navigation"
       >
         <div class="inline-flex w-96 space-x-2">
           <Tab :title="'Calendar'" :isActive="activeTab" @tab-click="handleTabClick" />
@@ -150,5 +152,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
-<style scoped></style>

@@ -59,22 +59,60 @@ onMounted(() => {
     <div>
       <FwbDropdown>
         <template #trigger>
-          <span class="flex items-center hover:cursor-pointer">
-            <FwbAvatar :img="avatar" rounded bordered size="lg" class="align-middle" />
+          <span
+            class="flex items-center hover:cursor-pointer"
+            role="button"
+            tabindex="0"
+            aria-label="User menu"
+            data-test="user-menu-trigger"
+          >
+            <FwbAvatar
+              :img="avatar"
+              rounded
+              bordered
+              size="lg"
+              class="align-middle"
+              data-test="user-avatar"
+              aria-label="Avatar Image"
+            />
             <div class="flex h-full flex-col">
-              <span v-if="user.username" class="ml-3 mt-5 cursor-default">{{ user.username }}</span>
+              <span
+                v-if="user.username"
+                class="ml-3 mt-5 cursor-default"
+                aria-label="Username"
+                data-test="user-name"
+                >{{ user.username }}</span
+              >
               <div class="ml-0 h-5">
-                <Points v-if="pointsStore.isPointsEnabled" :points="pointsStore.userPoints" />
+                <Points
+                  v-if="pointsStore.isPointsEnabled"
+                  :points="pointsStore.userPoints"
+                  data-test="user-points"
+                />
               </div>
             </div>
           </span>
         </template>
         <FwbListGroup>
           <FwbListGroupItem hover>
-            <button @click="openUserSettings" class="w-full">Settings</button>
+            <button
+              @click="openUserSettings"
+              class="w-full"
+              data-test="user-settings-button"
+              aria-label="Open user settings"
+            >
+              Settings
+            </button>
           </FwbListGroupItem>
           <FwbListGroupItem hover class="bg-slate-300">
-            <button @click="logoutUser" class="w-full">Logout</button>
+            <button
+              @click="logoutUser"
+              class="w-full"
+              data-test="logout-button"
+              aria-label="Logout"
+            >
+              Logout
+            </button>
           </FwbListGroupItem>
         </FwbListGroup>
       </FwbDropdown>
@@ -83,6 +121,7 @@ onMounted(() => {
       :user="user"
       :show-user-settings="isShowSettings"
       @close="isShowSettings = false"
+      data-test="user-settings-modal"
     />
   </div>
   <ConfirmationModal
@@ -90,5 +129,6 @@ onMounted(() => {
     :object="user.username"
     :is-show-modal="isShowConfirmation"
     @delete="handleDeletion"
+    data-test="confirmation-modal"
   />
 </template>

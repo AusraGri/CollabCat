@@ -122,15 +122,33 @@ watch(
 </script>
 
 <template>
-  <div class="relative z-[100]" v-if="isShowDateModal" tabindex="-1">
+  <div
+    class="relative z-[100]"
+    v-if="isShowDateModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="modalTitle"
+    aria-hidden="false"
+    aria-describedby="modalDescription"
+  >
     <div
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       @click.self.stop="closeDateModal"
+      role="presentation"
     >
-      <div class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
+      <div
+        class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalDescription"
+      >
         <header class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">Edit Date</h2>
-          <button @click.stop="closeDateModal" class="text-gray-500 hover:text-black">
+          <h2 class="text-xl font-semibold" id="modalTitle">Edit Date</h2>
+          <button
+            @click.stop="closeDateModal"
+            class="text-gray-500 hover:text-black"
+            aria-label="Close date modal"
+            data-test="close-modal-button"
+          >
             <svg
               class="h-[22px] w-[22px] text-gray-800 dark:text-white"
               aria-hidden="true"
@@ -150,7 +168,7 @@ watch(
             </svg>
           </button>
         </header>
-        <div class="mt-4 space-y-3">
+        <div id="modalDescription" class="mt-4 space-y-3">
           <div class="flex space-x-3">
             <div>
               <label for="startDate" class="block text-sm font-medium">Start Date</label>
@@ -163,6 +181,8 @@ watch(
                 :max-date="endDate"
                 auto-apply
                 :enable-time-picker="false"
+                aria-label="Select task start date"
+                data-test="start-date-picker"
               ></VueDatePicker>
             </div>
             <div v-if="isRecurring">
@@ -176,25 +196,50 @@ watch(
                 :min-date="endDateMin"
                 auto-apply
                 :enable-time-picker="false"
+                aria-label="Select task end date"
+                data-test="end-date-picker"
               ></VueDatePicker>
             </div>
           </div>
           <div class="flex items-center space-x-3">
             <div>
-              <FwbCheckbox v-model="isTime" label="Task Time" />
+              <FwbCheckbox
+                v-model="isTime"
+                label="Task Time"
+                aria-label="Toggle task time"
+                data-test="task-time-checkbox"
+              />
             </div>
             <div v-if="isTime">
-              <VueDatePicker v-model="originalDateValues.startTime" time-picker auto-apply />
+              <VueDatePicker
+                v-model="originalDateValues.startTime"
+                time-picker
+                auto-apply
+                aria-label="Select task start time"
+                data-test="start-time-picker"
+              />
             </div>
           </div>
         </div>
         <footer class="mt-4 flex justify-between space-x-2">
-          <fwb-button v-if="!noChanges" @click.stop="resetChanges" color="yellow">
+          <FwbButton
+            v-if="!noChanges"
+            @click.stop="resetChanges"
+            color="yellow"
+            aria-label="Reset changes"
+            data-test="reset-button"
+          >
             Reset Changes
-          </fwb-button>
-          <fwb-button v-if="!noChanges" @click.stop="saveChanges" color="green">
+          </FwbButton>
+          <FwbButton
+            v-if="!noChanges"
+            @click.stop="saveChanges"
+            color="green"
+            aria-label="Save changes"
+            data-test="save-button"
+          >
             Save Changes
-          </fwb-button>
+          </FwbButton>
         </footer>
       </div>
     </div>

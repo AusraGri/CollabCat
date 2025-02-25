@@ -26,9 +26,7 @@ const isPoints = ref(pointStore.isEnabled)
 const isShowConfirmation = ref(false)
 const isShowCategoriesManager = ref(false)
 const router = useRouter()
-const userCategories = computed(() =>
-  categoryStore.userCategories.filter((cat) => cat.isDefault === false)
-)
+const userCategories = computed(() => categoryStore.userCategories || [])
 
 async function changeName() {
   try {
@@ -122,7 +120,7 @@ watch(
             <FwbCheckbox label="Task Points" v-model="isPoints" />
           </div>
         </form>
-        <div v-if="userCategories?.length" class="mt-3 flex items-center border-t-2 pt-3">
+        <div v-if="userCategories.length > 0" class="mt-3 flex items-center border-t-2 pt-3">
           <FwbButton color="default" @click="openCategoryManager" outline pill square>
             Manage Your Categories
             <template #suffix>
@@ -142,7 +140,7 @@ watch(
           </FwbButton>
           <CategoriesManager
             :is-show-categories="isShowCategoriesManager"
-            :categories="userCategories || []"
+            :categories="userCategories"
             @close="isShowCategoriesManager = false"
           />
         </div>

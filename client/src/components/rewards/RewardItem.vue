@@ -67,16 +67,16 @@ const handleClaimConfirmation = (event: boolean) => {
 <template>
   <div class="flex w-full flex-col">
     <div class="flex w-full flex-nowrap items-center whitespace-nowrap">
-      <div class="mr-3 w-fit">
+      <div class="mr-3 w-fit" :aria-label="reward.title" data-test="reward-title">
         {{ reward.title }}
       </div>
       <div v-if="isShowAmount" aria-label="reward-amount">
-        <FwbBadge type="yellow">
+        <FwbBadge type="yellow" data-test="reward-amount-badge">
           {{ reward.amount }}
         </FwbBadge>
       </div>
       <div class="flex w-full items-center justify-end" aria-label="reward-cost">
-        <fwb-badge size="sm" :type="pointsBadgeColor">
+        <FwbBadge size="sm" :type="pointsBadgeColor" data-test="reward-cost-badge">
           <template #icon>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -85,6 +85,7 @@ const handleClaimConfirmation = (event: boolean) => {
               stroke-width="1.5"
               stroke="currentColor"
               class="size-6"
+              aria-hidden="true"
             >
               <path
                 stroke-linecap="round"
@@ -94,24 +95,51 @@ const handleClaimConfirmation = (event: boolean) => {
             </svg>
           </template>
           {{ reward.cost }}
-        </fwb-badge>
+        </FwbBadge>
       </div>
     </div>
     <div v-if="claimers" class="flex">
-      <UserBasicProfile v-for="claimer in claimers" :key="claimer.id" :user="claimer" />
+      <UserBasicProfile
+        v-for="claimer in claimers"
+        :key="claimer.id"
+        :user="claimer"
+        :aria-label="claimer.username"
+        data-test="claimer"
+      />
     </div>
 
     <div class="mt-3 flex items-baseline justify-between space-x-1">
       <div class="flex space-x-1">
         <div v-if="isAdmin">
-          <FwbButton color="red" size="xs" @click="confirmDeletion">delete</FwbButton>
+          <FwbButton
+            color="red"
+            size="xs"
+            @click="confirmDeletion"
+            aria-label="Delete Reward"
+            data-test="delete-reward-button"
+            >delete</FwbButton
+          >
         </div>
         <div v-if="isAdmin">
-          <FwbButton color="yellow" size="xs" @click="handleRewardEvents('edit')">Edit</FwbButton>
+          <FwbButton
+            color="yellow"
+            size="xs"
+            @click="handleRewardEvents('edit')"
+            aria-label="Edit Reward"
+            data-test="edit-reward-button"
+            >Edit</FwbButton
+          >
         </div>
       </div>
       <div v-if="isEnoughPoints && isEnoughRewardAmount">
-        <FwbButton color="green" size="sm" @click="confirmClaim">Claim</FwbButton>
+        <FwbButton
+          color="green"
+          size="sm"
+          @click="confirmClaim"
+          aria-label="Claim Reward"
+          data-test="claim-reward-button"
+          >Claim</FwbButton
+        >
       </div>
     </div>
   </div>
@@ -128,5 +156,3 @@ const handleClaimConfirmation = (event: boolean) => {
     @confirmed="handleClaimConfirmation"
   />
 </template>
-
-<style scoped></style>

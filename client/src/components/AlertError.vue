@@ -7,7 +7,13 @@ defineProps<{
 </script>
 
 <template>
-  <FwbAlert v-if="message" data-testid="errorMessage" type="danger">
+  <FwbAlert
+    v-if="message"
+    data-testid="errorMessage"
+    type="danger"
+    role="alert"
+    aria-live="assertive"
+  >
     {{ message }}
   </FwbAlert>
 </template>

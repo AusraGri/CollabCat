@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { PublicInvitation, UserPublic } from '@server/shared/types'
 
-interface UserState {
+export interface UserState {
   user: UserPublic | null
   invitations: PublicInvitation[] | null
 }

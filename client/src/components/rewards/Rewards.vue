@@ -41,6 +41,10 @@ const handleRewardUpdate = async (reward: RewardUpdateable) => {
   await rewardStore.updateReward(reward)
 }
 
+const handleDropdownClose = () => {
+  emit('closed')
+}
+
 const handleRewardChange = async ({
   reward,
   action,
@@ -68,11 +72,11 @@ const handleRewardChange = async ({
 </script>
 <template>
   <div v-if="isShowRewards" class="flex flex-col flex-nowrap">
-    <FwbDropdown align-to-end @hide="emit('closed')">
+    <FwbDropdown align-to-end @hide="handleDropdownClose">
       <template #trigger>
         <slot name="trigger"></slot>
       </template>
-      <fwb-list-group class="w-fit">
+      <FwbListGroup class="w-fit">
         <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover>
           <RewardItem
             v-if="currentUser"
@@ -86,11 +90,13 @@ const handleRewardChange = async ({
           <button
             class="w-full whitespace-nowrap px-4 py-2 font-medium text-green-600 hover:bg-green-50"
             @click="toggleAddReward"
+            aria-label="Add a new reward"
+            data-test="add-reward"
           >
             + Add Reward
           </button>
         </FwbListGroupItem>
-      </fwb-list-group>
+      </FwbListGroup>
     </FwbDropdown>
     <div>
       <NewRewardModule
@@ -103,5 +109,3 @@ const handleRewardChange = async ({
     </div>
   </div>
 </template>
-
-<style scoped></style>

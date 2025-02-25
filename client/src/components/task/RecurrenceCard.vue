@@ -40,7 +40,7 @@ function separation(count: number) {
 <template>
   <div class="text-sm">
     <div v-if="isDaily">
-      <div>{{ separationLabel }}</div>
+      <div :aria-label="separationLabel">{{ separationLabel }}</div>
     </div>
     <div
       v-if="isWeekly"
@@ -51,15 +51,14 @@ function separation(count: number) {
           v-for="day in weekdays"
           :key="day"
           class="w-fit min-w-8 rounded bg-green-500 p-1 text-center text-white"
+          :aria-label="`Day of the week: ${day}`"
         >
           {{ day }}
         </div>
       </div>
-      <div>
+      <div :aria-label="separationLabel">
         {{ separationLabel }}
       </div>
     </div>
   </div>
 </template>
-
-<style scoped></style>

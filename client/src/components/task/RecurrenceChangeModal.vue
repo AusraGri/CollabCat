@@ -53,15 +53,30 @@ const resetPatternChanges = () => {
 </script>
 
 <template>
-  <div class="relative z-[100]" v-if="isShowRecurrence" tabindex="-1">
+  <div
+    class="relative z-[100]"
+    v-if="isShowRecurrence"
+    tabindex="-1"
+    role="dialog"
+    data-test="recurrence-modal"
+    aria-labelledby="recurrence-modal-title"
+    aria-describedby="recurrence-modal-description"
+  >
     <div
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       @click.self.stop="closeRecurrenceModal"
     >
       <div class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
         <header class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">Edit Recurrence</h2>
-          <button @click.stop="closeRecurrenceModal" class="text-gray-500 hover:text-black">
+          <h2 class="text-xl font-semibold" id="recurrence-modal-title" aria-live="assertive">
+            Edit Recurrence
+          </h2>
+          <button
+            @click.stop="closeRecurrenceModal"
+            class="text-gray-500 hover:text-black"
+            aria-label="Close the recurrence modal"
+            data-test="close-recurrence-modal"
+          >
             <svg
               class="h-[22px] w-[22px] text-gray-800 dark:text-white"
               aria-hidden="true"
@@ -81,22 +96,40 @@ const resetPatternChanges = () => {
             </svg>
           </button>
         </header>
-        <div class="mt-4 space-y-3">
-          <FwbCheckbox v-model="recurrence" label="Recurring" />
+        <div class="mt-4 space-y-3" id="recurrence-modal-description" aria-live="polite">
+          <FwbCheckbox
+            v-model="recurrence"
+            label="Recurring"
+            aria-label="Enable recurring pattern"
+            data-test="recurrence-checkbox"
+          />
           <RecurrenceForm
             v-if="recurrence"
             :is-recurring="recurrence"
             :pick-dates="pickDates"
             v-model:recurrence-pattern="recurrencePattern"
+            data-test="recurrence-form"
           />
         </div>
         <footer class="mt-4 flex justify-between space-x-2">
-          <fwb-button v-if="!noChanges" @click.stop="resetPatternChanges" color="yellow">
+          <FwbButton
+            v-if="!noChanges"
+            @click.stop="resetPatternChanges"
+            color="yellow"
+            data-test="reset-pattern-changes"
+            aria-label="Reset changes to the recurrence pattern"
+          >
             Reset Changes
-          </fwb-button>
-          <fwb-button v-if="!noChanges" @click.stop="savePatternChanges" color="green">
+          </FwbButton>
+          <FwbButton
+            v-if="!noChanges"
+            @click.stop="savePatternChanges"
+            color="green"
+            data-test="save-pattern-changes"
+            aria-label="Save the recurrence pattern changes"
+          >
             Save Changes
-          </fwb-button>
+          </FwbButton>
         </footer>
       </div>
     </div>

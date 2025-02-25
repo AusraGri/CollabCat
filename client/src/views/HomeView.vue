@@ -92,16 +92,42 @@ watch(
 <template>
   <div class="container mx-auto dark:bg-gray-800">
     <div class="m-7 flex flex-col items-center space-x-2 sm:flex-row">
-      <FwbAvatar :img="collabCatLogo" rounded size="lg" bordered />
-      <FwbHeading>CollabCat</FwbHeading>
-      <span class="whitespace-nowrap"> Best way to share tasks!</span>
+      <FwbAvatar
+        :img="collabCatLogo"
+        rounded
+        size="lg"
+        bordered
+        alt="CollabCat logo"
+        aria-label="CollabCat logo"
+      />
+      <FwbHeading aria-label="CollabCat">CollabCat</FwbHeading>
+      <span class="whitespace-nowrap" aria-live="polite"> Best way to share tasks!</span>
     </div>
     <div class="mt-1 space-x-2 p-3">
-      <FwbButton @click="join('signup')" color="alternative">SignUp</FwbButton>
-      <FwbButton @click="join('login')" color="alternative">Login</FwbButton>
+      <FwbButton
+        @click="join('signup')"
+        color="alternative"
+        aria-label="Sign up for CollabCat"
+        data-test="signup-button"
+        >SignUp</FwbButton
+      >
+      <FwbButton
+        @click="join('login')"
+        color="alternative"
+        aria-label="Log in to CollabCat"
+        data-test="login-button"
+        >Login</FwbButton
+      >
     </div>
     <div class="w-full">
-      <FwbCarousel :pictures="pictures" slide :slide-interval="5000" />
+      <FwbCarousel
+        :pictures="pictures"
+        slide
+        :slide-interval="5000"
+        aria-live="polite"
+        aria-label="Carousel of CollabCat images"
+        data-test="collabcat-carousel"
+      />
     </div>
     <div>
       <AppDescription />

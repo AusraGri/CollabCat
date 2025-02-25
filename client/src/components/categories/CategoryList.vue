@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type PropType } from 'vue'
+import { ChevronDoubleRightIcon } from '@heroicons/vue/24/outline'
 import { FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
 import type { CategoriesPublic } from '@server/shared/types'
 
@@ -24,34 +25,26 @@ const isSelected = (id: number) => {
 </script>
 <template>
   <div v-if="categories">
-    <FwbListGroup v-for="category in categories" :key="category.id">
+    <FwbListGroup v-for="category in categories" :key="category.id" data-test="category-list">
       <FwbListGroupItem
         :class="[
           'tracking-wider, w-fit whitespace-nowrap',
-          { 'bg-blue-400': isSelected(category.id), 'font-bold': category.isDefault },
+          { 'bg-blue-400': isSelected(category.id) },
         ]"
         hover
+        data-test="category-item"
       >
         <template v-if="isSelected(category.id)" #prefix>
-          <svg
-            class="h-5 w-5 text-gray-800 dark:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 12H5m14 0-4 4m4-4-4-4"
-            />
-          </svg>
+          <div data-test="selected-icon">
+            <ChevronDoubleRightIcon class="h-5 w-5 text-green-300" />
+          </div>
         </template>
-        <button class="w-full pr-3 text-left" @click="selectCategory(category)">
+        <button
+          class="w-full pr-3 text-left"
+          @click="selectCategory(category)"
+          :aria-label="`Select category ${category.title}`"
+          data-test="select-category-button"
+        >
           {{ category.title }}
         </button>
       </FwbListGroupItem>

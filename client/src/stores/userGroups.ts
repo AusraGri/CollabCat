@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { GroupData, GroupMember, ActiveGroup } from '@server/shared/types'
-type GroupsPublic = {
+export type GroupsPublic = {
   id: number
   name: string
   createdByUserId: number
@@ -13,7 +13,7 @@ export interface UserGroups {
   userId: number
 }
 
-interface GroupsState {
+export interface GroupsState {
   userGroups: GroupsPublic[] | null
   activeGroup: ActiveGroup | null
   userMembership: GroupMember | null

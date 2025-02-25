@@ -99,11 +99,10 @@ watch(
       </div>
     </div>
     <GroupLayout @tab:new="setTabName" />
-    <main>
-      <div class="container mx-auto ">
+    <main aria-live="polite">
+      <div class="container mx-auto">
         <RouterView />
       </div>
     </main>
   </div>
 </template>
-<style scoped></style>

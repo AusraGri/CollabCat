@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/vue/24/outline'
 import {
   useUserGroupsStore,
   useCategoriesStore,
@@ -64,7 +65,10 @@ const tasks = computed(() => {
     categoryId: selectedCategoryId,
   })
 
-  const filteredByDefault = filterTasksByDefaultType({ tasks: filteredTasks, title: filterTitle.value })
+  const filteredByDefault = filterTasksByDefaultType({
+    tasks: filteredTasks,
+    title: filterTitle.value,
+  })
 
   return sortTasksByCompleted(filteredByDefault)
 })
@@ -159,6 +163,7 @@ watch(
   }
 )
 </script>
+
 <template>
   <div class="flex flex-col justify-start">
     <div class="inline-flex self-start">
@@ -166,70 +171,51 @@ watch(
         :title="'+ Task'"
         @tab-click="toggleTaskModal"
         :custom-tailwind-classes="'border-amber-700'"
+        aria-label="Create New Task Modal"
       />
       <TabRev
         :title="'+ Category'"
         @tab-click="toggleCategoryModal"
         :custom-tailwind-classes="'border-yellow-400'"
+        aria-label="Create New Category"
       />
       <div
         @click="toggleShowTypes"
         class="ml-2 flex items-center justify-end rounded-md pl-1 pr-1 text-sm hover:cursor-pointer"
+        :aria-expanded="isShowTypes"
+        aria-controls="types-container"
       >
         <span>Types</span>
-        <svg
+        <ChevronDownIcon
           v-if="!isShowTypes"
-          class="h-6 w-6 text-gray-800 dark:text-white"
+          class="ml-1 h-5 w-5 text-gray-800 dark:text-white"
           aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m19 9-7 7-7-7"
-          />
-        </svg>
-        <svg
+        />
+        <ChevronUpIcon
           v-if="isShowTypes"
-          class="h-6 w-6 text-gray-800 dark:text-white"
+          class="ml-1 h-5 w-5 text-gray-800 dark:text-white"
           aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="m5 15 7-7 7 7"
-          />
-        </svg>
+        />
       </div>
     </div>
     <div
       v-if="isShowTypes"
       class="flex flex-wrap space-x-1 border-l-2 border-green-500 pl-3 sm:flex-nowrap"
+      id="types-container"
     >
       <div class="inline-flex space-x-1">
         <TabRev
           :title="'Someday'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
+          aria-label="Filter Someday Tasks"
           >{{ showCount('Someday') }}</TabRev
         >
         <TabRev
           :title="'Routine'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
+          aria-label="Filter Routine Tasks"
           >{{ showCount('Routine') }}</TabRev
         >
       </div>
@@ -238,6 +224,7 @@ watch(
           :title="'Scheduled'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
+          aria-label="Filter Scheduled Tasks"
           >{{ showCount('Scheduled') }}</TabRev
         >
         <TabRev
@@ -245,6 +232,7 @@ watch(
           :title="'Not Assigned'"
           :is-active="selectedType"
           @tab-click="handleDefaultTypeTabClick"
+          aria-label="Filter Not Assigned Tasks"
           >{{ showCount('Not Assigned') }}</TabRev
         >
       </div>
@@ -257,11 +245,13 @@ watch(
       :group-members="members"
       :categories="categories"
       @close="toggleTaskModal"
+      aria-label="Create a new task"
     />
     <CreateCategory
       :is-show-modal="isNewCategory"
       :group-id="groupId"
       @close="toggleCategoryModal"
+      aria-label="Create a new category"
     />
   </div>
   <div class="mt-3 flex justify-around space-x-1">
@@ -279,9 +269,11 @@ watch(
       </div>
     </div>
     <div v-if="categories" class="w-fit whitespace-nowrap">
-      <CategoryList :categories="categories" v-model:selected-category="selectedCategory" />
+      <CategoryList
+        :categories="categories"
+        v-model:selected-category="selectedCategory"
+        aria-label="Select a category"
+      />
     </div>
   </div>
 </template>
-
-<style scoped></style>

@@ -17,22 +17,35 @@ function confirmAction(confirmed: boolean) {
 </script>
 
 <template>
-  <FwbModal v-if="isShowModal" persistent>
+  <FwbModal
+    v-if="isShowModal"
+    persistent
+    role="dialog"
+    aria-labelledby="modal-title"
+    aria-describedby="modal-description"
+    data-test="confirmation-modal"
+    @keydown.esc="confirmAction(false)"
+  >
     <template #header>
-      <div class="flex items-center text-lg text-black">Please Confirm the Action</div>
+      <div id="modal-title" class="flex items-center text-lg text-black">
+        Please Confirm the Action
+      </div>
     </template>
     <template #body>
-      <p>
+      <p id="modal-description">
         Do you really want to <span class="text-red-600">{{ action }}</span>
         <span class="pl-1 text-base font-extrabold">{{ object }}</span> ?
       </p>
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <fwb-button @click="confirmAction(false)" color="alternative"> Decline </fwb-button>
-        <fwb-button @click="confirmAction(true)" color="green"> I accept </fwb-button>
+        <FwbButton @click="confirmAction(false)" color="alternative" data-test="decline-button">
+          Decline
+        </FwbButton>
+        <FwbButton @click="confirmAction(true)" color="green" data-test="accept-button">
+          I accept
+        </FwbButton>
       </div>
     </template>
   </FwbModal>
 </template>
-<style scoped></style>

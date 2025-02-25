@@ -38,6 +38,13 @@ const emit = defineEmits<{
         customTailwindClasses,
       ]"
       @click="emit('tab-click', title)"
+      role="tab"
+      :aria-selected="activeTab"
+      :aria-label="title"
+      tabindex="0"
+      data-test="tab-item"
+      @keydown.enter="emit('tab-click', title)"
+      @keydown.space="emit('tab-click', title)"
     >
       {{ title }}
     </div>

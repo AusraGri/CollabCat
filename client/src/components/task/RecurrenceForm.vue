@@ -137,12 +137,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="isRecurring" class="w-full space-y-3 rounded-lg bg-white">
+  <div
+    v-if="isRecurring"
+    class="w-full space-y-3 rounded-lg bg-white"
+    aria-labelledby="recurrence-section"
+  >
     <div v-if="pickDates" class="flex flex-col justify-between space-y-1 text-sm">
       <!-- Recurring Start Date -->
       <div class="flex items-center space-x-2">
-        <p class="w-10">start:</p>
+        <label for="start-date" class="w-10">start:</label>
         <VueDatePicker
+          id="start-date"
           placeholder="Select Task Recurrence Start Date"
           v-model="startDate"
           :enable-time-picker="false"
@@ -150,13 +155,16 @@ onMounted(() => {
           name="Task Start Date"
           auto-apply
           required
+          aria-label="Task Recurrence Start Date"
+          data-test="start-date-picker"
         />
       </div>
 
       <!-- Recurring End Date -->
       <div class="flex items-center space-x-2">
-        <p class="w-10">end:</p>
+        <label for="end-date" class="w-10">end:</label>
         <VueDatePicker
+          id="end-date"
           v-model="endDate"
           :enable-time-picker="false"
           placeholder="Select Task Recurrence End Date"
@@ -164,18 +172,31 @@ onMounted(() => {
           :min-date="endDateMin"
           name="Task End Date"
           auto-apply
+          aria-label="Task Recurrence End Date"
+          data-test="end-date-picker"
         />
       </div>
     </div>
 
     <!-- Recurring Type -->
     <div class="flex flex-col">
-      <FwbSelect v-model="recurringType" :options="recurrenceTypes" label="Recurring Type" />
+      <FwbSelect
+        v-model="recurringType"
+        :options="recurrenceTypes"
+        label="Recurring Type"
+        aria-label="Select Recurring Type"
+        data-test="recurring-type-select"
+      />
     </div>
 
     <div v-if="recurringType === 'weekly'" class="space-y-4">
       <div class="flex flex-col">
-        <FwbDropdown placement="bottom" text="Choose days">
+        <FwbDropdown
+          placement="bottom"
+          text="Choose days"
+          aria-label="Choose the days for weekly recurrence"
+          data-test="choose-days-dropdown"
+        >
           <FwbListGroup>
             <FwbListGroupItem v-for="day in weekdays" :key="day.value" hover>
               <label class="flex items-center space-x-2">
@@ -185,6 +206,8 @@ onMounted(() => {
                   :checked="isDayChecked(day.value)"
                   @change.prevent="(event) => updateValue(event, day.value)"
                   class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+                  :aria-label="`Select ${day.name} for weekly recurrence`"
+                  data-test="weekly-recurrence-checkbox"
                 />
                 <span class="text-sm text-gray-900">{{ day.name }}</span>
               </label>
@@ -194,8 +217,14 @@ onMounted(() => {
       </div>
     </div>
     <div class="flex flex-col">
-      <FwbInput v-model="everyXCount" type="number" min="1" :label="countLabel" />
+      <FwbInput
+        v-model="everyXCount"
+        type="number"
+        min="1"
+        :label="countLabel"
+        aria-label="Enter number of separation for recurrence"
+        data-test="every-x-count-input"
+      />
     </div>
   </div>
 </template>
-<style scoped></style>

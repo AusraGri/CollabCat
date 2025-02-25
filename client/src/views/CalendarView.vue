@@ -60,8 +60,8 @@ const formatDate = (date: Date) => {
   const todayFormatted = formatDateToLongString(new Date())
   const dateFormatted = formatDateToLongString(date)
 
-  return todayFormatted === dateFormatted ? `Today ${dateFormatted}` : dateFormatted;
-};
+  return todayFormatted === dateFormatted ? `Today ${dateFormatted}` : dateFormatted
+}
 
 async function fetchDueTasks(date: Date) {
   if (isGroupTasks.value) {
@@ -134,28 +134,42 @@ watch(
 </script>
 
 <template>
-  <div v-if="!isLoading">
+  <div v-if="!isLoading" :aria-busy="isLoading">
     <div class="mx-auto flex max-w-screen-lg justify-center p-3 sm:justify-start">
       <div
         v-if="isGroupTasks"
         class="flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm"
       >
-        <span> Show Tasks for:</span>
-        <FwbSelect v-model="tasksFor" :options="memberOptions" class="whitespace-nowrap" />
+        <label for="tasks-for-group-select" class="text-sm">Show Tasks for:</label>
+        <FwbSelect
+          id="tasks-for-group-select"
+          v-model="tasksFor"
+          :options="memberOptions"
+          class="whitespace-nowrap"
+          aria-label="Select member for tasks"
+          data-test="select-member"
+        />
       </div>
       <div
         v-if="!isGroupTasks"
         class="flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm"
       >
-        <span> Show Tasks for:</span>
-        <FwbSelect v-model="tasksFor" :options="personalOptions" class="whitespace-nowrap" />
+        <label for="tasks-for-select" class="text-sm">Show Tasks for:</label>
+        <FwbSelect
+          id="tasks-for-select"
+          v-model="tasksFor"
+          :options="personalOptions"
+          class="whitespace-nowrap"
+          aria-label="Select personal tasks"
+          data-test="select-personal"
+        />
       </div>
     </div>
     <div class="mx-auto flex max-w-screen-lg flex-col justify-between p-3 sm:flex-row">
       <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-fit">
         <div class="w-full border-b-2 text-center">{{ formatDate(date) }}</div>
         <div v-if="tasks">
-          <div v-for="task in computedTasks" :key="task.id">
+          <div v-for="task in computedTasks" :key="task.id" :aria-live="'polite'">
             <TaskCard
               :task="task"
               :group-members="groupMembers"
@@ -167,10 +181,13 @@ watch(
               :is-show-recurrence="false"
               :is-checkbox-enabled="isCheckboxEnabled"
               @task:status="handleTaskStatusChange"
+              data-test="task-card"
             />
           </div>
         </div>
-        <div v-if="!tasks.length" class="p-3 text-center">No tasks for this day</div>
+        <div v-if="!tasks.length" class="p-3 text-center" role="alert" aria-live="assertive">
+          No tasks for this day
+        </div>
       </div>
       <div class="order-first mx-auto max-w-fit sm:order-last">
         <VueDatePicker
@@ -182,11 +199,20 @@ watch(
           focus-start-date
           :enable-time-picker="false"
           month-name-format="long"
+          data-test="date-picker"
+          aria-label="Select date"
         />
         <div>
-          <FwbButton class="w-full" @click="todayDate">Today</FwbButton>
+          <FwbButton
+            class="w-full"
+            @click="todayDate"
+            data-test="today-button"
+            aria-label="Go to today's date"
+            >Today</FwbButton
+          >
         </div>
       </div>
     </div>
   </div>
+  <div v-else aria-live="assertive" role="status" class="p-3">Loading...</div>
 </template>

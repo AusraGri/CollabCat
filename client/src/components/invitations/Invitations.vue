@@ -46,25 +46,55 @@ const confirmInvitation = async (value: boolean) => {
 </script>
 
 <template>
-  <div v-if="isInvitationData">
+  <div v-if="isInvitationData" aria-live="polite">
     <FwbListGroup>
-      <FwbListGroupItem class="justify-between">
+      <FwbListGroupItem
+        class="justify-between"
+        :aria-labelledby="'group-name-' + invitationData?.groupName"
+      >
         <div class="flex w-fit flex-col align-middle">
-          <div class="border-b-2">{{ invitationData?.groupName }}</div>
+          <div
+            class="border-b-2"
+            id="group-name"
+            :aria-label="`Group Name: ${invitationData?.groupName}`"
+          >
+            {{ invitationData?.groupName }}
+          </div>
           <div class="mt-1 flex w-fit items-center justify-between">
             <div>
-              <FwbAvatar :img="invitationData?.groupOwner.picture || undefined" rounded size="sm" />
+              <FwbAvatar
+                :img="invitationData?.groupOwner.picture || undefined"
+                rounded
+                size="sm"
+                alt="Group Owner Avatar: {{ invitationData?.groupOwner.username }}"
+              />
             </div>
-            <div class="w-fit whitespace-nowrap">
+            <div
+              class="w-fit whitespace-nowrap"
+              id="group-owner-username"
+              :aria-label="`Group owner: ${invitationData?.groupOwner.username}`"
+            >
               {{ invitationData?.groupOwner.username }}
             </div>
           </div>
         </div>
         <div class="ml-3 flex w-fit flex-col align-middle">
-          <FwbButton @click="confirmInvitation(true)" color="green" size="xs" class="m-1"
+          <FwbButton
+            @click="confirmInvitation(true)"
+            color="green"
+            size="xs"
+            class="m-1"
+            :aria-label="`Accept invitation to join ${invitationData?.groupName}`"
+            data-test="accept-invitation-button"
             >accept</FwbButton
           >
-          <FwbButton @click="confirmInvitation(false)" color="pink" size="xs" class="m-1"
+          <FwbButton
+            @click="confirmInvitation(false)"
+            color="pink"
+            size="xs"
+            class="m-1"
+            :aria-label="`Decline invitation to join ${invitationData?.groupName}`"
+            data-test="decline-invitation-button"
             >decline</FwbButton
           >
         </div>
@@ -72,5 +102,3 @@ const confirmInvitation = async (value: boolean) => {
     </FwbListGroup>
   </div>
 </template>
-
-<style scoped></style>

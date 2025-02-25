@@ -7,7 +7,7 @@ import type {
   RewardUpdateable,
 } from '@server/shared/types'
 
-interface RewardState {
+export interface RewardState {
   rewards: PublicReward[] | null
 
   activeUser: GroupMember | null

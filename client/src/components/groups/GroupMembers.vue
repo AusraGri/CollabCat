@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbAvatar } from 'flowbite-vue'
-import { useUserGroupsStore } from '@/stores/userGroups'
+import { useUserGroupsStore } from '@/stores'
 import InviteUsers from './InviteUsers.vue'
 
 const userGroupStore = useUserGroupsStore()
@@ -31,9 +31,13 @@ const handleInvitation = async (email: string) => {
       <template #trigger>
         <slot name="trigger"></slot>
       </template>
-      <fwb-list-group>
+      <FwbListGroup>
         <FwbListGroupItem v-for="member in members" :key="member.id" hover>
-          <button @click="openMemberSettings">
+          <button
+            @click="openMemberSettings"
+            data-test="member-settings-button"
+            aria-label="Open settings for {{ member.username }}"
+          >
             <div class="flex items-center">
               <FwbAvatar :img="member.picture || undefined" rounded size="md" />
               <div class="ml-2">{{ member.username }}</div>
@@ -44,18 +48,19 @@ const handleInvitation = async (email: string) => {
           <button
             class="w-full px-4 py-2 font-medium text-green-600 hover:bg-green-50"
             @click="toggleInviteUser"
+            data-test="invite-user-button"
+            aria-label="Invite a user to the group"
           >
             + Invite User
           </button>
         </FwbListGroupItem>
-      </fwb-list-group>
+      </FwbListGroup>
     </FwbDropdown>
     <InviteUsers
       :is-show-modal="isShowInvite"
       @invite:user="handleInvitation"
       @close="toggleInviteUser"
+      data-test="invite-users-modal"
     />
   </div>
 </template>
-
-<style scoped></style>
