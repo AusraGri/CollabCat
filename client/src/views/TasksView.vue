@@ -22,6 +22,7 @@ import {
   filterTasksByDefaultType,
   countTasksOfDefaultType,
 } from '@/utils/tasks'
+import { FwbDropdown } from 'flowbite-vue'
 
 const userGroupStore = useUserGroupsStore()
 const categoryStore = useCategoriesStore()
@@ -34,6 +35,7 @@ const isGroupTasks = computed(() => route.meta.group)
 const isNewTask = ref(false)
 const isNewCategory = ref(false)
 const selectedCategory = ref(null)
+
 const selectedType = ref('')
 const isShowTypes = ref(false)
 
@@ -44,6 +46,13 @@ const categories = computed(() => {
     return categoryStore.groupCategories || undefined
   }
   return categoryStore.userCategories || undefined
+})
+
+const selectedCategoryName = computed(() => {
+  const selectedCategoryId = selectedCategory.value || undefined
+  const category = categories.value.find((cat) => cat.id === selectedCategoryId)
+
+  return category?.title || 'Categories'
 })
 
 const filterTitle = computed(() => {
@@ -59,7 +68,7 @@ const groups = computed(() => {
 
 const allTasks = computed(() => taskStore.tasks)
 const tasks = computed(() => {
-  const selectedCategoryId = selectedCategory.value ? selectedCategory.value : undefined
+  const selectedCategoryId = selectedCategory.value || undefined
   const filteredTasks = filterTasksByCategoryId({
     tasks: allTasks.value,
     categoryId: selectedCategoryId,
@@ -74,7 +83,11 @@ const tasks = computed(() => {
 })
 
 function showCount(name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
-  return countTasksOfDefaultType(allTasks.value, name)
+  const filteredTasksByCategory = filterTasksByCategoryId({
+    tasks: allTasks.value,
+    categoryId: selectedCategory.value || undefined,
+  })
+  return countTasksOfDefaultType(filteredTasksByCategory, name)
 }
 
 const toggleTaskModal = () => {
@@ -165,77 +178,107 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col justify-start">
-    <div class="inline-flex self-start">
-      <TabRev
-        :title="'+ Task'"
-        @tab-click="toggleTaskModal"
-        :custom-tailwind-classes="'border-amber-700'"
-        aria-label="Create New Task Modal"
-      />
-      <TabRev
-        :title="'+ Category'"
-        @tab-click="toggleCategoryModal"
-        :custom-tailwind-classes="'border-yellow-400'"
-        aria-label="Create New Category"
-      />
+  <div class="flex justify-between">
+    <div class="flex flex-col">
+      <div class="inline-flex w-full items-center justify-between">
+        <div class="inline-flex items-center space-x-1">
+          <TabRev
+            :title="'+ Task'"
+            @tab-click="toggleTaskModal"
+            :custom-tailwind-classes="'border-amber-700'"
+            aria-label="Create New Task Modal"
+          />
+          <TabRev
+            :title="'+ Category'"
+            @tab-click="toggleCategoryModal"
+            :custom-tailwind-classes="'border-yellow-400'"
+            aria-label="Create New Category"
+          />
+          <div
+            @click="toggleShowTypes"
+            class="ml-2 flex items-center justify-end rounded-md pl-1 pr-1 text-sm hover:cursor-pointer"
+            :aria-expanded="isShowTypes"
+            aria-controls="types-container"
+          >
+            <span>Types</span>
+            <ChevronDownIcon
+              v-if="!isShowTypes"
+              class="ml-1 h-5 w-5 text-gray-800 dark:text-white"
+              aria-hidden="true"
+            />
+            <ChevronUpIcon
+              v-if="isShowTypes"
+              class="ml-1 h-5 w-5 text-gray-800 dark:text-white"
+              aria-hidden="true"
+            />
+          </div>
+        </div>
+      </div>
       <div
-        @click="toggleShowTypes"
-        class="ml-2 flex items-center justify-end rounded-md pl-1 pr-1 text-sm hover:cursor-pointer"
-        :aria-expanded="isShowTypes"
-        aria-controls="types-container"
+        v-if="isShowTypes"
+        class="flex flex-wrap sm:space-x-1 border-l-2 border-s-green-500 sm:pl-3 pl-1 sm:flex-nowrap"
+        id="types-container"
       >
-        <span>Types</span>
-        <ChevronDownIcon
-          v-if="!isShowTypes"
-          class="ml-1 h-5 w-5 text-gray-800 dark:text-white"
-          aria-hidden="true"
-        />
-        <ChevronUpIcon
-          v-if="isShowTypes"
-          class="ml-1 h-5 w-5 text-gray-800 dark:text-white"
-          aria-hidden="true"
-        />
+        <div class="inline-flex space-x-1 pl-1">
+          <TabRev
+            :title="'Someday'"
+            :is-active="selectedType"
+            @tab-click="handleDefaultTypeTabClick"
+            aria-label="Filter Someday Tasks"
+            >{{ showCount('Someday') }}</TabRev
+          >
+          <TabRev
+            :title="'Routine'"
+            :is-active="selectedType"
+            @tab-click="handleDefaultTypeTabClick"
+            aria-label="Filter Routine Tasks"
+            >{{ showCount('Routine') }}</TabRev
+          >
+        </div>
+        <div class="inline-flex space-x-1">
+          <TabRev
+            :title="'Scheduled'"
+            :is-active="selectedType"
+            @tab-click="handleDefaultTypeTabClick"
+            aria-label="Filter Scheduled Tasks"
+            >{{ showCount('Scheduled') }}</TabRev
+          >
+          <TabRev
+            v-if="isGroupTasks"
+            :title="'Not Assigned'"
+            :is-active="selectedType"
+            @tab-click="handleDefaultTypeTabClick"
+            aria-label="Filter Not Assigned Tasks"
+            >{{ showCount('Not Assigned') }}</TabRev
+          >
+        </div>
       </div>
     </div>
-    <div
-      v-if="isShowTypes"
-      class="flex flex-wrap space-x-1 border-l-2 border-green-500 pl-3 sm:flex-nowrap"
-      id="types-container"
-    >
-      <div class="inline-flex space-x-1">
-        <TabRev
-          :title="'Someday'"
-          :is-active="selectedType"
-          @tab-click="handleDefaultTypeTabClick"
-          aria-label="Filter Someday Tasks"
-          >{{ showCount('Someday') }}</TabRev
-        >
-        <TabRev
-          :title="'Routine'"
-          :is-active="selectedType"
-          @tab-click="handleDefaultTypeTabClick"
-          aria-label="Filter Routine Tasks"
-          >{{ showCount('Routine') }}</TabRev
-        >
-      </div>
-      <div class="inline-flex space-x-1">
-        <TabRev
-          :title="'Scheduled'"
-          :is-active="selectedType"
-          @tab-click="handleDefaultTypeTabClick"
-          aria-label="Filter Scheduled Tasks"
-          >{{ showCount('Scheduled') }}</TabRev
-        >
-        <TabRev
-          v-if="isGroupTasks"
-          :title="'Not Assigned'"
-          :is-active="selectedType"
-          @tab-click="handleDefaultTypeTabClick"
-          aria-label="Filter Not Assigned Tasks"
-          >{{ showCount('Not Assigned') }}</TabRev
-        >
-      </div>
+    <!-- dropdown menu -->
+    <div class="flex items-end ml-1">
+      <FwbDropdown align-to-end>
+        <template #trigger>
+          <div class="rounded-t-xl border-2 border-b-0 border-blue-500">
+            <button
+              type="button"
+              class="flex text-sm px-3 pt-1  "
+            >
+              <span class="pb-1 whitespace-nowrap">{{ selectedCategoryName }}</span>
+              <span>
+                <ChevronDownIcon
+                  class="ml-1 h-5 w-5 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                />
+              </span>
+            </button>
+          </div>
+        </template>
+        <CategoryList
+          :categories="categories"
+          v-model:selected-category="selectedCategory"
+          aria-label="Select a category"
+        />
+      </FwbDropdown>
     </div>
   </div>
   <div class="flex justify-between border-t-2">
@@ -254,11 +297,11 @@ watch(
       aria-label="Create a new category"
     />
   </div>
-  <div class="mt-3 flex justify-around space-x-1">
-    <div v-if="tasks" class="flex flex-col">
+  <div class="mt-3 flex justify-center">
+    <div v-if="tasks" class="flex flex-wrap items-center justify-center gap-1">
       <div v-for="task in tasks" :key="task.id">
         <TaskCard
-          class="items-stretch"
+          class="min-w-[350px] max-w-[350px] items-stretch"
           :task="task"
           :categories="categories"
           :group-members="members"
@@ -267,13 +310,6 @@ watch(
           @task:status="handleTaskStatusChange"
         />
       </div>
-    </div>
-    <div v-if="categories" class="w-fit whitespace-nowrap">
-      <CategoryList
-        :categories="categories"
-        v-model:selected-category="selectedCategory"
-        aria-label="Select a category"
-      />
     </div>
   </div>
 </template>

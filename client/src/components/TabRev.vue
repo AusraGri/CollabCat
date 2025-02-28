@@ -15,13 +15,13 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full h-full">
     <div
       :class="[
         'flex',
         'w-full',
         'whitespace-nowrap',
-        'h-fit',
+        'h-full',
         'min-h-7',
         'rounded-t-xl',
         'tracking-wider',

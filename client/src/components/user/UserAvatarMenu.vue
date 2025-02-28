@@ -121,7 +121,6 @@ onMounted(() => {
       :user="user"
       :show-user-settings="isShowSettings"
       @close="isShowSettings = false"
-      data-test="user-settings-modal"
     />
   </div>
   <ConfirmationModal

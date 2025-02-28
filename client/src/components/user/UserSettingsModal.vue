@@ -2,11 +2,13 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useUserStore, usePointsStore, useCategoriesStore } from '@/stores'
 import { useAuthStore } from '@/stores/authStore'
+import { useAuthService } from '@/services/auth0'
 import { useRouter } from 'vue-router'
 import ConfirmationModal from '../ConfirmationModal.vue'
 import { FwbModal, FwbButton, FwbInput, FwbCheckbox } from 'flowbite-vue'
 import { type UserPublic } from '@server/shared/types'
 import CategoriesManager from '../categories/CategoriesManager.vue'
+import { ChevronRightIcon } from '@heroicons/vue/24/outline'
 
 const { showUserSettings, user } = defineProps<{
   user: UserPublic
@@ -17,6 +19,7 @@ const emit = defineEmits<{
   (event: 'close'): void
 }>()
 
+const { logout } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const pointStore = usePointsStore()
@@ -51,10 +54,16 @@ const handleDeletion = async (value: boolean) => {
   isShowConfirmation.value = false
 }
 
+function logoutUser() {
+  logout()
+  authStore.logout()
+  userStore.clearUser()
+  router.push({ name: 'Home' })
+}
+
 async function deleteAccount() {
   await userStore.deleteUser()
-  authStore.logout()
-  router.push({ name: 'Home' })
+  logoutUser()
 }
 
 const closeModal = () => {
@@ -99,43 +108,49 @@ watch(
 </script>
 
 <template>
-  <div>
-    <FwbModal v-if="showUserSettings" @close="closeModal">
+  <div data-test="user-settings-modal">
+    <FwbModal v-if="showUserSettings" @close="closeModal" aria-modal="true" role="dialog">
       <template #header>
         <div class="flex items-center text-lg">User Settings</div>
       </template>
       <template #body>
+        <div class="pb-2">
+          <span class="mb-2 block cursor-default text-sm font-medium text-gray-900 dark:text-white">
+            E-mail </span
+          ><span
+            class="block w-full cursor-default rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            >{{ user.email }}
+          </span>
+        </div>
         <form id="userSettingsForm" v-on:submit.prevent="saveUserSettings">
           <div>
             <FwbInput
+              id="username-input"
               type="text"
               placeholder="Username"
               v-model="username"
               label="Username"
               required
+              :aria-label="username"
             >
             </FwbInput>
           </div>
           <div class="mt-3 w-fit">
-            <FwbCheckbox label="Task Points" v-model="isPoints" />
+            <FwbCheckbox label="Task Points" v-model="isPoints" aria-label="Task Points Checkbox" />
           </div>
         </form>
         <div v-if="userCategories.length > 0" class="mt-3 flex items-center border-t-2 pt-3">
-          <FwbButton color="default" @click="openCategoryManager" outline pill square>
+          <FwbButton
+            color="default"
+            @click="openCategoryManager"
+            outline
+            pill
+            square
+            aria-label="Manage your categories"
+          >
             Manage Your Categories
             <template #suffix>
-              <svg
-                class="h-5 w-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  clip-rule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  fill-rule="evenodd"
-                />
-              </svg>
+              <ChevronRightIcon class="w-5" />
             </template>
           </FwbButton>
           <CategoriesManager
@@ -148,23 +163,31 @@ watch(
       <template #footer>
         <div class="flex justify-between">
           <div>
-            <FwbButton color="red" @click="isShowConfirmation = true">Delete account</FwbButton>
+            <FwbButton
+              color="red"
+              @click="isShowConfirmation = true"
+              aria-label="Delete your account"
+              >Delete account</FwbButton
+            >
           </div>
           <div>
-            <fwb-button form="userSettingsForm" type="submit" color="green">
+            <FwbButton
+              form="userSettingsForm"
+              type="submit"
+              color="green"
+              aria-label="Save changes"
+            >
               Save Changes
-            </fwb-button>
+            </FwbButton>
           </div>
+          <ConfirmationModal
+            :action="'delete'"
+            :object="user.username"
+            :is-show-modal="isShowConfirmation"
+            @confirmed="handleDeletion"
+          />
         </div>
       </template>
     </FwbModal>
   </div>
-  <ConfirmationModal
-    :action="'delete'"
-    :object="user.username"
-    :is-show-modal="isShowConfirmation"
-    @delete="handleDeletion"
-  />
 </template>
-
-<style scoped></style>

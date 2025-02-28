@@ -41,10 +41,11 @@ const userGroups = computed(() => userGroupStore.userGroups || undefined)
 const date = ref(new Date())
 const startDate = ref(new Date())
 const tasks = ref<TaskData[]>([])
-const computedTasks = computed(() => {
+const sortedTasks = computed(() => {
   const sortedTasks = sortTasks(taskStore.tasks)
   return sortedTasks
 })
+
 
 const isCheckboxEnabled = computed(() => {
   const today = new Date()
@@ -169,7 +170,7 @@ watch(
       <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-fit">
         <div class="w-full border-b-2 text-center">{{ formatDate(date) }}</div>
         <div v-if="tasks">
-          <div v-for="task in computedTasks" :key="task.id" :aria-live="'polite'">
+          <div v-for="task in sortedTasks" :key="task.id" :aria-live="'polite'">
             <TaskCard
               :task="task"
               :group-members="groupMembers"

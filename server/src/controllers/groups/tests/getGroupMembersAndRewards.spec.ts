@@ -31,6 +31,7 @@ it('should get group members and rewards information', async () => {
   const groupData = {
     id: 1,
     name: 'Group',
+    createdByUserId: 1,
     members: [
       {
         id: 22,

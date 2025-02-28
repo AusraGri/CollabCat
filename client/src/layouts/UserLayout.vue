@@ -27,7 +27,7 @@ const invitationStore = useInvitationStore()
 const activeGroupId = computed(() =>
   userGroupStore.activeGroup ? userGroupStore.activeGroup.id : undefined
 )
-const invitations = computed(() => userStore.invitations)
+const invitations = computed(() => invitationStore.invitations)
 
 onMounted(async () => {
   await categoryStore.fetchAllCategories()

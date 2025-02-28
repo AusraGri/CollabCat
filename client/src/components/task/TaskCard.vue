@@ -13,7 +13,7 @@ import RecurrenceCard from './RecurrenceCard.vue'
 import TaskInfo from './TaskInfo.vue'
 import { toggle } from '@/utils/helpers'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
-import { useTasksStore } from '@/stores/taskStore'
+import { useTasksStore, useUserStore, useUserGroupsStore } from '@/stores'
 
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
@@ -25,6 +25,8 @@ const emit = defineEmits<{
 }>()
 
 const taskStore = useTasksStore()
+const userStore = useUserStore()
+const userGroupStore = useUserGroupsStore()
 
 const props = defineProps({
   categories: {
@@ -67,6 +69,15 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+})
+
+const isAdmin = computed(()=>{
+  const userId = userStore.user?.id
+  const taskAssigneeId = props.task.assignedUserId
+  const taskCreatorId = props.task.createdByUserId
+  const isGroupAdmin = userGroupStore.isAdmin
+
+  return isGroupAdmin || userId === taskAssigneeId || userId === taskCreatorId
 })
 
 const taskCategory = computed(() => {
@@ -137,6 +148,8 @@ const deleteTask = async () => {
 }
 
 const updateTaskStatus = async (value: boolean) => {
+  if(!isAdmin.value) return
+
   const taskData = {
     isCompleted: value,
     id: props.task.id,
@@ -166,7 +179,7 @@ watch(
       <div v-if="isCheckbox" class="self-center">
         <FwbCheckbox
           v-model="check"
-          :disabled="!isCheckboxEnabled"
+          :disabled="!isCheckboxEnabled || !isAdmin"
           @update:model-value="updateTaskStatus"
         />
       </div>

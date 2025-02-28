@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, type UnwrapRef } from 'vue'
 import { FwbModal, FwbButton, FwbTextarea, FwbInput, FwbCheckbox } from 'flowbite-vue'
 import RecurrenceForm from './RecurrenceForm.vue'
 import CategorySelect from '../categories/CategorySelect.vue'
@@ -10,6 +10,12 @@ import {
   type RecurrencePatternInsertable,
 } from '@server/shared/types'
 import MembersSelection from '../groups/MembersSelection.vue'
+
+type TaskDataType = UnwrapRef<typeof taskData>
+type NewTaskData = {
+  task: TaskDataType
+  recurrence: RecurrencePatternInsertable | undefined
+}
 
 const { isShowModal, categories, groupId } = defineProps<{
   isShowModal: boolean
@@ -37,9 +43,6 @@ const endDate = ref<Date | string>()
 const points = ref<string>('')
 
 const taskData = computed(() => {
-  if (!taskForm.value.title) {
-    return
-  }
 
   const taskTime = `${time.value.hours}:${time.value.minutes}`
 
@@ -75,6 +78,20 @@ function closeModal() {
   emit('close')
 }
 
+const validateNewTaskData = (taskData: NewTaskData ) => {
+  const {task, recurrence,} = taskData
+  if(!task) return false
+
+  if(!task.title) return false
+
+  if(task.isRecurring){
+    if(!recurrence) return false
+    if(!task.startDate) return false
+  }
+
+  return true
+}
+
 async function confirmAction(confirmed: boolean) {
   if (!confirmed) {
     resetForm()
@@ -82,14 +99,16 @@ async function confirmAction(confirmed: boolean) {
     return
   }
   try {
-    if (!taskData.value) return
-
-    if (taskData.value.isRecurring && !recurringPattern.value && !taskData.value.points) return
 
     const newTaskData = {
       task: taskData.value,
       recurrence: recurringPattern.value || undefined,
     }
+
+    const isValidTaskData = validateNewTaskData(newTaskData)
+
+    if(!isValidTaskData) return
+
     const newTask = await tasksStore.createTask(newTaskData)
     resetForm()
     emit('task:new', newTask)
@@ -119,7 +138,6 @@ const resetForm = () => {
   }
 }
 </script>
-
 <template>
   <FwbModal v-if="isShowModal" @close="closeModal">
     <template #header>
@@ -223,7 +241,7 @@ const resetForm = () => {
             data-test="category-select"
           />
         </div>
-        <div v-if="groupMembers" class="flex items-center space-x-3">
+        <div v-if="groupMembers && groupId" class="flex items-center space-x-3">
           <span class="text-sm">Assign To:</span>
           <MembersSelection
             :selected-members="selectedMembers"
@@ -272,6 +290,7 @@ const resetForm = () => {
           type="submit"
           aria-label="Submit Task"
           data-test="add-task-button"
+          :disabled="taskForm.title.length < 3"
         >
           Add Task
         </FwbButton>

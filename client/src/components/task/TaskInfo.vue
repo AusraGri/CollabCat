@@ -298,6 +298,7 @@ const saveChanges = () => {
           <span v-else>{{ categoryLabel }}</span>
         </div>
         <div
+        v-if="groupMembers?.length"
           class="flex w-full items-center justify-between space-x-3 pt-3"
           @click="isEditingAssignment = true"
           role="button"

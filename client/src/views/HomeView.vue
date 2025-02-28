@@ -4,7 +4,7 @@ import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
 import { FwbButton, FwbCarousel, FwbHeading, FwbAvatar } from 'flowbite-vue'
 import { useAuthService } from '@/services/auth0'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore, useInvitationStore } from '@/stores'
 import { useUserStore } from '@/stores/userProfile'
 import { useAuth0 } from '@auth0/auth0-vue'
 import logo from '@/assets/collabCat.png'
@@ -24,6 +24,7 @@ const collabCatLogo = ref(logo)
 const { getUserData } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const invitationStore = useInvitationStore()
 const { loginWithRedirect, isAuthenticated, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 const join = async (hint: 'signup' | 'login') => {
@@ -55,6 +56,11 @@ const handleAuthRedirect = async () => {
       userStore.user = { ...signedUser }
     } catch (error) {
       console.log(error)
+    }
+
+    if(invitationStore.invitationToken){
+      router.push({ name: 'Invite' })
+      return
     }
 
     if (userStore.user?.username) {

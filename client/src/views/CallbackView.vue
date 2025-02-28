@@ -4,12 +4,12 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { useRouter } from 'vue-router'
 import { trpc } from '@/trpc'
 import { useAuthService } from '@/services/auth0'
-import { useAuthStore } from '@/stores/authStore'
-import { useUserStore } from '@/stores/userProfile'
+import { useAuthStore, useUserStore, useInvitationStore} from '@/stores'
 
 const { getUserData } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const invitationStore = useInvitationStore()
 const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 
@@ -44,8 +44,11 @@ const handleAuthRedirect = async () => {
 
 onMounted(async () => {
   try {
-    if (isAuthenticated.value) {
+    if (isAuthenticated.value && !invitationStore.invitationToken) {
       await handleAuthRedirect()
+
+    } else if (isAuthenticated.value && invitationStore.invitationToken) {
+      router.push({ name: 'Invite' })
     } else {
       router.push({ name: 'Home' })
     }

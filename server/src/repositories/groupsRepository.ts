@@ -159,6 +159,7 @@ export function groupsRepository(db: Database) {
         .select((eb) => [
           'groups.id',
           'groups.name',
+          'groups.createdByUserId',
           jsonArrayFrom(
             eb
               .selectFrom('rewards')

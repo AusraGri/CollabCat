@@ -42,12 +42,11 @@ export const useInvitationStore = defineStore('invitations', {
         const tokenData = await trpc.invitations.validateInvitationToken.query({
           invitationToken: token,
         })
-        console.log('hello validation')
         this.tokenData = tokenData
 
         return tokenData
       } catch (error) {
-        throw new Error('Failed to validate the invitation token')
+        throw new Error(`Failed to validate the invitation token : ${error}`)
       }
     },
 

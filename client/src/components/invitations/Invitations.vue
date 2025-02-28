@@ -3,7 +3,7 @@ import { onMounted, ref, computed } from 'vue'
 import { trpc } from '@/trpc'
 import { useInvitationStore } from '@/stores'
 import { type PublicInvitation, type InvitationData } from '@server/shared/types'
-import { FwbListGroup, FwbListGroupItem, FwbAvatar, FwbButton } from 'flowbite-vue'
+import {  FwbAvatar, FwbButton } from 'flowbite-vue'
 
 const { invitation } = defineProps<{
   invitation: PublicInvitation
@@ -46,12 +46,8 @@ const confirmInvitation = async (value: boolean) => {
 </script>
 
 <template>
-  <div v-if="isInvitationData" aria-live="polite">
-    <FwbListGroup>
-      <FwbListGroupItem
-        class="justify-between"
-        :aria-labelledby="'group-name-' + invitationData?.groupName"
-      >
+  <div v-if="isInvitationData" aria-live="polite" >
+      <div class="flex space-x-4 w-full min-w-fit m-1 p-1">
         <div class="flex w-fit flex-col align-middle">
           <div
             class="border-b-2"
@@ -98,7 +94,6 @@ const confirmInvitation = async (value: boolean) => {
             >decline</FwbButton
           >
         </div>
-      </FwbListGroupItem>
-    </FwbListGroup>
+      </div>
   </div>
 </template>

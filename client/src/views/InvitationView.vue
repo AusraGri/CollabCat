@@ -5,14 +5,12 @@ import { FwbAvatar, FwbButton } from 'flowbite-vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthService } from '@/services/auth0'
-import { useAuth0 } from '@auth0/auth0-vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useInvitationStore } from '@/stores/invitationStore'
 import { useUserStore } from '@/stores/userProfile'
 import { stringToUrl } from '@/utils/helpers'
 
-const { getToken, getUserData, isAuth } = useAuthService()
-const { loginWithRedirect } = useAuth0()
+const { getToken, getUserData, isAuth, signup } = useAuthService()
 const isTokenValid = ref(true)
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -23,16 +21,8 @@ const error = ref()
 const groupInfo = ref<GroupsPublic>()
 const groupOwner = ref<UserPublic>()
 
-const signupUser = async () => {
-  loginWithRedirect({
-    appState: {
-      target: '/invite',
-    },
-    authorizationParams: {
-      prompt: 'login',
-      screen_hint: 'signup',
-    },
-  })
+const signupUser = async()=> {
+  signup('/invite')
 }
 
 async function validateInvitation() {
@@ -53,6 +43,7 @@ async function validateInvitation() {
   } catch (err) {
     error.value = `Error occurred: ${err}`
     isTokenValid.value = false
+    invitationStore.deleteInvitation()
   } finally {
     loading.value = false
   }
@@ -85,7 +76,6 @@ onMounted(async () => {
   loading.value = true
   try {
     if (!invitationStore.invitationToken && !isAuth) {
-      console.log('validation')
       await validateInvitation()
     }
 
@@ -94,12 +84,16 @@ onMounted(async () => {
 
     if (isAuth && !userStore.user) {
       isTokenValid.value = true
-      console.log('after authentication')
       const userData = await getUserData()
 
       const newUser = await trpc.user.signupAuth.mutate(userData)
       authStore.authToken = await getToken()
       userStore.user = newUser
+      await addUserToGroup()
+      await invitationStore.deleteInvitation()
+    }
+
+    if(isAuth && userStore.user){
       await addUserToGroup()
       await invitationStore.deleteInvitation()
     }
@@ -125,6 +119,8 @@ const redirectToHomePage = () => {
 }
 </script>
 <template>
+  <div>{{ isAuth }}</div>
+  <div>{{ invitationStore.invitationToken }}</div>
   <div class="rounded-lg bg-white p-6 shadow-md">
     <div>
       <!-- Invitation Block: Only visible if not authenticated -->

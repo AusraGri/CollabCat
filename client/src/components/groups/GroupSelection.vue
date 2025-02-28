@@ -17,9 +17,7 @@ const selected = computed(() => userGroupStore.activeGroup?.name)
 const dropdownRef = ref<HTMLElement | null>(null)
 
 const selectItem = async (group: GroupsPublic): Promise<void> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { createdByUserId, ...activeGroup } = group
-  userGroupStore.activeGroup = activeGroup
+  userGroupStore.activeGroup = group
   isOpen.value = false
 }
 

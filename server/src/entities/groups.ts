@@ -34,6 +34,7 @@ export const memberSchema = z.object({
 export const groupDataSchema = z.object({
   id: idSchema,
   name: z.string(),
+  createdByUserId: idSchema,
   rewards: z.array(rewardsSchemaOutput).optional(),
   members: z.array(
     z.object({
@@ -46,8 +47,6 @@ export const groupDataSchema = z.object({
     })
   ),
 })
-
-// list keys that we will return to the client
 export const groupsKeysAll = Object.keys(groupsSchema.shape) as (keyof Groups)[]
 
 export const groupsKeysPublic = ['id', 'name', 'createdByUserId'] as const
@@ -57,7 +56,7 @@ export type GroupsPublic = Pick<
   (typeof groupsKeysPublic)[number]
 >
 export type GroupData = z.infer<typeof groupDataSchema>
-export type ActiveGroup = Omit<GroupsPublic, 'createdByUserId'>
+
 export type InsertableGroups = Insertable<Groups>
 export type GroupMember = z.infer<typeof memberSchema>
 
