@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from 'vue'
 import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
-import { UsersIcon, Squares2X2Icon, ClockIcon } from '@heroicons/vue/24/outline'
+import { UsersIcon, Squares2X2Icon, ClockIcon, StarIcon } from '@heroicons/vue/24/outline'
 import {
   type TaskData,
   type CategoriesPublic,
@@ -14,6 +14,7 @@ import TaskInfo from './TaskInfo.vue'
 import { toggle } from '@/utils/helpers'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
 import { useTasksStore, useUserStore, useUserGroupsStore } from '@/stores'
+import { checkRecurrence } from '@/utils/tasks'
 
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
@@ -71,7 +72,7 @@ const props = defineProps({
   },
 })
 
-const isAdmin = computed(()=>{
+const isAdmin = computed(() => {
   const userId = userStore.user?.id
   const taskAssigneeId = props.task.assignedUserId
   const taskCreatorId = props.task.createdByUserId
@@ -126,29 +127,23 @@ const updateTask = async (updatedTask: TaskData) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { recurrence, completed, id, createdByUserId, ...task } = updatedTask
 
+  const checkedRecurrencePattern = checkRecurrence(recurrence)
   const updateTaskData = {
     id,
     task: { ...task },
-    recurrence: recurrence || undefined,
+    recurrence: checkedRecurrencePattern || undefined,
   }
-  try {
-    await taskStore.updateTask(updateTaskData)
-  } catch (error) {
-    console.log(error)
-  }
+
+  await taskStore.updateTask(updateTaskData)
 }
 
 const deleteTask = async () => {
   const taskId = props.task.id
-  try {
-    await taskStore.deleteTask(taskId)
-  } catch (error) {
-    console.log(error)
-  }
+  await taskStore.deleteTask(taskId)
 }
 
 const updateTaskStatus = async (value: boolean) => {
-  if(!isAdmin.value) return
+  if (!isAdmin.value) return
 
   const taskData = {
     isCompleted: value,
@@ -172,7 +167,7 @@ watch(
     <div
       :class="[
         'border-grey-700 m-1 flex h-fit w-full space-x-1 rounded rounded-s-2xl border-2 p-2 shadow-md',
-        isCompletedTask ? 'bg-green-400' : 'bg-gray-400',
+        isCompletedTask ? 'bg-gray-400' : 'bg-green-400',
       ]"
       aria-label="task item"
     >
@@ -185,7 +180,7 @@ watch(
       </div>
       <div
         @click="toggleTaskInfo"
-        class="flex min-w-60 flex-1 cursor-pointer flex-col items-stretch rounded-l-md bg-slate-50"
+        class="flex min-w-60 cursor-pointer flex-col items-stretch rounded-l-md bg-slate-50"
         aria-label="task-info"
       >
         <div class="flex w-full justify-between rounded-t p-1">
@@ -235,16 +230,20 @@ watch(
       </div>
       <div aria-label="task options" class="min-w-14">
         <div class="flex h-full w-fit min-w-10 flex-col justify-between">
-          <div class="min-w-10" aria-label="points">
-            <FwbBadge size="sm" class="w-fit min-w-10 rounded-e-full p-0">{{
-              task.points
-            }}</FwbBadge>
+          <div v-if="task.points" class="min-w-10" aria-label="points">
+            <FwbBadge size="sm" type="yellow" class="w-fit min-w-10 rounded-e-full p-0">
+              <StarIcon class="h-3 pr-1" />
+              {{ task.points }}</FwbBadge
+            >
           </div>
           <div v-if="assignedUserProfile" class="flex w-full justify-center">
             <UserBasicProfile :user="assignedUserProfile" />
           </div>
-          <div v-if="task.startTime && task.startDate" class="flex items-center space-x-1 text-sm">
-            <ClockIcon class="h-5 w-5 text-blue-500" />
+          <div
+            v-if="task.startTime && task.startDate"
+            class="mt-1 flex items-center space-x-1 text-sm"
+          >
+            <ClockIcon class="h-5 w-5 text-gray-50" />
             <span class="text-xs tracking-wider">
               {{ timeToLocalTime(task.startTime, task.startDate) }}</span
             >

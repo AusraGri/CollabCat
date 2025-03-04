@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { GroupData, GroupMember, GroupsPublic} from '@server/shared/types'
+import { setErrorMessage } from '@/utils/error'
 
 export interface UserGroups {
   groupId: number
@@ -69,6 +70,7 @@ export const useUserGroupsStore = defineStore('group', {
           this.userGroups = [newGroup]
         }
       } catch (error) {
+        setErrorMessage({messageKey: 'create', message: 'group'})
         console.error('Failed to create new group:', error)
       }
     },
@@ -81,7 +83,8 @@ export const useUserGroupsStore = defineStore('group', {
           await trpc.points.deletePoints.mutate({ groupId })
         }
       } catch (error) {
-        console.error('Failed to create new group:', error)
+        setErrorMessage({message: 'Failed to remove user from group. Please try again.'})
+        console.error('Failed to remove user from group:', error)
       }
     },
     async deleteGroup() {
@@ -91,6 +94,7 @@ export const useUserGroupsStore = defineStore('group', {
           await trpc.groups.deleteGroup.mutate({ groupId })
         }
       } catch (error) {
+        setErrorMessage({messageKey: 'delete', message:`${this.activeGroup?.name}` || 'group'})
         console.error('Failed to create new group:', error)
       }
     },
@@ -103,6 +107,7 @@ export const useUserGroupsStore = defineStore('group', {
 
         return invitation
       } catch (error) {
+        setErrorMessage({message:'Failed to invite user'})
         console.error('Failed to invite user:', error)
       }
     },

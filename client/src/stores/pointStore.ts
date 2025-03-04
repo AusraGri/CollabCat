@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { PointsPublic } from '@server/shared/types'
+import { setErrorMessage } from '@/utils/error'
 
 interface PointsState {
   pointsData: PointsPublic | null
@@ -35,7 +36,7 @@ export const usePointsStore = defineStore('points', {
           this.pointsData.points = points
         }
       } catch (error) {
-        console.error('Failed to set user points:', error)
+        throw new Error('Failed to set user points')
       }
     },
     async enablePoints(groupId?: number): Promise<void> {
@@ -47,7 +48,8 @@ export const usePointsStore = defineStore('points', {
         this.isEnabled = true
         this.pointsData = points
       } catch (error) {
-        console.error('Failed to set user points:', error)
+        setErrorMessage({message: 'Failed to enable user points. Please try again'})
+        throw new Error('Failed to enable user points')
       }
     },
     async disablePoints(): Promise<void> {
@@ -60,7 +62,8 @@ export const usePointsStore = defineStore('points', {
         this.isEnabled = false
         this.pointsData = null
       } catch (error) {
-        console.error('Failed to set user points:', error)
+        setErrorMessage({message: 'Failed to disable user points. Please try again'})
+        throw new Error('Failed to disable user points')
       }
     },
     async alterPoints(action: '+' | '-', points: number): Promise<void> {
@@ -75,7 +78,7 @@ export const usePointsStore = defineStore('points', {
         this.isEnabled = !!result
         this.pointsData = result
       } catch (error) {
-        console.error('Failed to set user points:', error)
+        throw new Error('Failed to change user points')
       }
     },
 
@@ -92,7 +95,7 @@ export const usePointsStore = defineStore('points', {
 
         await trpc.points.addClaimedPoints.mutate({ taskId, taskInstanceDate })
       } catch (error) {
-        console.error('Failed to update user points', error)
+        throw new Error('Failed to claim points')
       }
     },
   },

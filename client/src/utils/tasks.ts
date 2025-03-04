@@ -69,3 +69,11 @@ export const sortTasksByCompleted = (tasks: TaskData[]) => {
     return 0
   })
 }
+
+export const checkRecurrence = (rec: TaskData['recurrence'] ) => {
+  const isConvertToDaily = rec?.recurringType === 'weekly' && rec.separationCount === 0 && rec.dayOfWeek?.length === 7
+
+  if(isConvertToDaily) return {...rec, recurringType: 'daily', separationCount: 0}
+
+  return rec
+}

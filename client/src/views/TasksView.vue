@@ -23,6 +23,7 @@ import {
   countTasksOfDefaultType,
 } from '@/utils/tasks'
 import { FwbDropdown } from 'flowbite-vue'
+import { setErrorMessage } from '@/utils/error'
 
 const userGroupStore = useUserGroupsStore()
 const categoryStore = useCategoriesStore()
@@ -150,7 +151,7 @@ const handleTaskStatusChange = async (taskData: {
       }
     }
   } catch (error) {
-    console.log('Failed to update task status', error)
+    setErrorMessage({messageKey: 'update', message: 'task completion status' })
   }
 }
 
@@ -255,7 +256,7 @@ watch(
       </div>
     </div>
     <!-- dropdown menu -->
-    <div class="flex items-end ml-1">
+    <div v-if="categories.length" class="flex items-end ml-1">
       <FwbDropdown align-to-end>
         <template #trigger>
           <div class="rounded-t-xl border-2 border-b-0 border-blue-500">

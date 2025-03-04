@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   server: {
-    host: 'localhost', // or use '0.0.0.0' to listen on all addresses
-    port: 5174, // Change to your desired port
+    host: 'localhost',
+    port: 5174,
   },
 })

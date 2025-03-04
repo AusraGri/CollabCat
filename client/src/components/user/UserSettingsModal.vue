@@ -32,18 +32,15 @@ const router = useRouter()
 const userCategories = computed(() => categoryStore.userCategories || [])
 
 async function changeName() {
-  try {
-    if (user.username === username.value) {
-      emit('close')
-      return
-    }
-
-    userStore.updateUserName(username.value)
-    username.value = user.username
-    router.push({ params: { username: username.value.replace(' ', '') } })
-  } catch (error) {
-    console.log(error)
+  if (user.username === username.value) {
+    emit('close')
+    return
   }
+
+  userStore.updateUserName(username.value)
+  username.value = user.username
+  router.push({ params: { username: username.value.replace(' ', '') } })
+
   emit('close')
 }
 
@@ -76,19 +73,15 @@ const saveUserSettings = async () => {
 }
 
 const handlePointsChange = async () => {
-  try {
-    if (isPoints.value === pointStore.isPointsEnabled) {
-      return
-    }
-    if (isPoints.value) {
-      await pointStore.enablePoints()
-
-      return
-    }
-    await pointStore.disablePoints()
-  } catch (error) {
-    console.log('Failed to change point status', error)
+  if (isPoints.value === pointStore.isPointsEnabled) {
+    return
   }
+  if (isPoints.value) {
+    await pointStore.enablePoints()
+
+    return
+  }
+  await pointStore.disablePoints()
 }
 
 onMounted(() => {

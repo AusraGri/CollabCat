@@ -8,8 +8,11 @@ import {
   type CategoriesPublic,
   type GroupMember,
   type RecurrencePatternInsertable,
+  type TaskData,
 } from '@server/shared/types'
 import MembersSelection from '../groups/MembersSelection.vue'
+import { checkRecurrence } from '@/utils/tasks'
+import { useKeyboardAction } from '@/composables/useKeyboardAction'
 
 type TaskDataType = UnwrapRef<typeof taskData>
 type NewTaskData = {
@@ -43,7 +46,6 @@ const endDate = ref<Date | string>()
 const points = ref<string>('')
 
 const taskData = computed(() => {
-
   const taskTime = `${time.value.hours}:${time.value.minutes}`
 
   const assignedUserId = selectedMembers.value[0] || undefined
@@ -78,15 +80,15 @@ function closeModal() {
   emit('close')
 }
 
-const validateNewTaskData = (taskData: NewTaskData ) => {
-  const {task, recurrence,} = taskData
-  if(!task) return false
+const validateNewTaskData = (taskData: NewTaskData) => {
+  const { task, recurrence } = taskData
+  if (!task) return false
 
-  if(!task.title) return false
+  if (!task.title) return false
 
-  if(task.isRecurring){
-    if(!recurrence) return false
-    if(!task.startDate) return false
+  if (task.isRecurring) {
+    if (!recurrence) return false
+    if (!task.startDate) return false
   }
 
   return true
@@ -98,24 +100,21 @@ async function confirmAction(confirmed: boolean) {
     emit('close')
     return
   }
-  try {
 
-    const newTaskData = {
-      task: taskData.value,
-      recurrence: recurringPattern.value || undefined,
-    }
+  const recurrence = checkRecurrence(recurringPattern.value as TaskData['recurrence'])
 
-    const isValidTaskData = validateNewTaskData(newTaskData)
-
-    if(!isValidTaskData) return
-
-    const newTask = await tasksStore.createTask(newTaskData)
-    resetForm()
-    emit('task:new', newTask)
-  } catch (error) {
-    console.log('Error while saving task', error)
+  const newTaskData = {
+    task: taskData.value,
+    recurrence: recurrence || undefined,
   }
+
+  const isValidTaskData = validateNewTaskData(newTaskData)
+
+  if (!isValidTaskData) return
+
+  const newTask = await tasksStore.createTask(newTaskData)
   resetForm()
+  emit('task:new', newTask)
   emit('close')
 }
 
@@ -137,6 +136,12 @@ const resetForm = () => {
     isPoints: false,
   }
 }
+
+useKeyboardAction(
+  () => confirmAction(true),
+  () => confirmAction(false),
+  () => taskForm.value.title.length >= 3
+)
 </script>
 <template>
   <FwbModal v-if="isShowModal" @close="closeModal">

@@ -2,8 +2,9 @@
 import { ref, computed, type PropType } from 'vue'
 import { FwbButton, FwbCheckbox } from 'flowbite-vue'
 import RecurrenceForm from './RecurrenceForm.vue'
-import { type RecurrencePattern } from '@server/shared/types'
+import { type RecurrencePattern, type TaskData } from '@server/shared/types'
 import { areObjectsEqual } from '@/utils/helpers'
+import { checkRecurrence } from '../../utils/tasks';
 
 const { isShowRecurrence, isRecurring, pickDates } = defineProps<{
   isShowRecurrence: boolean
@@ -19,12 +20,12 @@ const recurrencePattern = defineModel('recurrencePattern', {
   type: [Object, null] as PropType<RecurrencePattern | null>,
 })
 
-const recurrence = ref(isRecurring)
-const recurrenceOrigin = ref(isRecurring)
+const isRecurrence = ref(isRecurring)
+const isRecurrenceOrigin = ref(isRecurring)
 const originalRecurrence = ref(recurrencePattern.value)
 
 const current = computed(() => {
-  if (!recurrence.value) return null
+  if (!isRecurrence.value) return null
 
   return recurrencePattern.value
 })
@@ -38,14 +39,15 @@ const closeRecurrenceModal = () => {
 }
 
 const savePatternChanges = () => {
-  recurrencePattern.value = current.value
-  originalRecurrence.value = current.value
-  recurrenceOrigin.value = recurrence.value
+  const recurrence = current.value as TaskData['recurrence']
+  recurrencePattern.value = checkRecurrence(recurrence)
+  originalRecurrence.value = checkRecurrence(recurrence)
+  isRecurrenceOrigin.value = isRecurrence.value
   emit('closeRecurrence')
 }
 
 const resetPatternChanges = () => {
-  recurrence.value = recurrenceOrigin.value
+  isRecurrence.value = isRecurrenceOrigin.value
   if (originalRecurrence.value) {
     recurrencePattern.value = originalRecurrence.value
   }
@@ -98,14 +100,14 @@ const resetPatternChanges = () => {
         </header>
         <div class="mt-4 space-y-3" id="recurrence-modal-description" aria-live="polite">
           <FwbCheckbox
-            v-model="recurrence"
+            v-model="isRecurrence"
             label="Recurring"
             aria-label="Enable recurring pattern"
             data-test="recurrence-checkbox"
           />
           <RecurrenceForm
-            v-if="recurrence"
-            :is-recurring="recurrence"
+            v-if="isRecurrence"
+            :is-recurring="isRecurrence"
             :pick-dates="pickDates"
             v-model:recurrence-pattern="recurrencePattern"
             data-test="recurrence-form"

@@ -42,23 +42,18 @@ const join = async (hint: 'signup' | 'login') => {
 const handleAuthRedirect = async () => {
   try {
     if (!isAuthenticated.value) {
-      console.log('User is not authenticated yet.')
-      return
+      throw new Error('User is not authenticated yet.')
     }
 
     const idToken = await getAccessTokenSilently()
 
     authStore.setAuthToken(idToken)
     let routeUsername: string
-    try {
-      const newUser = await getUserData()
-      const signedUser = await trpc.user.signupAuth.mutate(newUser)
-      userStore.user = { ...signedUser }
-    } catch (error) {
-      console.log(error)
-    }
+    const newUser = await getUserData()
+    const signedUser = await trpc.user.signupAuth.mutate(newUser)
+    userStore.user = { ...signedUser }
 
-    if(invitationStore.invitationToken){
+    if (invitationStore.invitationToken) {
       router.push({ name: 'Invite' })
       return
     }
@@ -69,20 +64,16 @@ const handleAuthRedirect = async () => {
       router.push({ name: 'PersonalCalendar', params: { username: routeUsername } })
     }
   } catch (error) {
-    console.error('Error handling Auth0 redirect callback:', error)
+    throw new Error(`Error handling Auth0 redirect callback: ${error}`)
   }
 }
 
 onMounted(async () => {
-  try {
     if (isAuthenticated.value) {
       await handleAuthRedirect()
     } else {
       console.log('User not authenticated. Waiting for login...')
     }
-  } catch (error) {
-    console.error('Error in onMounted:', error)
-  }
 })
 
 watch(

@@ -3,6 +3,7 @@ import { useCategoriesStore } from '@/stores'
 import type { CategoriesPublic } from '@server/shared/types'
 import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
 import { ref } from 'vue'
+import { useKeyboardAction } from '@/composables/useKeyboardAction'
 
 const { isShowModal, groupId } = defineProps<{
   isShowModal: boolean
@@ -24,15 +25,12 @@ async function confirmAction(confirmed: boolean) {
     return
   }
 
-  try {
-    const category = await categoryStore.createCategory({
-      title: title.value,
-      groupId: groupId || null,
-    })
-    emit('create:category', category)
-  } catch (error) {
-    console.log('error while creating category', error)
-  }
+  const category = await categoryStore.createCategory({
+    title: title.value,
+    groupId: groupId || null,
+  })
+  emit('create:category', category)
+
   closeModal()
 }
 
@@ -40,6 +38,12 @@ const closeModal = () => {
   emit('close')
   title.value = ''
 }
+
+useKeyboardAction(
+  () => confirmAction(true),
+  () => confirmAction(false),
+  () => title.value.length >= 3
+)
 </script>
 
 <template>
@@ -65,10 +69,10 @@ const closeModal = () => {
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <fwb-button @click="confirmAction(false)" color="alternative" data-test="decline-button">
+        <FwbButton @click="confirmAction(false)" color="alternative" data-test="decline-button">
           Decline
-        </fwb-button>
-        <fwb-button
+        </FwbButton>
+        <FwbButton
           @click="confirmAction(true)"
           type="submit"
           color="green"
@@ -76,7 +80,7 @@ const closeModal = () => {
           data-test="accept-button"
         >
           I accept
-        </fwb-button>
+        </FwbButton>
       </div>
     </template>
   </FwbModal>

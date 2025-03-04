@@ -43,8 +43,8 @@ onMounted(async () => {
 })
 
 const refreshInvitations = async () => {
-  await invitationStore.fetchInvitations()
   await userGroupStore.fetchUserGroups()
+  await invitationStore.fetchInvitations()
 }
 
 const setTabName = (value: string) => {

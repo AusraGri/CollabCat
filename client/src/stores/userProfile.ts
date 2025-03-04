@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { PublicInvitation, UserPublic } from '@server/shared/types'
+import { setErrorMessage } from '@/utils/error'
 
 export interface UserState {
   user: UserPublic | null
@@ -31,27 +32,27 @@ export const useUserStore = defineStore('user', {
         console.error('Failed to fetch user data:', error)
       }
     },
-    async fetchInvitations() {
-      try {
-        const data = await trpc.invitations.getGroupInvitations.query()
-        this.invitations = data
+    // async fetchInvitations() {
+    //   try {
+    //     const data = await trpc.invitations.getGroupInvitations.query()
+    //     this.invitations = data
 
-        return data
-      } catch (error) {
-        console.error('Failed to fetch user groups data:', error)
-      }
-    },
-    async deleteInvitation(invitation: PublicInvitation) {
-      try {
-        this.invitations = this.invitations?.filter((inv) => inv != invitation) || null
+    //     return data
+    //   } catch (error) {
+    //     console.error('Failed to fetch user groups data:', error)
+    //   }
+    // },
+    // async deleteInvitation(invitation: PublicInvitation) {
+    //   try {
+    //     this.invitations = this.invitations?.filter((inv) => inv != invitation) || null
 
-        await trpc.invitations.deleteInvitation.mutate({
-          invitationToken: invitation.invitationToken,
-        })
-      } catch (error) {
-        console.log('error while deleting invitation')
-      }
-    },
+    //     await trpc.invitations.deleteInvitation.mutate({
+    //       invitationToken: invitation.invitationToken,
+    //     })
+    //   } catch (error) {
+    //     console.log('error while deleting invitation')
+    //   }
+    // },
 
     updateUserName(newName: string) {
       if (!this.user) return
@@ -61,8 +62,12 @@ export const useUserStore = defineStore('user', {
     },
 
     async deleteUser() {
-      await trpc.user.deleteUser.mutate()
-      this.clearUser()
+      try {
+        await trpc.user.deleteUser.mutate()
+        this.clearUser()
+      } catch (error) {
+        setErrorMessage({messageKey: 'delete', message: `${this.user?.username}`||'user'})
+      }
     },
 
     async saveUserChanges(username: string) {
@@ -70,6 +75,7 @@ export const useUserStore = defineStore('user', {
         const updatedUser = await trpc.user.updateUser.mutate({ username })
         this.user = updatedUser
       } catch (error) {
+        setErrorMessage({ messageKey: 'update', message: 'username'})
         console.error('Failed to save user changes:', error)
       }
     },

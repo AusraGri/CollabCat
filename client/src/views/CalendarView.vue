@@ -181,6 +181,7 @@ watch(
               :is-show-dates="false"
               :is-show-recurrence="false"
               :is-checkbox-enabled="isCheckboxEnabled"
+              :is-checkbox="isCheckboxEnabled"
               @task:status="handleTaskStatusChange"
               data-test="task-card"
             />

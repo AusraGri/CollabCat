@@ -17,3 +17,4 @@ export default function useErrorMessage<
 
   return [withError(errorMessage, fn), errorMessage]
 }
+

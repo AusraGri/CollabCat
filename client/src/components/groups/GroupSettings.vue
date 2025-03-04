@@ -6,6 +6,7 @@ import ConfirmationModal from '../ConfirmationModal.vue'
 import { ChevronRightIcon } from '@heroicons/vue/24/outline'
 import { useRouter } from 'vue-router'
 import CategoriesManager from '../categories/CategoriesManager.vue'
+import { setErrorMessage } from '@/utils/error'
 
 const { isShowModal } = defineProps<{
   isShowModal: boolean
@@ -57,16 +58,13 @@ const handlePointChange = async () => {
       pointStore.disablePoints()
     }
   } catch (error) {
-    console.log(error)
+    setErrorMessage({ message: 'Failed to change user points status' })
   }
 }
 
 const saveChanges = async () => {
-  try {
-    await handlePointChange()
-  } catch (error) {
-    console.log(error)
-  }
+  await handlePointChange()
+
   emit('close')
 }
 
@@ -75,19 +73,15 @@ const processConfirmation = async (confirm: boolean) => {
 
   if (!confirm) return
 
-  try {
-    if (confirm && isAdmin.value) {
-      await userGroupStore.deleteGroup()
-    } else if (confirm && !isAdmin.value) {
-      await userGroupStore.removeUserFromGroup()
-    }
-    userGroupStore.activeGroup = null
-    userGroupStore.fetchUserGroups()
-    emit('close')
-    router.push({ name: 'Profile' })
-  } catch (error) {
-    console.log(error)
+  if (confirm && isAdmin.value) {
+    await userGroupStore.deleteGroup()
+  } else if (confirm && !isAdmin.value) {
+    await userGroupStore.removeUserFromGroup()
   }
+  userGroupStore.activeGroup = null
+  userGroupStore.fetchUserGroups()
+  emit('close')
+  router.push({ name: 'Profile' })
 }
 
 watch(

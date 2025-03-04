@@ -66,6 +66,7 @@ const weekdays = [
 
 const recurrencePatternNew = computed<Partial<RecurrencePattern> | null>(() => {
   if (!isRecurring) return null
+
   return {
     recurringType: recurringType.value,
     separationCount: everyXCount.value ? Number(everyXCount.value) - 1 : undefined,
