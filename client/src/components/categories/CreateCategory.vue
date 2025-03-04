@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { trpc } from '@/trpc'
+import { useCategoriesStore } from '@/stores'
 import type { CategoriesPublic } from '@server/shared/types'
 import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
 import { ref } from 'vue'
+import { useKeyboardAction } from '@/composables/useKeyboardAction'
 
 const { isShowModal, groupId } = defineProps<{
   isShowModal: boolean
@@ -14,37 +15,41 @@ const emit = defineEmits<{
   (event: 'close'): void
 }>()
 
+const categoryStore = useCategoriesStore()
 const title = ref<string>('')
 
 async function confirmAction(confirmed: boolean) {
   if (!confirmed) {
-    emit('close')
+    closeModal()
 
     return
   }
 
-  try {
-    const category = await trpc.categories.createCategory.mutate({
-      title: title.value,
-      groupId: groupId || null,
-    })
-    emit('create:category', category)
-    title.value = ''
-  } catch (error) {
-    console.log('error while creating category', error)
-  }
-  emit('close')
+  const category = await categoryStore.createCategory({
+    title: title.value,
+    groupId: groupId || null,
+  })
+  emit('create:category', category)
+
+  closeModal()
 }
 
 const closeModal = () => {
   emit('close')
+  title.value = ''
 }
+
+useKeyboardAction(
+  () => confirmAction(true),
+  () => confirmAction(false),
+  () => title.value.length >= 3
+)
 </script>
 
 <template>
-  <FwbModal v-if="isShowModal" @close="closeModal">
+  <FwbModal v-if="isShowModal" @close="closeModal" data-test="create-category-modal">
     <template #header>
-      <div class="flex items-center text-lg">Create New Category</div>
+      <div class="flex items-center text-lg" data-test="modal-header">Create New Category</div>
     </template>
     <template #body>
       <div>
@@ -56,14 +61,26 @@ const closeModal = () => {
             minlength="3"
             maxlength="20"
             required
+            data-test="category-title-input"
+            aria-label="Enter category title"
           />
         </form>
       </div>
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <fwb-button @click="confirmAction(false)" color="alternative"> Decline </fwb-button>
-        <fwb-button @click="confirmAction(true)" color="green"> I accept </fwb-button>
+        <FwbButton @click="confirmAction(false)" color="alternative" data-test="decline-button">
+          Decline
+        </FwbButton>
+        <FwbButton
+          @click="confirmAction(true)"
+          type="submit"
+          color="green"
+          :disabled="title.length < 3"
+          data-test="accept-button"
+        >
+          I accept
+        </FwbButton>
       </div>
     </template>
   </FwbModal>

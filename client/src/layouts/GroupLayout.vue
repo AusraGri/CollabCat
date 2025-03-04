@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watchEffect, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useUserGroupsStore, useUserStore, usePointsStore } from '@/stores'
+import { useUserGroupsStore, useUserStore, usePointsStore, useCategoriesStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import GroupMembers from '@/components/groups/GroupMembers.vue'
 import { useRewardStore } from '@/stores/rewardStore'
@@ -14,6 +14,7 @@ const emit = defineEmits<{
 }>()
 
 const userGroupStore = useUserGroupsStore()
+const categoryStore = useCategoriesStore()
 const rewardStore = useRewardStore()
 const userStore = useUserStore()
 const pointsStore = usePointsStore()
@@ -26,6 +27,7 @@ const isUserInGroupPage = computed(() => route.meta.group)
 watchEffect(async () => {
   if (userGroupStore.activeGroup?.name && isUserInGroupPage.value) {
     await rewardStore.manageGroupRewards(userGroupStore.activeGroup?.id)
+    await categoryStore.getGroupCategories(userGroupStore.activeGroup?.id)
     return
   }
 
@@ -36,6 +38,7 @@ watchEffect(async () => {
       role: 'Admin',
     }
     await rewardStore.managePersonalRewards(userInfo)
+    await categoryStore.getUserCategories()
   }
 })
 
@@ -102,43 +105,50 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div class="flex flex-col">
-    <div
-      :class="['flex', 'justify-end', 'pr-3', { 'border-r-2 border-gray-300': isUserInGroupPage }]"
-    >
-      <div class="inline-flex w-96 space-x-2">
-        <Tab :title="'Calendar'" :isActive="activeTab" @tab-click="handleTabClick" />
-        <Tab :title="'Tasks'" :isActive="activeTab" @tab-click="handleTabClick" />
-        <Rewards @reward:claimed="handleRewardClaim">
-          <template #trigger>
-            <Tab :title="'Rewards'" :custom-tailwind-classes="'border-red-500'" />
-          </template>
-        </Rewards>
-      </div>
-    </div>
-    <div :class="['flex', 'w-full', 'flex-nowrap', 'h-9', 'justify-end']">
-      <div v-if="isUserInGroupPage" class="inline-flex space-x-1">
-        <div>
-          <GroupMembers>
+  <div class="container mx-auto">
+    <div class="flex flex-col">
+      <div
+        :class="[
+          'flex',
+          'justify-end',
+          'pr-3',
+          { 'border-r-2 border-gray-300': isUserInGroupPage },
+        ]"
+        role="tablist"
+        aria-label="Tabs navigation"
+      >
+        <div class="inline-flex w-96 space-x-2">
+          <Tab :title="'Calendar'" :isActive="activeTab" @tab-click="handleTabClick" />
+          <Tab :title="'Tasks'" :isActive="activeTab" @tab-click="handleTabClick" />
+          <Rewards @reward:claimed="handleRewardClaim">
             <template #trigger>
-              <Tab :title="'Members'" :custom-tailwind-classes="'border-green-400'" />
+              <Tab :title="'Rewards'" :custom-tailwind-classes="'border-red-500'" />
             </template>
-          </GroupMembers>
+          </Rewards>
         </div>
-        <div>
-          <Tab
-            :title="'Settings'"
-            @tab-click="openGroupSettings"
-            :custom-tailwind-classes="'border-gray-300 text-gray-500'"
-          />
-          <GroupSettings
-            :is-show-modal="isShowGroupSettings"
-            @close="isShowGroupSettings = false"
-          />
+      </div>
+      <div :class="['flex', 'w-full', 'flex-nowrap', 'h-9', 'justify-end']">
+        <div v-if="isUserInGroupPage" class="inline-flex space-x-1">
+          <div>
+            <GroupMembers>
+              <template #trigger>
+                <Tab :title="'Members'" :custom-tailwind-classes="'border-green-400'" />
+              </template>
+            </GroupMembers>
+          </div>
+          <div>
+            <Tab
+              :title="'Settings'"
+              @tab-click="openGroupSettings"
+              :custom-tailwind-classes="'border-gray-300 text-gray-500'"
+            />
+            <GroupSettings
+              :is-show-modal="isShowGroupSettings"
+              @close="isShowGroupSettings = false"
+            />
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped></style>

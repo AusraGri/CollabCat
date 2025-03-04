@@ -4,7 +4,7 @@ import { trpc } from '@/trpc'
 import { useRouter } from 'vue-router'
 import { FwbButton, FwbCarousel, FwbHeading, FwbAvatar } from 'flowbite-vue'
 import { useAuthService } from '@/services/auth0'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore, useInvitationStore } from '@/stores'
 import { useUserStore } from '@/stores/userProfile'
 import { useAuth0 } from '@auth0/auth0-vue'
 import logo from '@/assets/collabCat.png'
@@ -24,6 +24,7 @@ const collabCatLogo = ref(logo)
 const { getUserData } = useAuthService()
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const invitationStore = useInvitationStore()
 const { loginWithRedirect, isAuthenticated, getAccessTokenSilently } = useAuth0()
 const router = useRouter()
 const join = async (hint: 'signup' | 'login') => {
@@ -41,20 +42,20 @@ const join = async (hint: 'signup' | 'login') => {
 const handleAuthRedirect = async () => {
   try {
     if (!isAuthenticated.value) {
-      console.log('User is not authenticated yet.')
-      return
+      throw new Error('User is not authenticated yet.')
     }
 
     const idToken = await getAccessTokenSilently()
 
     authStore.setAuthToken(idToken)
     let routeUsername: string
-    try {
-      const newUser = await getUserData()
-      const signedUser = await trpc.user.signupAuth.mutate(newUser)
-      userStore.user = { ...signedUser }
-    } catch (error) {
-      console.log(error)
+    const newUser = await getUserData()
+    const signedUser = await trpc.user.signupAuth.mutate(newUser)
+    userStore.user = { ...signedUser }
+
+    if (invitationStore.invitationToken) {
+      router.push({ name: 'Invite' })
+      return
     }
 
     if (userStore.user?.username) {
@@ -63,20 +64,16 @@ const handleAuthRedirect = async () => {
       router.push({ name: 'PersonalCalendar', params: { username: routeUsername } })
     }
   } catch (error) {
-    console.error('Error handling Auth0 redirect callback:', error)
+    throw new Error(`Error handling Auth0 redirect callback: ${error}`)
   }
 }
 
 onMounted(async () => {
-  try {
     if (isAuthenticated.value) {
       await handleAuthRedirect()
     } else {
       console.log('User not authenticated. Waiting for login...')
     }
-  } catch (error) {
-    console.error('Error in onMounted:', error)
-  }
 })
 
 watch(
@@ -92,16 +89,42 @@ watch(
 <template>
   <div class="container mx-auto dark:bg-gray-800">
     <div class="m-7 flex flex-col items-center space-x-2 sm:flex-row">
-      <FwbAvatar :img="collabCatLogo" rounded size="lg" bordered />
-      <FwbHeading>CollabCat</FwbHeading>
-      <span class="whitespace-nowrap"> Best way to share tasks!</span>
+      <FwbAvatar
+        :img="collabCatLogo"
+        rounded
+        size="lg"
+        bordered
+        alt="CollabCat logo"
+        aria-label="CollabCat logo"
+      />
+      <FwbHeading aria-label="CollabCat">CollabCat</FwbHeading>
+      <span class="whitespace-nowrap" aria-live="polite"> Best way to share tasks!</span>
     </div>
     <div class="mt-1 space-x-2 p-3">
-      <FwbButton @click="join('signup')" color="alternative">SignUp</FwbButton>
-      <FwbButton @click="join('login')" color="alternative">Login</FwbButton>
+      <FwbButton
+        @click="join('signup')"
+        color="alternative"
+        aria-label="Sign up for CollabCat"
+        data-test="signup-button"
+        >SignUp</FwbButton
+      >
+      <FwbButton
+        @click="join('login')"
+        color="alternative"
+        aria-label="Log in to CollabCat"
+        data-test="login-button"
+        >Login</FwbButton
+      >
     </div>
     <div class="w-full">
-      <FwbCarousel :pictures="pictures" slide :slide-interval="5000" />
+      <FwbCarousel
+        :pictures="pictures"
+        slide
+        :slide-interval="5000"
+        aria-live="polite"
+        aria-label="Carousel of CollabCat images"
+        data-test="collabcat-carousel"
+      />
     </div>
     <div>
       <AppDescription />

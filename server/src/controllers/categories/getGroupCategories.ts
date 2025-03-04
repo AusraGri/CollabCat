@@ -1,7 +1,7 @@
 import { groupAuthProcedure } from '@server/trpc/groupAuthProcedure'
 import { categoriesRepository } from '@server/repositories/categoriesRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { categoriesSchema } from '@server/entities/categories'
+import { publicCategorySchema } from '@server/entities/categories'
 import z from 'zod'
 
 export default groupAuthProcedure
@@ -16,7 +16,7 @@ export default groupAuthProcedure
     },
   })
   .input(z.object({}))
-  .output(z.array(categoriesSchema))
+  .output(z.array(publicCategorySchema))
   .query(async ({ ctx: { userGroup, repos } }) => {
     const groupCategories =
       await repos.categoriesRepository.getCategoriesByGroupId(

@@ -1,4 +1,5 @@
-import 'dotenv/config'
+// import 'dotenv/config'
+import 'dotenv-flow/config'
 import { z } from 'zod'
 
 const { env } = process

@@ -12,7 +12,14 @@ const picked = ref()
 
 <template>
   <FwbListGroupItem>
-    <FwbCheckbox v-model="picked" label="User" name="list-radio" :value="user.id" />
+    <FwbCheckbox
+      v-model="picked"
+      label="User"
+      name="list-radio"
+      :value="user.id"
+      aria-label="Select user"
+      data-test="user-checkbox"
+      data-test-user-id="user.id"
+    />
   </FwbListGroupItem>
 </template>
-<style scoped></style>

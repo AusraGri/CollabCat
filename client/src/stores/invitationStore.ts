@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { UserPublic, GroupsPublic, PublicInvitation } from '@server/shared/types'
+import { setErrorMessage } from '@/utils/error'
 export interface DecodedToken {
   user: {
     email: string
@@ -42,12 +43,12 @@ export const useInvitationStore = defineStore('invitations', {
         const tokenData = await trpc.invitations.validateInvitationToken.query({
           invitationToken: token,
         })
-        console.log('hello validation')
         this.tokenData = tokenData
 
         return tokenData
       } catch (error) {
-        throw new Error('Failed to validate the invitation token')
+        setErrorMessage({ message: 'Failed to validate invitation token.' })
+        throw new Error(`Failed to validate the invitation token : ${error}`)
       }
     },
 
@@ -58,7 +59,7 @@ export const useInvitationStore = defineStore('invitations', {
 
         return data
       } catch (error) {
-        console.error('Failed to fetch user groups data:', error)
+        setErrorMessage({ messageKey: 'read', message: 'invitations data' })
       }
     },
 
@@ -76,19 +77,24 @@ export const useInvitationStore = defineStore('invitations', {
         throw new Error('Failed to fetch group info')
       }
     },
-    async acceptInvitation(invitation?: PublicInvitation) {
+    async acceptInvitation(invitation: PublicInvitation) {
       try {
-        const groupId = this.tokenData?.invitation.groupId || invitation?.groupId
+        const groupId = invitation?.groupId
 
         if (!groupId) throw new Error('Missing group id')
 
         await trpc.groups.addUserToGroup.mutate({ groupId })
 
+        await trpc.invitations.deleteInvitation.mutate({
+          invitationToken: invitation.invitationToken,
+        })
+
         if (this.invitations) {
           this.invitations = this.invitations?.filter((inv) => inv.id != invitation?.id) || null
         }
       } catch (error) {
-        throw new Error('Failed to fetch group info')
+        setErrorMessage({ message: 'Failed to accept invitation' })
+        throw new Error('Failed to accept invitation')
       }
     },
     async getInviterData() {
@@ -127,7 +133,7 @@ export const useInvitationStore = defineStore('invitations', {
           invitationToken: invitation.invitationToken,
         })
       } catch (error) {
-        console.log('error while deleting invitation')
+        setErrorMessage({ message: 'Failed to decline invitation' })
       }
     },
   },

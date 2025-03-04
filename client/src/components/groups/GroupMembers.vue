@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbAvatar } from 'flowbite-vue'
-import { useUserGroupsStore } from '@/stores/userGroups'
+import { FwbDropdown, FwbListGroup, FwbListGroupItem, FwbAvatar, FwbBadge,} from 'flowbite-vue'
+import { useUserGroupsStore } from '@/stores'
 import InviteUsers from './InviteUsers.vue'
 
 const userGroupStore = useUserGroupsStore()
 const isShowInvite = ref(false)
 const members = computed(() => userGroupStore.groupMembers)
 
-const openMemberSettings = () => {
-  if (!userGroupStore.isAdmin) return
-
-  console.log('opening settings...')
-}
+const groupAdminId = computed(() => {
+  return userGroupStore.activeGroup?.createdByUserId || undefined
+})
 
 const toggleInviteUser = () => {
   isShowInvite.value = !isShowInvite.value
@@ -26,36 +24,36 @@ const handleInvitation = async (email: string) => {
 }
 </script>
 <template>
-  <div class="w-full">
-    <FwbDropdown>
-      <template #trigger>
-        <slot name="trigger"></slot>
-      </template>
-      <fwb-list-group>
+  <FwbDropdown align-to-end content-class="rounded-xl" >
+    <template #trigger>
+      <slot name="trigger"></slot>
+    </template>
+    <FwbListGroup class="w-full">
         <FwbListGroupItem v-for="member in members" :key="member.id" hover>
-          <button @click="openMemberSettings">
-            <div class="flex items-center">
+            <div class="flex min-w-fit items-center space-x-2">
               <FwbAvatar :img="member.picture || undefined" rounded size="md" />
-              <div class="ml-2">{{ member.username }}</div>
+              <div class="ml-2 whitespace-nowrap">{{ member.username }}</div>
+              <div v-if="member.id === groupAdminId">
+                <FwbBadge type="yellow">Admin</FwbBadge>
+              </div>
             </div>
-          </button>
         </FwbListGroupItem>
-        <FwbListGroupItem v-if="userGroupStore.isAdmin">
-          <button
-            class="w-full px-4 py-2 font-medium text-green-600 hover:bg-green-50"
-            @click="toggleInviteUser"
-          >
-            + Invite User
-          </button>
-        </FwbListGroupItem>
-      </fwb-list-group>
-    </FwbDropdown>
-    <InviteUsers
-      :is-show-modal="isShowInvite"
-      @invite:user="handleInvitation"
-      @close="toggleInviteUser"
-    />
-  </div>
+      <FwbListGroupItem v-if="userGroupStore.isAdmin">
+        <button
+          class="w-full px-4 py-2 font-medium text-green-600 hover:bg-green-50"
+          @click="toggleInviteUser"
+          data-test="invite-user-button"
+          aria-label="Invite a user to the group"
+        >
+          + Invite User
+        </button>
+      </FwbListGroupItem>
+    </FwbListGroup>
+  </FwbDropdown>
+  <InviteUsers
+    :is-show-modal="isShowInvite"
+    @invite:user="handleInvitation"
+    @close="toggleInviteUser"
+    data-test="invite-users-modal"
+  />
 </template>
-
-<style scoped></style>

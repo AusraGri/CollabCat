@@ -43,6 +43,8 @@ const updateValue = (event: Event, member: GroupMember) => {
               :checked="isMemberChecked(member)"
               @change.prevent="(event) => updateValue(event, member)"
               class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+              :aria-label="'Select ' + member.username + ' as a member'"
+              data-test="member-checkbox"
             />
             <span>
               <FwbAvatar :img="member.picture || undefined" rounded size="sm" />
@@ -54,4 +56,3 @@ const updateValue = (event: Event, member: GroupMember) => {
     </FwbDropdown>
   </div>
 </template>
-<style scoped></style>

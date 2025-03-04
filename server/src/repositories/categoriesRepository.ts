@@ -37,6 +37,31 @@ export function categoriesRepository(db: Database) {
         .where('createdByUserId', '=', userId)
         .execute()
     },
+
+    async getAllRelatedCategoriesByUserId(
+      userId: number
+    ): Promise<CategoriesPublic[]> {
+      return db
+        .selectFrom('categories')
+        .leftJoin('userGroups', 'categories.groupId', 'userGroups.groupId')
+        .select([
+          'categories.createdByUserId',
+          'categories.groupId',
+          'categories.id',
+          'categories.title',
+          'categories.isDefault'
+        ])
+        .where(({ eb, or, and, not }) =>
+          and([
+            or([
+              eb('categories.createdByUserId', '=', userId),
+              eb('userGroups.userId', '=', userId),
+            ]),
+            not(eb('categories.isDefault', '=', true)),
+          ])
+        )
+        .execute()
+    },
     async getPersonalCategoriesByUserId(
       userId: number
     ): Promise<CategoriesPublic[]> {
@@ -44,7 +69,6 @@ export function categoriesRepository(db: Database) {
         .selectFrom('categories')
         .select(categoriesKeysAll)
         .where('categories.groupId', 'is', null)
-        .where('categories.isGroupDefault', 'is', false)
         .where((eb) =>
           eb.or([
             eb('categories.createdByUserId', '=', userId),

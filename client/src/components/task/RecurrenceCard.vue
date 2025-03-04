@@ -40,26 +40,25 @@ function separation(count: number) {
 <template>
   <div class="text-sm">
     <div v-if="isDaily">
-      <div>{{ separationLabel }}</div>
+      <div :aria-label="separationLabel">{{ separationLabel }}</div>
     </div>
     <div
       v-if="isWeekly"
-      class="flex flex-col space-y-1 sm:flex-row sm:items-center sm:space-x-3 sm:space-y-0"
+      class="flex flex-col space-y-1  sm:items-center sm:space-x-3 sm:space-y-0"
     >
       <div v-if="recurrence.dayOfWeek" class="flex space-x-1">
         <div
           v-for="day in weekdays"
           :key="day"
           class="w-fit min-w-8 rounded bg-green-500 p-1 text-center text-white"
+          :aria-label="`Day of the week: ${day}`"
         >
           {{ day }}
         </div>
       </div>
-      <div>
+      <div :aria-label="separationLabel">
         {{ separationLabel }}
       </div>
     </div>
   </div>
 </template>
-
-<style scoped></style>

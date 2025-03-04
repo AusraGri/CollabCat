@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from 'vue'
 import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
+import { UsersIcon, Squares2X2Icon, ClockIcon, StarIcon } from '@heroicons/vue/24/outline'
 import {
   type TaskData,
   type CategoriesPublic,
@@ -12,7 +13,8 @@ import RecurrenceCard from './RecurrenceCard.vue'
 import TaskInfo from './TaskInfo.vue'
 import { toggle } from '@/utils/helpers'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
-import { useTasksStore } from '@/stores/taskStore'
+import { useTasksStore, useUserStore, useUserGroupsStore } from '@/stores'
+import { checkRecurrence } from '@/utils/tasks'
 
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
@@ -24,6 +26,8 @@ const emit = defineEmits<{
 }>()
 
 const taskStore = useTasksStore()
+const userStore = useUserStore()
+const userGroupStore = useUserGroupsStore()
 
 const props = defineProps({
   categories: {
@@ -54,6 +58,27 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isGroupInfo: {
+    type: Boolean,
+    default: true,
+  },
+  isShowDates: {
+    type: Boolean,
+    default: true,
+  },
+  isShowRecurrence: {
+    type: Boolean,
+    default: true,
+  },
+})
+
+const isAdmin = computed(() => {
+  const userId = userStore.user?.id
+  const taskAssigneeId = props.task.assignedUserId
+  const taskCreatorId = props.task.createdByUserId
+  const isGroupAdmin = userGroupStore.isAdmin
+
+  return isGroupAdmin || userId === taskAssigneeId || userId === taskCreatorId
 })
 
 const taskCategory = computed(() => {
@@ -78,6 +103,14 @@ const showTaskInfo = ref(false)
 
 const check = ref(isTaskCompleted(props.task))
 
+const isCompletedTask = computed(() => {
+  if (check.value && props.isCheckbox) return true
+
+  if (!props.isCheckbox && props.task.isCompleted) return true
+
+  return false
+})
+
 const toggleTaskInfo = () => {
   toggle(showTaskInfo)
 }
@@ -94,28 +127,24 @@ const updateTask = async (updatedTask: TaskData) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { recurrence, completed, id, createdByUserId, ...task } = updatedTask
 
+  const checkedRecurrencePattern = checkRecurrence(recurrence)
   const updateTaskData = {
     id,
     task: { ...task },
-    recurrence: recurrence || undefined,
+    recurrence: checkedRecurrencePattern || undefined,
   }
-  try {
-    await taskStore.updateTask(updateTaskData)
-  } catch (error) {
-    console.log(error)
-  }
+
+  await taskStore.updateTask(updateTaskData)
 }
 
 const deleteTask = async () => {
   const taskId = props.task.id
-  try {
-    await taskStore.deleteTask(taskId)
-  } catch (error) {
-    console.log(error)
-  }
+  await taskStore.deleteTask(taskId)
 }
 
 const updateTaskStatus = async (value: boolean) => {
+  if (!isAdmin.value) return
+
   const taskData = {
     isCompleted: value,
     id: props.task.id,
@@ -134,77 +163,105 @@ watch(
 </script>
 
 <template>
-  <div
-    class="m-1 flex h-fit w-fit items-stretch space-x-1 rounded rounded-s-2xl bg-slate-400 p-1"
-    aria-label="task item"
-  >
-    <div v-if="isCheckbox" class="h-6 self-center">
-      <FwbCheckbox
-        v-model="check"
-        :disabled="!isCheckboxEnabled"
-        @update:model-value="updateTaskStatus"
-      />
-    </div>
+  <div>
     <div
-      @click="toggleTaskInfo"
-      class="flex h-full min-w-60 cursor-pointer flex-col items-center"
-      aria-label="task-info"
+      :class="[
+        'border-grey-700 m-1 flex h-fit w-full space-x-1 rounded rounded-s-2xl border-2 p-2 shadow-md',
+        isCompletedTask ? 'bg-gray-400' : 'bg-green-400',
+      ]"
+      aria-label="task item"
     >
-      <div class="flex w-full justify-between rounded-t p-1">
-        <div class="p-1">{{ task.title }}</div>
+      <div v-if="isCheckbox" class="self-center">
+        <FwbCheckbox
+          v-model="check"
+          :disabled="!isCheckboxEnabled || !isAdmin"
+          @update:model-value="updateTaskStatus"
+        />
       </div>
       <div
-        v-if="task.startDate"
-        :class="[
-          'flex',
-          'w-full',
-          'justify-between',
-          'bg-orange-300',
-          'p-1',
-          { 'rounded-b': !task.assignedUserId },
-        ]"
+        @click="toggleTaskInfo"
+        class="flex min-w-60 cursor-pointer flex-col items-stretch rounded-l-md bg-slate-50"
+        aria-label="task-info"
       >
-        <div v-if="task.startDate" class="p-1 text-sm">
-          {{ formatDateToLocal(task.startDate) }}
-          <span v-if="task.endDate">--> {{ formatDateToLocal(task.endDate) }}</span>
+        <div class="flex w-full justify-between rounded-t p-1">
+          <div class="p-1">{{ task.title }}</div>
         </div>
-        <div v-if="task.startTime && task.startDate">
-          {{ timeToLocalTime(task.startTime, task.startDate) }}
+        <div
+          v-if="task.startDate && isShowDates"
+          :class="[
+            'flex',
+            'w-full',
+            'justify-around',
+            'items-middle',
+            ,
+            'p-1',
+            { 'justify-between bg-orange-300': isShowDates },
+            { ' rounded-bl': !task.recurrence && !task.categoryId && !task.groupId },
+          ]"
+        >
+          <div v-if="task.startDate" class="text-sm" aria-label="task-dates">
+            <span>{{ formatDateToLocal(task.startDate) }}</span>
+            <span v-if="task.endDate"> --> {{ formatDateToLocal(task.endDate) }}</span>
+          </div>
+        </div>
+
+        <div
+          v-if="task.recurrence && isShowRecurrence"
+          class="bg-orange-200 p-1 text-center text-sm"
+        >
+          <RecurrenceCard :recurrence="task.recurrence" />
+        </div>
+        <div
+          v-if="taskCategory"
+          class="flex items-center space-x-2 pl-1 text-sm"
+          aria-label="category"
+        >
+          <Squares2X2Icon class="h-5 w-5 text-blue-500" />
+          <span>{{ taskCategory?.title }}</span>
+        </div>
+        <div
+          v-if="taskGroup && isGroupInfo"
+          class="flex items-center space-x-2 pl-1 text-sm"
+          aria-label="group"
+        >
+          <UsersIcon class="h-5 w-5 text-blue-500" />
+          <span>{{ taskGroup.name }}</span>
         </div>
       </div>
-      <div v-if="task.recurrence">
-        <RecurrenceCard :recurrence="task.recurrence" />
-      </div>
-      <div v-if="taskCategory" class="text-sm" aria-label="category">
-        <span>Category:</span>
-        <span>{{ taskCategory?.title }}</span>
-      </div>
-      <div v-if="taskGroup" class="text-sm" aria-label="category">
-        <span>Group:</span>
-        <span>{{ taskGroup.name }}</span>
-      </div>
-      <div v-if="assignedUserProfile" class="flex w-full">
-        <UserBasicProfile :user="assignedUserProfile" />
+      <div aria-label="task options" class="min-w-14">
+        <div class="flex h-full w-fit min-w-10 flex-col justify-between">
+          <div v-if="task.points" class="min-w-10" aria-label="points">
+            <FwbBadge size="sm" type="yellow" class="w-fit min-w-10 rounded-e-full p-0">
+              <StarIcon class="h-3 pr-1" />
+              {{ task.points }}</FwbBadge
+            >
+          </div>
+          <div v-if="assignedUserProfile" class="flex w-full justify-center">
+            <UserBasicProfile :user="assignedUserProfile" />
+          </div>
+          <div
+            v-if="task.startTime && task.startDate"
+            class="mt-1 flex items-center space-x-1 text-sm"
+          >
+            <ClockIcon class="h-5 w-5 text-gray-50" />
+            <span class="text-xs tracking-wider">
+              {{ timeToLocalTime(task.startTime, task.startDate) }}</span
+            >
+          </div>
+        </div>
       </div>
     </div>
-    <div aria-label="task options">
-      <div class="flex h-full w-fit flex-col space-y-1">
-        <div class="min-w-10" aria-label="points">
-          <FwbBadge size="sm" class="w-full rounded-e-full p-0">{{ task.points }}</FwbBadge>
-        </div>
-      </div>
+    <div v-if="isTaskInfo">
+      <TaskInfo
+        :is-show-modal="showTaskInfo"
+        :categories="categories"
+        :group-members="groupMembers"
+        :task="task"
+        @update:task="updateTask"
+        @delete:task="deleteTask"
+        @close="toggleTaskInfo"
+      />
     </div>
-  </div>
-  <div v-if="isTaskInfo">
-    <TaskInfo
-      :is-show-modal="showTaskInfo"
-      :categories="categories"
-      :group-members="groupMembers"
-      :task="task"
-      @update:task="updateTask"
-      @delete:task="deleteTask"
-      @close="toggleTaskInfo"
-    />
   </div>
 </template>
 <style scoped></style>

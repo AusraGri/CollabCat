@@ -3,7 +3,7 @@ import { categoriesRepository } from '@server/repositories/categoriesRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import {
   insertCategorySchema,
-  categoriesSchema,
+  publicCategorySchema,
 } from '@server/entities/categories'
 
 export default authenticatedProcedure
@@ -18,7 +18,7 @@ export default authenticatedProcedure
     },
   })
   .input(insertCategorySchema)
-  .output(categoriesSchema)
+  .output(publicCategorySchema)
   .mutation(async ({ input: categoryData, ctx: { authUser, repos } }) => {
     const newCategory = {
       ...categoryData,

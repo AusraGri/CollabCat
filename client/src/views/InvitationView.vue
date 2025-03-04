@@ -5,14 +5,12 @@ import { FwbAvatar, FwbButton } from 'flowbite-vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthService } from '@/services/auth0'
-import { useAuth0 } from '@auth0/auth0-vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useInvitationStore } from '@/stores/invitationStore'
 import { useUserStore } from '@/stores/userProfile'
 import { stringToUrl } from '@/utils/helpers'
 
-const { getToken, getUserData, isAuth } = useAuthService()
-const { loginWithRedirect } = useAuth0()
+const { getToken, getUserData, isAuth, signup } = useAuthService()
 const isTokenValid = ref(true)
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -23,16 +21,8 @@ const error = ref()
 const groupInfo = ref<GroupsPublic>()
 const groupOwner = ref<UserPublic>()
 
-const signupUser = async () => {
-  loginWithRedirect({
-    appState: {
-      target: '/invite',
-    },
-    authorizationParams: {
-      prompt: 'login',
-      screen_hint: 'signup',
-    },
-  })
+const signupUser = async()=> {
+  signup('/invite')
 }
 
 async function validateInvitation() {
@@ -53,6 +43,7 @@ async function validateInvitation() {
   } catch (err) {
     error.value = `Error occurred: ${err}`
     isTokenValid.value = false
+    invitationStore.deleteInvitation()
   } finally {
     loading.value = false
   }
@@ -85,7 +76,6 @@ onMounted(async () => {
   loading.value = true
   try {
     if (!invitationStore.invitationToken && !isAuth) {
-      console.log('validation')
       await validateInvitation()
     }
 
@@ -94,12 +84,16 @@ onMounted(async () => {
 
     if (isAuth && !userStore.user) {
       isTokenValid.value = true
-      console.log('after authentication')
       const userData = await getUserData()
 
       const newUser = await trpc.user.signupAuth.mutate(userData)
       authStore.authToken = await getToken()
       userStore.user = newUser
+      await addUserToGroup()
+      await invitationStore.deleteInvitation()
+    }
+
+    if(isAuth && userStore.user){
       await addUserToGroup()
       await invitationStore.deleteInvitation()
     }
@@ -125,15 +119,25 @@ const redirectToHomePage = () => {
 }
 </script>
 <template>
+  <div>{{ isAuth }}</div>
+  <div>{{ invitationStore.invitationToken }}</div>
   <div class="rounded-lg bg-white p-6 shadow-md">
     <div>
+      <!-- Invitation Block: Only visible if not authenticated -->
       <div v-if="!isAuth" class="text-center">
-        <h1 class="mb-4 text-2xl font-bold text-gray-800">Welcome to CollabCat!</h1>
+        <h1 class="mb-4 text-2xl font-bold text-gray-800" aria-live="polite">
+          Welcome to CollabCat!
+        </h1>
         <div class="text-center text-lg text-gray-600">
           <div v-if="isTokenValid">
             <div class="mb-1 flex flex-col items-center justify-center space-x-3 sm:flex-row">
               <span class="inline-flex items-center">
-                <FwbAvatar :img="groupOwner?.picture || undefined" rounded class="mr-2 h-10 w-10" />
+                <FwbAvatar
+                  :img="groupOwner?.picture || undefined"
+                  rounded
+                  class="mr-2 h-10 w-10"
+                  alt="Group Owner Avatar"
+                />
                 <span class="font-semibold">{{ groupOwner?.username }}</span>
               </span>
               <span>invited you</span>
@@ -143,28 +147,38 @@ const redirectToHomePage = () => {
             </p>
             <p class="mb-4">and start sharing tasks together!</p>
           </div>
-          <p class="text-sm text-gray-500">If you want to join, please sign up to CollabCat</p>
+          <p class="text-sm text-gray-500" aria-live="polite">
+            If you want to join, please sign up to CollabCat
+          </p>
           <div class="mt-6">
             <FwbButton
               @click="signupUser"
               class="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+              aria-label="Sign up to CollabCat"
+              data-test="signup-button"
             >
               Signup
             </FwbButton>
           </div>
         </div>
-        <p v-if="loading" class="mt-4 text-gray-500">Validating invitation...</p>
-        <p v-else-if="error" class="mt-4 text-red-500">{{ error }}</p>
+        <p v-if="loading" class="mt-4 text-gray-500" aria-live="assertive">
+          Validating invitation...
+        </p>
+        <p v-else-if="error" class="mt-4 text-red-500" role="alert">{{ error }}</p>
       </div>
 
+      <!-- Authenticated Block: Only visible if user is logged in -->
+
       <div v-if="authStore.isLoggedIn" class="text-center">
-        <h1 class="mb-4 text-2xl font-bold text-green-600">Welcome aboard!</h1>
+        <h1 class="mb-4 text-2xl font-bold text-green-600" aria-live="polite">Welcome aboard!</h1>
         <p class="mb-4 text-lg text-gray-600">You have successfully joined the group!</p>
-        <div class="mb-6">You can now go to your profile page</div>
+        <div class="mb-6" aria-live="polite">You can now go to your profile page</div>
         <div>
           <FwbButton
             @click="redirectToProfilePage"
             class="rounded-lg bg-green-600 px-4 py-2 text-white transition hover:bg-green-700"
+            aria-label="Go to profile page"
+            data-test="profile-button"
           >
             To Profile Page
           </FwbButton>
@@ -172,12 +186,14 @@ const redirectToHomePage = () => {
       </div>
     </div>
 
-    <div v-if="!isTokenValid" class="text-center text-red-600">
+    <div v-if="!isTokenValid" class="text-center text-red-600" aria-live="assertive">
       <p>We are very sorry, but it looks like your invitation token has expired or is invalid.</p>
       <div class="mt-6">
         <FwbButton
           @click="redirectToHomePage"
           class="rounded-lg bg-red-600 px-4 py-2 text-white transition hover:bg-red-700"
+          aria-label="Go to home page"
+          data-test="home-button"
         >
           Go to home page
         </FwbButton>
@@ -185,4 +201,3 @@ const redirectToHomePage = () => {
     </div>
   </div>
 </template>
-<style scoped></style>

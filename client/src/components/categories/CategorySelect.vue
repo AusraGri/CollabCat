@@ -19,12 +19,13 @@ const categoryOptions = computed(() => {
 </script>
 
 <template>
-  <div class="w-fit">
+  <div class="flex w-fit items-center gap-x-2">
     <FwbSelect
+      id="category-select"
       v-model="selectedCategory"
       :options="categoryOptions"
-      :label="label"
       placeholder="Select Category"
+      :aria-label="label || 'Select a category'"
     />
   </div>
 </template>

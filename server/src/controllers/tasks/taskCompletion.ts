@@ -59,6 +59,7 @@ export default authenticatedProcedure
       isTaskCompleted = isCompleted
     }
 
+
     return {
       success: true,
       message: isTaskCompleted

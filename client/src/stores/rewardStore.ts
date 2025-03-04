@@ -6,8 +6,9 @@ import type {
   InsertableReward,
   RewardUpdateable,
 } from '@server/shared/types'
+import { setErrorMessage } from '@/utils/error'
 
-interface RewardState {
+export interface RewardState {
   rewards: PublicReward[] | null
 
   activeUser: GroupMember | null
@@ -69,7 +70,8 @@ export const useRewardStore = defineStore('reward', {
         this.rewards =
           this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
       } catch (error) {
-        throw new Error('Failed to edit reward')
+        setErrorMessage({messageKey: 'update', message: 'reward'})
+        throw new Error('Failed to update reward')
       }
     },
     async deleteReward(rewardId: number) {
@@ -77,6 +79,7 @@ export const useRewardStore = defineStore('reward', {
         await trpc.rewards.deleteReward.mutate({ rewardId })
         this.rewards = this.rewards?.filter((r) => r.id !== rewardId) || null
       } catch (error) {
+        setErrorMessage({messageKey: 'delete', message: 'reward'})
         throw new Error('Failed to delete reward')
       }
     },
@@ -90,7 +93,8 @@ export const useRewardStore = defineStore('reward', {
 
         this.rewards = this.rewards ? [...this.rewards, reward] : [reward]
       } catch (error) {
-        console.error('Failed to create new reward:', error)
+        setErrorMessage({messageKey: 'create', message: 'reward'})
+        throw new Error('Failed to create new reward')
       }
     },
     async claimReward(reward: PublicReward) {
@@ -108,7 +112,7 @@ export const useRewardStore = defineStore('reward', {
             this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
         }
       } catch (error) {
-        console.error('Failed to claim reward:', error)
+        throw new Error('Failed to claim reward')
       }
     },
   },

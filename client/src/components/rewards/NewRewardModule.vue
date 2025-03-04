@@ -125,9 +125,11 @@ watch(
 </script>
 
 <template>
-  <FwbModal v-if="isShowModal" @close="closeModal">
+  <FwbModal v-if="isShowModal" @close="closeModal" aria-labelledby="reward-modal-header">
     <template #header>
-      <div class="flex items-center text-lg">{{ headerText }}</div>
+      <h2 id="reward-modal-header" class="text-lg font-semibold" data-test="modal-header">
+        {{ headerText }}
+      </h2>
     </template>
     <template #body>
       <form @submit.prevent>
@@ -138,26 +140,48 @@ watch(
             maxlength="40"
             placeholder="enter reward title"
             v-model="reward.title"
+            aria-label="Reward Title"
+            data-test="reward-title-input"
           >
             <template #validationMessage v-if="!isTitleValid">
-              <span class="text-red-600">Please enter a valid reward title</span>
+              <span class="text-red-600" aria-live="assertive"
+                >Please enter a valid reward title</span
+              >
             </template>
           </FwbInput>
         </div>
         <div class="flex flex-col">
           <div class="mb-3">
-            <FwbToggle label="Limit Reward Claims" v-model="isClaims" />
+            <FwbToggle
+              label="Limit Reward Claims"
+              v-model="isClaims"
+              aria-label="Limit Reward Claims"
+            />
           </div>
           <div v-if="isClaims" class="mb-3 flex-grow">
-            <FwbRange v-model="claimValue" :label="claimValueLabel" :min="1" />
+            <FwbRange
+              v-model="claimValue"
+              :label="claimValueLabel"
+              :min="1"
+              aria-label="Claim Value"
+              data-test="claim-value-range"
+            />
           </div>
         </div>
         <div v-if="isForGroup">
           <div class="mb-3">
-            <FwbToggle label="All Members Can Claim" v-model="isForAll" />
+            <FwbToggle
+              label="All Members Can Claim"
+              v-model="isForAll"
+              aria-label="All Members Can Claim"
+            />
           </div>
           <div v-if="!isForAll && members" class="mb-3">
-            <MembersSelection :selectedMembers="selectedMembers" :groupMembers="members" />
+            <MembersSelection
+              :selectedMembers="selectedMembers"
+              :groupMembers="members"
+              aria-label="Select Members"
+            />
           </div>
         </div>
         <div>
@@ -167,9 +191,13 @@ watch(
             min="1"
             placeholder="enter reward cost in points"
             label="Reward Cost"
+            aria-label="Reward Cost"
+            data-test="reward-cost-input"
           >
             <template #validationMessage v-if="!isCostValid">
-              <span class="text-red-600">Please enter a valid cost for the reward</span>
+              <span class="text-red-600" aria-live="assertive"
+                >Please enter a valid cost for the reward</span
+              >
             </template>
           </FwbInput>
         </div>
@@ -177,13 +205,24 @@ watch(
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <fwb-button @click="confirmAction(false)" color="alternative"> Decline </fwb-button>
-        <fwb-button @click="confirmAction(true)" color="green">
+        <FwbButton
+          @click="confirmAction(false)"
+          color="alternative"
+          aria-label="Decline reward creation"
+          data-test="decline-button"
+        >
+          Decline
+        </FwbButton>
+        <FwbButton
+          @click="confirmAction(true)"
+          color="green"
+          type="submit"
+          aria-label="Submit reward creation"
+          data-test="submit-button"
+        >
           {{ buttonText }} Reward
-        </fwb-button>
+        </FwbButton>
       </div>
     </template>
   </FwbModal>
 </template>
-
-<style scoped></style>

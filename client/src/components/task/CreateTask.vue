@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, type UnwrapRef } from 'vue'
 import { FwbModal, FwbButton, FwbTextarea, FwbInput, FwbCheckbox } from 'flowbite-vue'
 import RecurrenceForm from './RecurrenceForm.vue'
 import CategorySelect from '../categories/CategorySelect.vue'
@@ -8,8 +8,17 @@ import {
   type CategoriesPublic,
   type GroupMember,
   type RecurrencePatternInsertable,
+  type TaskData,
 } from '@server/shared/types'
 import MembersSelection from '../groups/MembersSelection.vue'
+import { checkRecurrence } from '@/utils/tasks'
+import { useKeyboardAction } from '@/composables/useKeyboardAction'
+
+type TaskDataType = UnwrapRef<typeof taskData>
+type NewTaskData = {
+  task: TaskDataType
+  recurrence: RecurrencePatternInsertable | undefined
+}
 
 const { isShowModal, categories, groupId } = defineProps<{
   isShowModal: boolean
@@ -37,10 +46,6 @@ const endDate = ref<Date | string>()
 const points = ref<string>('')
 
 const taskData = computed(() => {
-  if (!taskForm.value.title) {
-    return
-  }
-
   const taskTime = `${time.value.hours}:${time.value.minutes}`
 
   const assignedUserId = selectedMembers.value[0] || undefined
@@ -71,7 +76,22 @@ const taskForm = ref({
 
 function closeModal() {
   taskForm.value.isRecurring = false
+  resetForm()
   emit('close')
+}
+
+const validateNewTaskData = (taskData: NewTaskData) => {
+  const { task, recurrence } = taskData
+  if (!task) return false
+
+  if (!task.title) return false
+
+  if (task.isRecurring) {
+    if (!recurrence) return false
+    if (!task.startDate) return false
+  }
+
+  return true
 }
 
 async function confirmAction(confirmed: boolean) {
@@ -80,22 +100,21 @@ async function confirmAction(confirmed: boolean) {
     emit('close')
     return
   }
-  try {
-    if (!taskData.value) return
 
-    if (taskData.value.isRecurring && !recurringPattern.value) return
+  const recurrence = checkRecurrence(recurringPattern.value as TaskData['recurrence'])
 
-    const newTaskData = {
-      task: taskData.value,
-      recurrence: recurringPattern.value || undefined,
-    }
-    const newTask = await tasksStore.createTask(newTaskData)
-    resetForm()
-    emit('task:new', newTask)
-  } catch (error) {
-    console.log('Error while saving task', error)
+  const newTaskData = {
+    task: taskData.value,
+    recurrence: recurrence || undefined,
   }
+
+  const isValidTaskData = validateNewTaskData(newTaskData)
+
+  if (!isValidTaskData) return
+
+  const newTask = await tasksStore.createTask(newTaskData)
   resetForm()
+  emit('task:new', newTask)
   emit('close')
 }
 
@@ -117,8 +136,13 @@ const resetForm = () => {
     isPoints: false,
   }
 }
-</script>
 
+useKeyboardAction(
+  () => confirmAction(true),
+  () => confirmAction(false),
+  () => taskForm.value.title.length >= 3
+)
+</script>
 <template>
   <FwbModal v-if="isShowModal" @close="closeModal">
     <template #header>
@@ -135,6 +159,8 @@ const resetForm = () => {
             placeholder="Enter task title"
             maxlength="40"
             required
+            aria-label="Task Title Input"
+            data-test="task-title-input"
           />
         </div>
 
@@ -146,12 +172,22 @@ const resetForm = () => {
             label="Description"
             placeholder="Enter task description"
             maxlength="150"
+            aria-label="Task Description Input"
+            data-test="task-description-input"
           />
         </div>
 
         <!-- Recurring Checkbox -->
         <div class="flex items-center">
-          <FwbCheckbox v-model="taskForm.isRecurring" label="Recurring" />
+          <FwbCheckbox
+            v-model="taskForm.isRecurring"
+            label="Recurring"
+            aria-label="Recurring Task Checkbox"
+            data-test="recurring-checkbox"
+          />
+          <span id="recurrence-info" class="pl-3 text-xs text-gray-500">
+            Select the recurrence pattern for this task (e.g., daily, weekly).
+          </span>
         </div>
         <div>
           <RecurrenceForm
@@ -160,6 +196,8 @@ const resetForm = () => {
             v-model:recurrence-pattern="recurringPattern"
             v-model:start-date="startDate"
             v-model:end-date="endDate"
+            aria-describedby="recurrence-info"
+            data-test="recurrence-form"
           />
         </div>
         <!-- Date and Time Input -->
@@ -175,7 +213,28 @@ const resetForm = () => {
               :min-date="new Date()"
               auto-apply
               :enable-time-picker="false"
+              aria-label="Select task due date"
+              data-test="task-date-picker"
             ></VueDatePicker>
+          </div>
+        </div>
+        <div v-if="startDate" class="flex h-11 items-center space-x-3 whitespace-nowrap">
+          <div>
+            <FwbCheckbox
+              v-model="taskForm.isTime"
+              label="Tasks Time"
+              aria-label="Task Time Checkbox"
+              data-test="task-time-checkbox"
+            />
+          </div>
+          <div v-if="taskForm.isTime" class="grow">
+            <VueDatePicker
+              v-model="time"
+              time-picker
+              auto-apply
+              data-test="task-time-picker"
+              aria-label="Task Time Picker"
+            />
           </div>
         </div>
         <div v-if="categories">
@@ -183,38 +242,63 @@ const resetForm = () => {
             v-model:selected-category="selectedCategory"
             :categories="categories"
             :label="'Select Category'"
+            aria-label="Category Selection"
+            data-test="category-select"
           />
         </div>
-        <div v-if="groupMembers" class="flex items-center space-x-3">
+        <div v-if="groupMembers && groupId" class="flex items-center space-x-3">
           <span class="text-sm">Assign To:</span>
           <MembersSelection
             :selected-members="selectedMembers"
             :group-members="groupMembers"
             :max-selections="1"
+            aria-label="Assign task members"
+            data-test="members-selection"
           />
         </div>
+
         <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
           <div>
-            <FwbCheckbox v-model="taskForm.isTime" label="Tasks Time" />
-          </div>
-          <div v-if="taskForm.isTime" class="grow">
-            <VueDatePicker v-model="time" time-picker auto-apply />
-          </div>
-        </div>
-        <div class="flex h-11 items-center space-x-3 whitespace-nowrap">
-          <div>
-            <FwbCheckbox v-model="taskForm.isPoints" label="Task Points" />
+            <FwbCheckbox
+              v-model="taskForm.isPoints"
+              label="Task Points"
+              aria-label="Task Points Checkbox"
+              data-test="task-points-checkbox"
+            />
           </div>
           <div v-if="taskForm.isPoints" class="grow">
-            <FwbInput v-model="points" type="number" placeholder="Enter point amount" min="1" />
+            <FwbInput
+              v-model="points"
+              type="number"
+              placeholder="Enter point amount"
+              min="1"
+              aria-label="Points Input"
+              data-test="points-input"
+            />
           </div>
         </div>
       </form>
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <fwb-button @click="confirmAction(false)" color="alternative"> Decline </fwb-button>
-        <fwb-button @click="confirmAction(true)" color="green"> Add Task </fwb-button>
+        <FwbButton
+          @click="confirmAction(false)"
+          color="alternative"
+          aria-label="Decline"
+          data-test="decline-button"
+        >
+          Decline
+        </FwbButton>
+        <FwbButton
+          @click="confirmAction(true)"
+          color="green"
+          type="submit"
+          aria-label="Submit Task"
+          data-test="add-task-button"
+          :disabled="taskForm.title.length < 3"
+        >
+          Add Task
+        </FwbButton>
       </div>
     </template>
   </FwbModal>

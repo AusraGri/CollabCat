@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import { FwbListGroup, FwbListGroupItem } from 'flowbite-vue'
 import { useUserGroupsStore } from '@/stores/userGroups'
 import { type GroupsPublic } from '@server/shared/types'
@@ -16,9 +17,7 @@ const selected = computed(() => userGroupStore.activeGroup?.name)
 const dropdownRef = ref<HTMLElement | null>(null)
 
 const selectItem = async (group: GroupsPublic): Promise<void> => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { createdByUserId, ...activeGroup } = group
-  userGroupStore.activeGroup = activeGroup
+  userGroupStore.activeGroup = group
   isOpen.value = false
 }
 
@@ -60,46 +59,43 @@ const handleNoGroup = () => {
     <button
       @click="toggleDropdown"
       class="flex w-full items-center justify-between rounded-md bg-blue-500 px-4 py-2 text-left text-white"
+      :aria-expanded="isOpen"
+      aria-label="Dropdown for selecting group"
+      data-test="dropdown-button"
     >
       <span>{{ selected || 'Groups' }}</span>
-      <svg
-        class="ms-3 h-2.5 w-2.5"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
-      >
-        <path
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="m1 1 4 4 4-4"
-        />
-      </svg>
+      <ChevronDownIcon class="h-5 w-5" />
     </button>
     <div
       v-if="isOpen"
       class="absolute right-0 z-10 mt-2 w-fit rounded-md border border-gray-300 bg-white shadow-lg"
+      aria-labelledby="dropdown-button"
+      data-test="dropdown-menu"
     >
-      <fwb-list-group>
-        <fwb-list-group-item
+      <FwbListGroup>
+        <FwbListGroupItem
           hover
           v-for="group in groups"
           :key="group.id"
           @click="selectItem(group)"
+          data-test="group-item"
+          aria-label="Select {{ group.name }} group"
         >
           {{ group.name }}
-        </fwb-list-group-item>
-        <FwbListGroupItem v-if="!groups.length">You have no groups 👇</FwbListGroupItem>
-        <FwbListGroupItem v-if="selected" hover @click="handleNoGroup"
+        </FwbListGroupItem>
+        <FwbListGroupItem v-if="!groups.length" data-test="no-groups"
+          >You have no groups 👇</FwbListGroupItem
+        >
+        <FwbListGroupItem v-if="selected" hover @click="handleNoGroup" data-test="no-group-option"
           >-- No Group --</FwbListGroupItem
         >
-      </fwb-list-group>
+      </FwbListGroup>
       <div class="my-1 border-t border-gray-200"></div>
       <button
         class="w-full px-4 py-2 font-medium text-green-600 hover:bg-green-50"
         @click="toggleCreateNewGroup"
+        data-test="create-new-group-button"
+        aria-label="Create a new group"
       >
         + Create New Group
       </button>
@@ -109,6 +105,6 @@ const handleNoGroup = () => {
     :is-show-modal="isCreateNewGroup"
     @create:group="createNewGroup"
     @close="isCreateNewGroup = false"
+    data-test="create-new-group-modal"
   />
 </template>
-<style scoped></style>

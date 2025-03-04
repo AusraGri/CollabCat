@@ -15,13 +15,13 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full h-full">
     <div
       :class="[
         'flex',
         'w-full',
         'whitespace-nowrap',
-        'h-fit',
+        'h-full',
         'min-h-7',
         'rounded-t-xl',
         'tracking-wider',
@@ -40,6 +40,13 @@ const emit = defineEmits<{
         customTailwindClasses,
       ]"
       @click="emit('tab-click', title)"
+      role="tab"
+      :aria-selected="activeTab"
+      :aria-label="title"
+      tabindex="0"
+      data-test="tab-item"
+      @keydown.enter="emit('tab-click', title)"
+      @keydown.space="emit('tab-click', title)"
     >
       <span>{{ title }}</span>
       <span class="ml-2 text-sm">

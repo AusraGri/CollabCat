@@ -6,7 +6,7 @@ const { points } = defineProps<{
 
 <template>
   <div>
-    <div class="flex w-fit items-center p-1 text-sm">
+    <div class="flex w-fit items-center p-1 text-sm" role="status" aria-live="polite">
       <span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -15,6 +15,7 @@ const { points } = defineProps<{
           stroke-width="1.5"
           stroke="currentColor"
           class="size-6"
+          aria-hidden="true"
         >
           <path
             stroke-linecap="round"
@@ -23,7 +24,7 @@ const { points } = defineProps<{
           />
         </svg>
       </span>
-      <span>{{ points }}</span>
+      <span role="text" aria-label="Total Points" data-test="points-display">{{ points }}</span>
     </div>
   </div>
 </template>

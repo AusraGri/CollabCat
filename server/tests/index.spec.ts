@@ -17,10 +17,13 @@ describe('Server Initialization', () => {
   it('should create the database with the correct configuration', async () => {
     const mockDatabase = {}
     mockedCreateDatabase.mockReturnValue(mockDatabase)
+    const environment = config.env
+    const database = environment === 'test' ? config.testDatabase : config.database
+
 
     await import('../src')
 
-    expect(mockedCreateDatabase).toHaveBeenCalledWith(config.database)
+    expect(mockedCreateDatabase).toHaveBeenCalledWith(database)
   })
 
   it('should create the app with the correct database instance', async () => {

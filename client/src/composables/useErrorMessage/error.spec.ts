@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { expect, describe, it, vi } from 'vitest'
 import { withError } from './error'
 
 describe('withError', () => {

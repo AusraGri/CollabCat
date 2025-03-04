@@ -28,20 +28,39 @@ const closeModal = () => {
 <template>
   <FwbModal v-if="isShowModal" @close="closeModal">
     <template #header>
-      <div class="flex items-center text-lg">Invite New User to the Group</div>
+      <h2 class="text-lg font-semibold" data-test="modal-header">Invite New User to the Group</h2>
     </template>
     <template #body>
       <div>
-        <FwbInput label="User Email" placeholder="enter user email" v-model="email" required />
+        <FwbInput
+          label="User Email"
+          placeholder="enter user email"
+          v-model="email"
+          required
+          aria-label="Enter the email address of the user"
+          data-test="user-email-input"
+        />
       </div>
     </template>
     <template #footer>
       <div class="flex justify-between">
-        <fwb-button @click="confirmAction(false)" color="alternative"> Decline </fwb-button>
-        <fwb-button @click="confirmAction(true)" color="green"> Send Invitation </fwb-button>
+        <FwbButton
+          @click="confirmAction(false)"
+          color="alternative"
+          aria-label="Decline invitation"
+          data-test="decline-button"
+        >
+          Decline
+        </FwbButton>
+        <FwbButton
+          @click="confirmAction(true)"
+          color="green"
+          aria-label="Send invitation"
+          data-test="send-invitation-button"
+        >
+          Send Invitation
+        </FwbButton>
       </div>
     </template>
   </FwbModal>
 </template>
-
-<style scoped></style>

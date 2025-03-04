@@ -1,9 +1,8 @@
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
 import { pointsRepository } from '@server/repositories/pointsRepository'
 import provideRepos from '@server/trpc/provideRepos'
-import { idSchema } from '@server/entities/shared'
+import { dateSchema, idSchema } from '@server/entities/shared'
 import z from 'zod'
-import { setDateToUTCmidnight } from '../utility/helpers'
 
 export default authenticatedProcedure
   .use(provideRepos({ pointsRepository }))
@@ -20,7 +19,7 @@ export default authenticatedProcedure
     z
       .object({
         taskId: idSchema,
-        taskInstanceDate: z.date(),
+        taskInstanceDate: dateSchema
       })
       .strict()
   )
@@ -30,11 +29,10 @@ export default authenticatedProcedure
       input: { taskId, taskInstanceDate },
       ctx: { authUser, repos },
     }) => {
-      const taskDate = setDateToUTCmidnight(taskInstanceDate)
 
       const queryOptions = {
         taskId,
-        taskInstanceDate: taskDate,
+        taskInstanceDate,
         userId: authUser.id,
       }
 

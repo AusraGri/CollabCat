@@ -9,19 +9,20 @@ export default authenticatedProcedure
   .meta({
     openapi: {
       method: 'GET',
-      path: '/categories/getUser',
+      path: '/categories/get',
       tags: ['category'],
       protect: true,
-      summary: 'Get categories for the user, by user id',
+      summary:
+        'Get all categories related to user (user group categories included)',
     },
   })
   .input(z.void())
   .output(z.array(publicCategorySchema))
   .query(async ({ ctx: { authUser, repos } }) => {
-    const userCategories =
-      await repos.categoriesRepository.getPersonalCategoriesByUserId(
+    const categories =
+      await repos.categoriesRepository.getAllRelatedCategoriesByUserId(
         authUser.id
       )
 
-    return userCategories
+    return categories
   })

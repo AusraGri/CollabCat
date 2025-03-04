@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
 import type { InsertTaskData, TaskUpdateData, TaskData } from '@server/shared/types'
+import { setErrorMessage } from '@/utils/error'
 
-interface TasksState {
+export interface TasksState {
   tasks: TaskData[]
 }
 export const useTasksStore = defineStore('tasks', {
@@ -20,6 +21,7 @@ export const useTasksStore = defineStore('tasks', {
         this.tasks = tasks
         return tasks
       } catch (error) {
+        setErrorMessage({messageKey: 'read', message: 'your due tasks'})
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
@@ -33,6 +35,7 @@ export const useTasksStore = defineStore('tasks', {
         }
         return this.tasks
       } catch (error) {
+        setErrorMessage({messageKey: 'read', message: 'your due personal tasks'})
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
@@ -42,6 +45,7 @@ export const useTasksStore = defineStore('tasks', {
         this.tasks = tasks
         return tasks
       } catch (error) {
+        setErrorMessage({messageKey: 'read', message: 'your due group tasks'})
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
@@ -49,6 +53,7 @@ export const useTasksStore = defineStore('tasks', {
       try {
         this.tasks = await trpc.tasks.getTasks.query({ groupId })
       } catch (error) {
+        setErrorMessage({messageKey: 'read', message: 'your group tasks'})
         throw new Error('Failed to fetch group tasks')
       }
     },
@@ -59,6 +64,7 @@ export const useTasksStore = defineStore('tasks', {
 
         return this.tasks
       } catch (error) {
+        setErrorMessage({messageKey: 'read', message: 'your personal tasks'})
         throw new Error('Failed to fetch group tasks')
       }
     },
@@ -69,6 +75,7 @@ export const useTasksStore = defineStore('tasks', {
 
         return newTask
       } catch (error) {
+        setErrorMessage({messageKey: 'create', message: 'task'})
         throw new Error(`Failed to save new task: ${error}`)
       }
     },
@@ -86,6 +93,7 @@ export const useTasksStore = defineStore('tasks', {
 
         return updatedTask
       } catch (error) {
+        setErrorMessage({messageKey: 'update', message: `task ${taskData.task.title}`})
         throw new Error(`Failed to update task: ${error}`)
       }
     },
@@ -99,6 +107,8 @@ export const useTasksStore = defineStore('tasks', {
 
         return result
       } catch (error) {
+        const task = this.tasks.find((task)=> task.id === taskId)
+        setErrorMessage({messageKey: 'delete', message: `${task?.title}` || 'task'})
         throw new Error(`Failed to delete task: ${error}`)
       }
     },
@@ -113,6 +123,8 @@ export const useTasksStore = defineStore('tasks', {
           )
         }
       } catch (error) {
+        const task = this.tasks.find((task)=> task.id === taskData.id)
+        setErrorMessage({messageKey: 'update', message: `${task?.title} completion status` || 'task completion status'})
         throw new Error(`Failed to update task completion: ${error}`)
       }
     },

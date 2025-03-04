@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { useUserGroupsStore, usePointsStore } from '@/stores'
+import { useUserGroupsStore, usePointsStore, useCategoriesStore } from '@/stores'
 import { FwbCheckbox, FwbModal, FwbButton } from 'flowbite-vue'
 import ConfirmationModal from '../ConfirmationModal.vue'
+import { ChevronRightIcon } from '@heroicons/vue/24/outline'
 import { useRouter } from 'vue-router'
 import CategoriesManager from '../categories/CategoriesManager.vue'
+import { setErrorMessage } from '@/utils/error'
 
 const { isShowModal } = defineProps<{
   isShowModal: boolean
@@ -17,13 +19,14 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const userGroupStore = useUserGroupsStore()
+const categoryStory = useCategoriesStore()
 const pointStore = usePointsStore()
 const isPointsEnabled = ref(pointStore.isPointsEnabled)
 const isShowConfirmation = ref(false)
 const isManageCategories = ref(false)
 const isAdmin = computed(() => userGroupStore.isAdmin)
 const categories = computed(() => {
-  const groupCategories = userGroupStore.categories?.filter((cat) => cat.isDefault === false) || []
+  const groupCategories = categoryStory.groupCategories || []
 
   if (isAdmin.value) return groupCategories
 
@@ -55,16 +58,13 @@ const handlePointChange = async () => {
       pointStore.disablePoints()
     }
   } catch (error) {
-    console.log(error)
+    setErrorMessage({ message: 'Failed to change user points status' })
   }
 }
 
 const saveChanges = async () => {
-  try {
-    await handlePointChange()
-  } catch (error) {
-    console.log(error)
-  }
+  await handlePointChange()
+
   emit('close')
 }
 
@@ -73,19 +73,15 @@ const processConfirmation = async (confirm: boolean) => {
 
   if (!confirm) return
 
-  try {
-    if (confirm && isAdmin.value) {
-      await userGroupStore.deleteGroup()
-    } else if (confirm && !isAdmin.value) {
-      await userGroupStore.removeUserFromGroup()
-    }
-    userGroupStore.activeGroup = null
-    userGroupStore.fetchUserGroups()
-    emit('close')
-    router.push({ name: 'Profile' })
-  } catch (error) {
-    console.log(error)
+  if (confirm && isAdmin.value) {
+    await userGroupStore.deleteGroup()
+  } else if (confirm && !isAdmin.value) {
+    await userGroupStore.removeUserFromGroup()
   }
+  userGroupStore.activeGroup = null
+  userGroupStore.fetchUserGroups()
+  emit('close')
+  router.push({ name: 'Profile' })
 }
 
 watch(
@@ -98,50 +94,62 @@ watch(
 
 <template>
   <div>
-    <FwbModal v-if="isShowModal" @close="closeModal">
+    <FwbModal v-if="isShowModal" @close="closeModal" aria-labelledby="modal-title">
       <template #header>
-        <div>Manage {{ userGroupStore.activeGroup?.name }}</div>
+        <h2 class="text-lg font-semibold" id="modal-title">
+          Manage {{ userGroupStore.activeGroup?.name }}
+        </h2>
       </template>
       <template #body>
         <div class="w-fit">
           <FwbCheckbox v-model="isPointsEnabled" label="My Group Task Points" />
         </div>
         <div v-if="categories.length" class="mt-5">
-          <FwbButton color="default" @click="isManageCategories = true" outline pill square>
+          <FwbButton
+            color="default"
+            @click="isManageCategories = true"
+            outline
+            pill
+            square
+            aria-label="Manage categories for group"
+            data-test="manage-categories-button"
+          >
             Manage Your Categories
             <template #suffix>
-              <svg
-                class="h-5 w-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  clip-rule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  fill-rule="evenodd"
-                />
-              </svg>
+              <div>
+                <ChevronRightIcon class="w-5" />
+              </div>
             </template>
           </FwbButton>
           <CategoriesManager
             :categories="categories"
             :is-show-categories="isManageCategories"
             @close="isManageCategories = false"
+            data-test="categories-manager"
           />
         </div>
       </template>
       <template #footer>
         <div class="flex justify-between">
           <div>
-            <FwbButton color="red" @click="isShowConfirmation = true"
+            <FwbButton
+              color="red"
+              @click="isShowConfirmation = true"
+              aria-label="Remove this group"
+              data-test="remove-group-button"
               >{{ removeText }} this Group</FwbButton
             >
           </div>
           <div>
-            <fwb-button form="userSettingsForm" color="green" @click="saveChanges">
+            <FwbButton
+              form="userSettingsForm"
+              color="green"
+              @click="saveChanges"
+              data-test="save-changes-button"
+              aria-label="Save changes to the group settings"
+            >
               Save Changes
-            </fwb-button>
+            </FwbButton>
           </div>
         </div>
       </template>
@@ -151,7 +159,7 @@ watch(
       :object="userGroupStore.activeGroup?.name"
       :is-show-modal="isShowConfirmation"
       @confirmed="processConfirmation"
+      data-test="confirmation-modal"
     />
   </div>
 </template>
-<style scoped></style>

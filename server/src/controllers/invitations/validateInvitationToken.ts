@@ -27,8 +27,8 @@ export default publicProcedure
   )
   .query(async ({ input: { invitationToken }, ctx: { repos } }) => {
     const invitation =
-      await repos.invitationsRepository.getInvitationByToken(invitationToken)
-
+    await repos.invitationsRepository.getInvitationByToken(invitationToken)
+    
     if (!invitation) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',

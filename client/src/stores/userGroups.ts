@@ -1,11 +1,7 @@
 import { defineStore } from 'pinia'
 import { trpc } from '@/trpc'
-import type { GroupData, GroupMember, CategoriesPublic, ActiveGroup } from '@server/shared/types'
-type GroupsPublic = {
-  id: number
-  name: string
-  createdByUserId: number
-}
+import type { GroupData, GroupMember, GroupsPublic} from '@server/shared/types'
+import { setErrorMessage } from '@/utils/error'
 
 export interface UserGroups {
   groupId: number
@@ -13,13 +9,12 @@ export interface UserGroups {
   userId: number
 }
 
-interface GroupsState {
+export interface GroupsState {
   userGroups: GroupsPublic[] | null
-  activeGroup: ActiveGroup | null
+  activeGroup: GroupsPublic | null
   userMembership: GroupMember | null
   groupMembers: GroupMember[] | null
   groupData: GroupData | null
-  categories: CategoriesPublic[] | null
 }
 
 export const useUserGroupsStore = defineStore('group', {
@@ -28,10 +23,7 @@ export const useUserGroupsStore = defineStore('group', {
     userMembership: null,
     activeGroup: null,
     groupMembers: null,
-    // rewards: null,
     groupData: null,
-    categories: null,
-    // tasks: null,
   }),
 
   getters: {
@@ -44,7 +36,7 @@ export const useUserGroupsStore = defineStore('group', {
     async fetchUserGroups() {
       try {
         const data = await trpc.groups.getUserGroups.query()
-        this.userGroups = data
+        this.userGroups = data.length ? data : null
 
         return data
       } catch (error) {
@@ -58,7 +50,6 @@ export const useUserGroupsStore = defineStore('group', {
         if (!groupId) throw new Error('Missing group id')
 
         const data = await trpc.groups.getGroupMembersAndRewards.query({ groupId })
-        this.categories = await trpc.categories.getGroupCategories.query({ groupId })
 
         if (!data) return
         this.groupData = data
@@ -79,6 +70,7 @@ export const useUserGroupsStore = defineStore('group', {
           this.userGroups = [newGroup]
         }
       } catch (error) {
+        setErrorMessage({messageKey: 'create', message: 'group'})
         console.error('Failed to create new group:', error)
       }
     },
@@ -91,7 +83,8 @@ export const useUserGroupsStore = defineStore('group', {
           await trpc.points.deletePoints.mutate({ groupId })
         }
       } catch (error) {
-        console.error('Failed to create new group:', error)
+        setErrorMessage({message: 'Failed to remove user from group. Please try again.'})
+        console.error('Failed to remove user from group:', error)
       }
     },
     async deleteGroup() {
@@ -101,6 +94,7 @@ export const useUserGroupsStore = defineStore('group', {
           await trpc.groups.deleteGroup.mutate({ groupId })
         }
       } catch (error) {
+        setErrorMessage({messageKey: 'delete', message:`${this.activeGroup?.name}` || 'group'})
         console.error('Failed to create new group:', error)
       }
     },
@@ -113,6 +107,7 @@ export const useUserGroupsStore = defineStore('group', {
 
         return invitation
       } catch (error) {
+        setErrorMessage({message:'Failed to invite user'})
         console.error('Failed to invite user:', error)
       }
     },
