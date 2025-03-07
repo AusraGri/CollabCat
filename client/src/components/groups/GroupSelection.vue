@@ -16,6 +16,10 @@ const isCreateNewGroup = ref(false)
 const selected = computed(() => userGroupStore.activeGroup?.name)
 const dropdownRef = ref<HTMLElement | null>(null)
 
+const selectedGroupLabel = computed(() => {
+  return selected.value || 'None'
+})
+
 const selectItem = async (group: GroupsPublic): Promise<void> => {
   userGroupStore.activeGroup = group
   isOpen.value = false
@@ -60,17 +64,17 @@ const handleNoGroup = () => {
       @click="toggleDropdown"
       class="flex w-full items-center justify-between rounded-md bg-blue-500 px-4 py-2 text-left text-white"
       :aria-expanded="isOpen"
-      aria-label="Dropdown for selecting group"
-      data-test="dropdown-button"
+      :aria-label="`Select Group. Selected group: ${selectedGroupLabel}`"
+      data-test="group-dropdown-button"
     >
-      <span>{{ selected || 'Groups' }}</span>
-      <ChevronDownIcon class="h-5 w-5" />
+      {{ selected || 'Groups' }}
+      <ChevronDownIcon class="ml-3 h-5 w-5" />
     </button>
     <div
       v-if="isOpen"
       class="absolute right-0 z-10 mt-2 w-fit rounded-md border border-gray-300 bg-white shadow-lg"
       aria-labelledby="dropdown-button"
-      data-test="dropdown-menu"
+      data-test="group-dropdown-menu"
     >
       <FwbListGroup>
         <FwbListGroupItem
@@ -79,7 +83,7 @@ const handleNoGroup = () => {
           :key="group.id"
           @click="selectItem(group)"
           data-test="group-item"
-          aria-label="Select {{ group.name }} group"
+          :aria-label="`Select ${group.name} group`"
         >
           {{ group.name }}
         </FwbListGroupItem>
@@ -94,7 +98,7 @@ const handleNoGroup = () => {
       <button
         class="w-full px-4 py-2 font-medium text-green-600 hover:bg-green-50"
         @click="toggleCreateNewGroup"
-        data-test="create-new-group-button"
+        data-test="create-group-button"
         aria-label="Create a new group"
       >
         + Create New Group

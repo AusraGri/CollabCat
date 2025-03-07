@@ -15,7 +15,6 @@ import { openApiDocument } from './trpc/openApi'
 export default function createApp(db: Database) {
   const app = express()
 
-  // app.use(cors());
   app.use(
     cors({
       origin: config.auth0.clientOriginUrl,

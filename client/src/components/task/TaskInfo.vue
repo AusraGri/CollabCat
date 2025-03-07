@@ -258,6 +258,7 @@ const saveChanges = () => {
           role="heading"
           aria-level="1"
           id="modalTitle"
+          data-test="edit-title"
         >
           {{ editableTask.title }}
         </div>
@@ -284,6 +285,7 @@ const saveChanges = () => {
           class="flex cursor-pointer items-center space-x-3"
           role="button"
           aria-label="Edit category"
+          data-test="edit-category"
         >
           <Squares2X2Icon class="w-7 text-black" />
           <label for="categorySelect" class="text-sm font-bold"> Category:</label>

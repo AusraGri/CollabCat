@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, type UnwrapRef } from 'vue'
-import { FwbModal, FwbButton, FwbTextarea, FwbInput, FwbCheckbox } from 'flowbite-vue'
+import { FwbModal, FwbButton, FwbTextarea, FwbInput, FwbCheckbox, FwbAlert } from 'flowbite-vue'
 import RecurrenceForm from './RecurrenceForm.vue'
 import CategorySelect from '../categories/CategorySelect.vue'
 import { useTasksStore } from '@/stores/taskStore'
@@ -37,13 +37,19 @@ const time = ref({
   minutes: new Date().getMinutes(),
 })
 const tasksStore = useTasksStore()
-
+const errorMessage = ref('')
 const selectedCategory = ref<string | undefined>()
 const selectedMembers = ref<number[]>([])
 const recurringPattern = ref<RecurrencePatternInsertable | undefined>()
 const startDate = ref<Date | string>()
 const endDate = ref<Date | string>()
 const points = ref<string>('')
+
+const checkIfTaskTitleExists = (title: string) => {
+  const taskTitle = tasksStore.tasks.find((task)=> task.title.toLowerCase() === title.toLowerCase())
+
+  return !!taskTitle
+}
 
 const taskData = computed(() => {
   const taskTime = `${time.value.hours}:${time.value.minutes}`
@@ -75,6 +81,7 @@ const taskForm = ref({
 })
 
 function closeModal() {
+  errorMessage.value =''
   taskForm.value.isRecurring = false
   resetForm()
   emit('close')
@@ -87,14 +94,20 @@ const validateNewTaskData = (taskData: NewTaskData) => {
   if (!task.title) return false
 
   if (task.isRecurring) {
-    if (!recurrence) return false
-    if (!task.startDate) return false
+    if (!recurrence) throw new Error('Missing recurrence data')
+    if (!task.startDate) throw new Error('Missing recurring task start date')
   }
+
+  const titleExists = checkIfTaskTitleExists(task.title)
+
+  if(titleExists) throw new Error('Task title already exists. Please choose different')
 
   return true
 }
 
 async function confirmAction(confirmed: boolean) {
+  errorMessage.value =''
+
   if (!confirmed) {
     resetForm()
     emit('close')
@@ -107,10 +120,16 @@ async function confirmAction(confirmed: boolean) {
     task: taskData.value,
     recurrence: recurrence || undefined,
   }
+   try {
+     const isValidTaskData = validateNewTaskData(newTaskData)
+     if (!isValidTaskData) return
+   } catch (error) {
+    if(error instanceof Error){
+      errorMessage.value = error.message
+      return
+    }
+   }
 
-  const isValidTaskData = validateNewTaskData(newTaskData)
-
-  if (!isValidTaskData) return
 
   const newTask = await tasksStore.createTask(newTaskData)
   resetForm()
@@ -144,9 +163,12 @@ useKeyboardAction(
 )
 </script>
 <template>
-  <FwbModal v-if="isShowModal" @close="closeModal">
+  <FwbModal v-if="isShowModal" @close="closeModal" >
     <template #header>
-      <div class="flex items-center text-lg">New task</div>
+      <div class="inline-flex space-x-3">
+        <div class="flex items-center text-lg" data-test="new-task-modal-title">New Task</div>
+        <FwbAlert icon type="danger" v-if="errorMessage">{{ errorMessage }}</FwbAlert>
+      </div>
     </template>
     <template #body>
       <form @submit.prevent class="flex flex-col space-y-3">

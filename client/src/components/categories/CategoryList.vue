@@ -9,18 +9,19 @@ const { categories } = defineProps<{
 }>()
 
 const selectedCategory = defineModel('selectedCategory', {
-  type: [Number, null] as PropType<Number | null>,
+  type: [Object, null] as PropType<CategoriesPublic | null>,
 })
+
 const selectCategory = (category: CategoriesPublic) => {
-  if (selectedCategory.value === category.id) {
+  if (selectedCategory.value === category) {
     selectedCategory.value = null
     return
   }
-  selectedCategory.value = category.id
+  selectedCategory.value = category
 }
 
 const isSelected = (id: number) => {
-  return selectedCategory.value === id ? true : false
+  return selectedCategory.value?.id === id ? true : false
 }
 </script>
 <template>
@@ -35,14 +36,18 @@ const isSelected = (id: number) => {
         data-test="category-item"
       >
         <template v-if="isSelected(category.id)" #prefix>
-          <div data-test="selected-icon">
+          <div data-test="selected-icon" aria-hidden="true">
             <ChevronDoubleRightIcon class="h-5 w-5 text-green-300" />
           </div>
         </template>
         <button
           class="w-full pr-3 text-left"
           @click="selectCategory(category)"
-          :aria-label="`Select category ${category.title}`"
+          :aria-label="
+            isSelected(category.id)
+              ? `Deselect category: ${category.title}`
+              : `Select category: ${category.title}`
+          "
           data-test="select-category-button"
         >
           {{ category.title }}

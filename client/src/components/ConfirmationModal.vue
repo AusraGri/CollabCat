@@ -20,16 +20,16 @@ function confirmAction(confirmed: boolean) {
   <FwbModal
     v-if="isShowModal"
     persistent
-    role="dialog"
+    role="alertdialog"
     aria-labelledby="modal-title"
     aria-describedby="modal-description"
     data-test="confirmation-modal"
     @keydown.esc="confirmAction(false)"
   >
     <template #header>
-      <div id="modal-title" class="flex items-center text-lg text-black">
+      <h1 id="modal-title" class="flex items-center text-lg text-black">
         Please Confirm the Action
-      </div>
+      </h1>
     </template>
     <template #body>
       <p id="modal-description">

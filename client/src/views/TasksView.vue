@@ -24,6 +24,7 @@ import {
 } from '@/utils/tasks'
 import { FwbDropdown } from 'flowbite-vue'
 import { setErrorMessage } from '@/utils/error'
+import type { CategoriesPublic } from '@server/shared/types'
 
 const userGroupStore = useUserGroupsStore()
 const categoryStore = useCategoriesStore()
@@ -35,7 +36,7 @@ const route = useRoute()
 const isGroupTasks = computed(() => route.meta.group)
 const isNewTask = ref(false)
 const isNewCategory = ref(false)
-const selectedCategory = ref(null)
+const selectedCategory = ref<CategoriesPublic>()
 
 const selectedType = ref('')
 const isShowTypes = ref(false)
@@ -50,10 +51,15 @@ const categories = computed(() => {
 })
 
 const selectedCategoryName = computed(() => {
-  const selectedCategoryId = selectedCategory.value || undefined
-  const category = categories.value.find((cat) => cat.id === selectedCategoryId)
+  const selectedCategoryTitle = selectedCategory.value?.title || undefined
 
-  return category?.title || 'Categories'
+  return selectedCategoryTitle || 'Categories'
+})
+
+const selectedCategoryLabel = computed(()=> {
+  const selectedCategoryTitle = selectedCategory.value?.title || undefined
+
+  return selectedCategoryTitle || 'None'
 })
 
 const filterTitle = computed(() => {
@@ -69,7 +75,7 @@ const groups = computed(() => {
 
 const allTasks = computed(() => taskStore.tasks)
 const tasks = computed(() => {
-  const selectedCategoryId = selectedCategory.value || undefined
+  const selectedCategoryId = selectedCategory.value?.id || undefined
   const filteredTasks = filterTasksByCategoryId({
     tasks: allTasks.value,
     categoryId: selectedCategoryId,
@@ -86,7 +92,7 @@ const tasks = computed(() => {
 function showCount(name: 'Not Assigned' | 'Someday' | 'Routine' | 'Scheduled') {
   const filteredTasksByCategory = filterTasksByCategoryId({
     tasks: allTasks.value,
-    categoryId: selectedCategory.value || undefined,
+    categoryId: selectedCategory.value?.id || undefined,
   })
   return countTasksOfDefaultType(filteredTasksByCategory, name)
 }
@@ -151,7 +157,7 @@ const handleTaskStatusChange = async (taskData: {
       }
     }
   } catch (error) {
-    setErrorMessage({messageKey: 'update', message: 'task completion status' })
+    setErrorMessage({ messageKey: 'update', message: 'task completion status' })
   }
 }
 
@@ -188,18 +194,21 @@ watch(
             @tab-click="toggleTaskModal"
             :custom-tailwind-classes="'border-amber-700'"
             aria-label="Create New Task Modal"
+            data-test="create-task"
           />
           <TabRev
             :title="'+ Category'"
             @tab-click="toggleCategoryModal"
             :custom-tailwind-classes="'border-yellow-400'"
             aria-label="Create New Category"
+            data-test="create-category"
           />
           <div
             @click="toggleShowTypes"
             class="ml-2 flex items-center justify-end rounded-md pl-1 pr-1 text-sm hover:cursor-pointer"
             :aria-expanded="isShowTypes"
             aria-controls="types-container"
+            data-test="types"
           >
             <span>Types</span>
             <ChevronDownIcon
@@ -217,7 +226,7 @@ watch(
       </div>
       <div
         v-if="isShowTypes"
-        class="flex flex-wrap sm:space-x-1 border-l-2 border-s-green-500 sm:pl-3 pl-1 sm:flex-nowrap"
+        class="flex flex-wrap border-l-2 border-s-green-500 pl-1 sm:flex-nowrap sm:space-x-1 sm:pl-3"
         id="types-container"
       >
         <div class="inline-flex space-x-1 pl-1">
@@ -256,15 +265,17 @@ watch(
       </div>
     </div>
     <!-- dropdown menu -->
-    <div v-if="categories.length" class="flex items-end ml-1">
+    <div v-if="categories.length" class="ml-1 flex items-end">
       <FwbDropdown align-to-end>
         <template #trigger>
           <div class="rounded-t-xl border-2 border-b-0 border-blue-500">
             <button
               type="button"
-              class="flex text-sm px-3 pt-1  "
+              class="flex px-3 pt-1 text-sm whitespace-nowrap pb-1"
+              :aria-label="`Select category. Selected category: ${selectedCategoryLabel}`"
+              data-test="select-category"
             >
-              <span class="pb-1 whitespace-nowrap">{{ selectedCategoryName }}</span>
+              {{ selectedCategoryName }}
               <span>
                 <ChevronDownIcon
                   class="ml-1 h-5 w-5 text-gray-800 dark:text-white"

@@ -18,8 +18,38 @@ const emit = defineEmits<{
 const categoryStore = useCategoriesStore()
 const title = ref<string>('')
 
+const isCategoryTitle = (params: { title: string; groupId?: number }) => {
+  const { title, groupId } = params
+
+  const groupCategories = categoryStore.groupCategories
+  const groupCategoriesGroupId = groupCategories.length ? groupCategories[0].groupId : undefined
+  const userCategories = categoryStore.userCategories
+
+  if (groupId) {
+    if (groupCategoriesGroupId && groupCategoriesGroupId === groupId) {
+      const isGroupTitle = groupCategories.some(
+        (cat) => cat.title.toLowerCase() === title.toLowerCase()
+      )
+      return isGroupTitle
+    }
+  }
+
+  const isPersonalTitle = userCategories.some(
+    (cat) => cat.title.toLowerCase() === title.toLowerCase()
+  )
+  return isPersonalTitle
+}
+
 async function confirmAction(confirmed: boolean) {
   if (!confirmed) {
+    closeModal()
+
+    return
+  }
+
+  const isCategory = isCategoryTitle({ title: title.value, groupId: groupId})
+
+  if (isCategory) {
     closeModal()
 
     return

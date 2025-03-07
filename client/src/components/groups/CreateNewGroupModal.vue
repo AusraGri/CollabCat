@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { FwbModal, FwbButton, FwbInput } from 'flowbite-vue'
+import { FwbModal, FwbButton, FwbInput, FwbAlert } from 'flowbite-vue'
+import { useUserGroupsStore } from '@/stores';
 import { ref } from 'vue'
 
 const { isShowModal } = defineProps<{
@@ -11,17 +12,34 @@ const emit = defineEmits<{
   (event: 'close'): void
 }>()
 
+const userGroupStore = useUserGroupsStore()
+const errorMessage = ref('')
+
 const name = ref<string>('')
+
+const isGroupName = (name: string)=> {
+  const userGroups = userGroupStore.userGroups || []
+  return userGroups.some((group) => group.name.toLowerCase() === name.toLowerCase())
+
+}
 
 function confirmAction(confirmed: boolean) {
   if (confirmed) {
+   const isName = isGroupName(name.value)
+
+   if(isName){
+    errorMessage.value = 'This group name already exist in your groups'
+    return
+   }
     emit('create:group', name.value)
-    name.value = ''
   }
-  emit('close')
+
+  closeModal()
 }
 
 const closeModal = () => {
+  errorMessage.value = ''
+  name.value = ''
   emit('close')
 }
 </script>
@@ -29,7 +47,10 @@ const closeModal = () => {
 <template>
   <FwbModal v-if="isShowModal" @close="closeModal" data-test="create-group-modal">
     <template #header>
-      <h2 class="text-lg font-semibold" data-test="modal-header">Create New Group</h2>
+      <div class="inline-flex items-center space-x-2">
+        <h2 class="text-lg font-semibold" data-test="group-modal-header">Create New Group</h2>
+        <FwbAlert icon type="danger" v-if="errorMessage">{{ errorMessage }}</FwbAlert>
+      </div>
     </template>
     <template #body>
       <div>

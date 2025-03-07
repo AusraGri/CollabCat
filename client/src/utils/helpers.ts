@@ -1,7 +1,15 @@
 import type { Ref } from 'vue'
+import { z } from 'zod'
 
 export function stringToUrl(string: string) {
   return string.replace(' ', '')
+}
+
+export function isEmailValid(email: string) {
+  const emailSchema = z.string().email()
+  const result = emailSchema.safeParse(email)
+
+  return result.success
 }
 
 export function timeToLocalTime(timeString: string, timestamptz: Date): string {

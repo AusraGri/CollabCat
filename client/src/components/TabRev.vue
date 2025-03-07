@@ -42,9 +42,9 @@ const emit = defineEmits<{
       @click="emit('tab-click', title)"
       role="tab"
       :aria-selected="activeTab"
-      :aria-label="title"
+      :aria-label="`${title} tab`"
       tabindex="0"
-      data-test="tab-item"
+      :data-test="`${title}-tab`"
       @keydown.enter="emit('tab-click', title)"
       @keydown.space="emit('tab-click', title)"
     >

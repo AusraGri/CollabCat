@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { FwbButton, FwbModal, FwbInput } from 'flowbite-vue'
+import { isEmailValid } from '@/utils/helpers';
 
 const { isShowModal } = defineProps<{
   isShowModal: boolean
@@ -13,6 +14,10 @@ const emit = defineEmits<{
 
 const email = ref('')
 
+const isInviteEmailValid = computed(()=> {
+  return !isEmailValid(email.value)
+})
+
 function confirmAction(confirmed: boolean) {
   if (confirmed) {
     emit('invite:user', email.value)
@@ -22,6 +27,7 @@ function confirmAction(confirmed: boolean) {
 }
 
 const closeModal = () => {
+  email.value = ''
   emit('close')
 }
 </script>
@@ -39,6 +45,7 @@ const closeModal = () => {
           required
           aria-label="Enter the email address of the user"
           data-test="user-email-input"
+          type="email"
         />
       </div>
     </template>
@@ -57,6 +64,7 @@ const closeModal = () => {
           color="green"
           aria-label="Send invitation"
           data-test="send-invitation-button"
+          :disabled="isInviteEmailValid"
         >
           Send Invitation
         </FwbButton>

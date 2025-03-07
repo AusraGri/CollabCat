@@ -187,7 +187,7 @@ watch(
             />
           </div>
         </div>
-        <div v-if="!tasks.length" class="p-3 text-center" role="alert" aria-live="assertive">
+        <div v-if="!tasks.length" class="p-3 text-center" role="note" aria-live="assertive">
           No tasks for this day
         </div>
       </div>

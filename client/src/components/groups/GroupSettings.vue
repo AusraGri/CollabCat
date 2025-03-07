@@ -25,6 +25,7 @@ const isPointsEnabled = ref(pointStore.isPointsEnabled)
 const isShowConfirmation = ref(false)
 const isManageCategories = ref(false)
 const isAdmin = computed(() => userGroupStore.isAdmin)
+const groupName = computed(()=> userGroupStore.activeGroup?.name)
 const categories = computed(() => {
   const groupCategories = categoryStory.groupCategories || []
 
@@ -94,15 +95,15 @@ watch(
 
 <template>
   <div>
-    <FwbModal v-if="isShowModal" @close="closeModal" aria-labelledby="modal-title">
+    <FwbModal v-if="isShowModal" @close="closeModal" aria-labelledby="group-settings-modal">
       <template #header>
-        <h2 class="text-lg font-semibold" id="modal-title">
-          Manage {{ userGroupStore.activeGroup?.name }}
+        <h2 class="text-lg font-semibold" id="group-settings-modal" data-test="group-settings-title">
+          Manage {{ groupName}}
         </h2>
       </template>
       <template #body>
         <div class="w-fit">
-          <FwbCheckbox v-model="isPointsEnabled" label="My Group Task Points" />
+          <FwbCheckbox v-model="isPointsEnabled" label="My Group Task Points" :aria-label="`${groupName} points checkbox`" />
         </div>
         <div v-if="categories.length" class="mt-5">
           <FwbButton
@@ -111,7 +112,7 @@ watch(
             outline
             pill
             square
-            aria-label="Manage categories for group"
+            :aria-label="`Manage categories for ${groupName}`"
             data-test="manage-categories-button"
           >
             Manage Your Categories
@@ -135,7 +136,7 @@ watch(
             <FwbButton
               color="red"
               @click="isShowConfirmation = true"
-              aria-label="Remove this group"
+              :aria-label="`${removeText} group: ${groupName}`"
               data-test="remove-group-button"
               >{{ removeText }} this Group</FwbButton
             >
@@ -146,7 +147,7 @@ watch(
               color="green"
               @click="saveChanges"
               data-test="save-changes-button"
-              aria-label="Save changes to the group settings"
+              :aria-label="`Save changes to the ${groupName} settings`"
             >
               Save Changes
             </FwbButton>
