@@ -211,8 +211,8 @@ watch(
           ]"
         >
           <div v-if="task.startDate" class="text-sm">
-            <span :aria-label="`${task.title} start date`">{{ formatDateToLocal(task.startDate) }}</span>
-            <span v-if="task.endDate" :aria-label="`${task.title} end date`"> --> {{ formatDateToLocal(task.endDate) }}</span>
+            <span :aria-label="`${task.title} start date`" data-test="task-start-date">{{ formatDateToLocal(task.startDate) }}</span>
+            <span v-if="task.endDate" :aria-label="`${task.title} end date`" data-test="task-end-date"> --> {{ formatDateToLocal(task.endDate) }}</span>
           </div>
         </div>
 
@@ -231,7 +231,7 @@ watch(
           data-test="task-category"
         >
           <Squares2X2Icon class="h-5 w-5 text-blue-500" />
-          <span>{{ taskCategory?.title }}</span>
+          <p>{{ taskCategory?.title }}</p>
         </div>
         <div
           v-if="taskGroup && isGroupInfo"
@@ -240,7 +240,7 @@ watch(
           data-test="task-group"
         >
           <UsersIcon class="h-5 w-5 text-blue-500" />
-          <span>{{ taskGroup.name }}</span>
+          <p>{{ taskGroup.name }}</p>
         </div>
       </div>
       <div aria-label="task options" class="min-w-14">
@@ -268,11 +268,11 @@ watch(
             v-if="task.startTime && task.startDate"
             class="mt-1 flex items-center space-x-1 text-sm"
             :aria-label="`${task.title} time`"
-            data-test="`task-time"
+            data-test="task-time"
           >
             <ClockIcon class="h-5 w-5 text-gray-50" />
-            <span class="text-xs tracking-wider">
-              {{ timeToLocalTime(task.startTime, task.startDate) }}</span
+            <p class="text-xs tracking-wider">
+              {{ timeToLocalTime(task.startTime, task.startDate) }}</p
             >
           </div>
         </div>

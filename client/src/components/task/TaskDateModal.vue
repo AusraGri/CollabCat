@@ -127,9 +127,9 @@ watch(
     v-if="isShowDateModal"
     tabindex="-1"
     role="dialog"
-    aria-labelledby="modalTitle"
+    aria-labelledby="dateModalTitle"
     aria-hidden="false"
-    aria-describedby="modalDescription"
+    aria-describedby="dateModalDescription"
   >
     <div
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
@@ -139,10 +139,10 @@ watch(
       <div
         class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg"
         aria-labelledby="modalTitle"
-        aria-describedby="modalDescription"
+        aria-describedby="dateModalDescription"
       >
         <header class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold" id="modalTitle">Edit Date</h2>
+          <h2 class="text-xl font-semibold" id="dateModalTitle">Edit Date</h2>
           <button
             @click.stop="closeDateModal"
             class="text-gray-500 hover:text-black"
@@ -168,7 +168,7 @@ watch(
             </svg>
           </button>
         </header>
-        <div id="modalDescription" class="mt-4 space-y-3">
+        <div id="dateModalDescription" class="mt-4 space-y-3">
           <div class="flex space-x-3">
             <div>
               <label for="startDate" class="block text-sm font-medium">Start Date</label>

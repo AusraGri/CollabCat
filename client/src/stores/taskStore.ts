@@ -21,7 +21,7 @@ export const useTasksStore = defineStore('tasks', {
         this.tasks = tasks
         return tasks
       } catch (error) {
-        setErrorMessage({messageKey: 'read', message: 'your due tasks'})
+        setErrorMessage({ messageKey: 'read', message: 'your due tasks' })
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
@@ -35,7 +35,7 @@ export const useTasksStore = defineStore('tasks', {
         }
         return this.tasks
       } catch (error) {
-        setErrorMessage({messageKey: 'read', message: 'your due personal tasks'})
+        setErrorMessage({ messageKey: 'read', message: 'your due personal tasks' })
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
@@ -45,7 +45,7 @@ export const useTasksStore = defineStore('tasks', {
         this.tasks = tasks
         return tasks
       } catch (error) {
-        setErrorMessage({messageKey: 'read', message: 'your due group tasks'})
+        setErrorMessage({ messageKey: 'read', message: 'your due group tasks' })
         throw new Error(`Failed to fetch tasks: ${error}`)
       }
     },
@@ -53,7 +53,7 @@ export const useTasksStore = defineStore('tasks', {
       try {
         this.tasks = await trpc.tasks.getTasks.query({ groupId })
       } catch (error) {
-        setErrorMessage({messageKey: 'read', message: 'your group tasks'})
+        setErrorMessage({ messageKey: 'read', message: 'your group tasks' })
         throw new Error('Failed to fetch group tasks')
       }
     },
@@ -64,7 +64,7 @@ export const useTasksStore = defineStore('tasks', {
 
         return this.tasks
       } catch (error) {
-        setErrorMessage({messageKey: 'read', message: 'your personal tasks'})
+        setErrorMessage({ messageKey: 'read', message: 'your personal tasks' })
         throw new Error('Failed to fetch group tasks')
       }
     },
@@ -75,7 +75,7 @@ export const useTasksStore = defineStore('tasks', {
 
         return newTask
       } catch (error) {
-        setErrorMessage({messageKey: 'create', message: 'task'})
+        setErrorMessage({ messageKey: 'create', message: 'task' })
         throw new Error(`Failed to save new task: ${error}`)
       }
     },
@@ -84,16 +84,12 @@ export const useTasksStore = defineStore('tasks', {
         const updatedTask = await trpc.tasks.updateTask.mutate(taskData)
 
         if (this.isTasks) {
-          const index = this.tasks?.findIndex((task) => task.id === updatedTask.id)
-
-          if (index && index !== -1) {
-            this.tasks[index] = updatedTask
-          }
+          this.tasks = this.tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
         }
 
         return updatedTask
       } catch (error) {
-        setErrorMessage({messageKey: 'update', message: `task ${taskData.task.title}`})
+        setErrorMessage({ messageKey: 'update', message: `task ${taskData.task.title}` })
         throw new Error(`Failed to update task: ${error}`)
       }
     },
@@ -107,8 +103,8 @@ export const useTasksStore = defineStore('tasks', {
 
         return result
       } catch (error) {
-        const task = this.tasks.find((task)=> task.id === taskId)
-        setErrorMessage({messageKey: 'delete', message: `${task?.title}` || 'task'})
+        const task = this.tasks.find((task) => task.id === taskId)
+        setErrorMessage({ messageKey: 'delete', message: `${task?.title}` || 'task' })
         throw new Error(`Failed to delete task: ${error}`)
       }
     },
@@ -123,8 +119,11 @@ export const useTasksStore = defineStore('tasks', {
           )
         }
       } catch (error) {
-        const task = this.tasks.find((task)=> task.id === taskData.id)
-        setErrorMessage({messageKey: 'update', message: `${task?.title} completion status` || 'task completion status'})
+        const task = this.tasks.find((task) => task.id === taskData.id)
+        setErrorMessage({
+          messageKey: 'update',
+          message: `${task?.title} completion status` || 'task completion status',
+        })
         throw new Error(`Failed to update task completion: ${error}`)
       }
     },

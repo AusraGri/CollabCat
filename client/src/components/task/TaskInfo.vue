@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FwbModal, FwbButton } from 'flowbite-vue'
 import type { TaskData, CategoriesPublic, GroupMember } from '@server/shared/types'
+import { useTasksStore } from '@/stores'
 import { ref, computed, nextTick } from 'vue'
 import {
   TrashIcon,
@@ -34,6 +35,7 @@ const { task, categories, groupMembers, isShowModal } = defineProps<{
   isShowModal: boolean
 }>()
 
+const tasksStore = useTasksStore()
 const errorMessage = ref()
 const selectedCategory = ref(task.categoryId ? String(task.categoryId) : '')
 const selectedMember = ref(task.assignedUserId ? [task.assignedUserId] : [])
@@ -171,8 +173,21 @@ const stopEditingDate = () => {
   isEditingDate.value = false
 }
 
+const checkIfTaskTitleExists = (title: string) => {
+  const taskTitle = tasksStore.tasks.find((task)=> task.title.toLowerCase() === title.toLowerCase())
+
+  return !!taskTitle
+}
+
 const validateTitleAndSave = () => {
   const title = editableTask.value.title.trim()
+
+  const isTitleExists = checkIfTaskTitleExists(title)
+  if(task.title !== title && isTitleExists){
+    errorMessage.value = 'Title already exists'
+    return
+  }
+
   if (title.length < 3 || title.length > 20) {
     errorMessage.value = 'Title must be between 3 and 20 characters long.'
     return
@@ -272,6 +287,7 @@ const saveChanges = () => {
           class="rounded border-0 p-1"
           aria-label="Edit task title"
           aria-describedby="titleError"
+          data-test="edit-task-title"
         />
         <p v-if="errorMessage && isEditingTitle" id="titleError" class="text-sm text-red-500">
           {{ errorMessage }}
@@ -279,7 +295,7 @@ const saveChanges = () => {
       </div>
     </template>
     <template #body>
-      <div class="text-md flex w-full flex-col justify-between space-y-3 divide-y">
+      <div class="text-md flex w-full flex-col justify-between space-y-3 divide-y"  data-test="task-edit-info">
         <div
           @click="isEditingCategory = true"
           class="flex cursor-pointer items-center space-x-3"
@@ -297,7 +313,7 @@ const saveChanges = () => {
             aria-label="Select a category"
             data-test="select-category"
           />
-          <span v-else>{{ categoryLabel }}</span>
+          <p v-else aria-label="Task category" data-test="task-category" class="text-sm">{{ categoryLabel }}</p>
         </div>
         <div
         v-if="groupMembers?.length"
@@ -332,10 +348,10 @@ const saveChanges = () => {
             @click="startEditingPoints"
             class="flex cursor-pointer items-center space-x-3"
             role="button"
-            aria-label="Edit task points"
+            aria-label="Edit task points" data-test="task-points-edit"
           >
             <StarIcon class="w-7" />
-            <div class="text-sm font-bold">{{ pointsLabel }}</div>
+            <p class="text-sm font-bold">{{ pointsLabel }}</p>
             <div v-if="editableTask.points && !isEditingPoints">{{ editableTask.points }}</div>
           </div>
           <div>
@@ -350,6 +366,7 @@ const saveChanges = () => {
               class="rounded border-0 p-1"
               aria-label="Edit task points"
               aria-describedby="pointsError"
+              data-test="task-points-input"
             />
             <p v-if="errorMessage && isEditingPoints" id="pointsError" class="text-sm text-red-500">
               {{ errorMessage }}
@@ -361,19 +378,21 @@ const saveChanges = () => {
           @click="editDate"
           role="button"
           aria-label="Edit task dates"
+          data-test="task-date-time-edit"
         >
           <div class="flex items-center space-x-2">
             <div>
               <CalendarDaysIcon class="w-7" />
             </div>
             <div class="flex flex-nowrap p-1 text-sm">
-              <div v-if="editableTask.startDate" aria-label="Task Start Date">
+              <div v-if="editableTask.startDate" aria-label="Task Start Date" data-test="task-start-date">
                 {{ formatDateToLocal(editableTask.startDate) }}
               </div>
-              <div v-if="editableTask.endDate" aria-label="Task End Date">
+              <div v-if="editableTask.endDate" aria-label="Task End Date" data-test="task-end-date" class=" whitespace-nowrap inline-flex">
                 <span class="ml-2 mr-2">--></span>
-                <span>{{ formatDateToLocal(editableTask.endDate) }}</span>
+                <p>{{ formatDateToLocal(editableTask.endDate) }}</p>
               </div>
+              <p v-if="!editableTask.startDate && !editableTask.endDate">Not scheduled</p>
             </div>
           </div>
           <div
@@ -383,7 +402,7 @@ const saveChanges = () => {
             <span>
               <ClockIcon class="w-7" />
             </span>
-            <div>
+            <div aria-label="Task Time" data-test="task-time">
               {{ timeToLocalTime(editableTask.startTime, editableTask.startDate) }}
             </div>
           </div>
@@ -432,9 +451,9 @@ const saveChanges = () => {
           >
             <div class="flex w-fit items-center space-x-2 whitespace-nowrap">
               <InformationCircleIcon class="w-7" />
-              <div class="cursor-pointer text-sm font-bold">{{ descriptionLabel }}</div>
+              <p class="cursor-pointer text-sm font-bold">{{ descriptionLabel }}</p>
             </div>
-            <p v-if="!isEditingDescription" class="text-sm">{{ editableTask.description }}</p>
+            <p v-if="!isEditingDescription" class="text-sm" aria-label="Task description" data-test="task-description">{{ editableTask.description }}</p>
             <div v-if="isEditingDescription">
               <textarea
                 v-model="editableTask.description"
