@@ -1,4 +1,4 @@
-import type { User } from '@server/shared/types'
+import type { RecurrencePattern, Tasks, User } from '@server/shared/types'
 import type { Insertable } from 'kysely'
 import { Chance } from 'chance'
 
@@ -12,5 +12,16 @@ export const random = process.env.CI ? Chance(1) : Chance()
 export const fakeUser = <T extends Insertable<User>>(overrides: Partial<T> = {} as T) => ({
   email: random.email(),
   username: random.first(),
+  ...overrides,
+})
+
+export const fakeTask = <T extends Insertable<Tasks>>(overrides: Partial<T> = {} as T) => ({
+  title: random.word(),
+  ...overrides,
+})
+
+export const fakeRecurrencePattern = <T extends Insertable<RecurrencePattern>>(overrides: Partial<T> = {} as T) => ({
+  separationCount: random.integer({ min: 1, max: 5 }),
+  recurringType: 'daily',
   ...overrides,
 })

@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test'
 
+test.use({ storageState: { cookies: [], origins: [] } })
+
 test('new user signup, user settings', async ({ page }) => {
   const userEmail = 'someemail@email.com'
   const password = 'SOMEemail123$'

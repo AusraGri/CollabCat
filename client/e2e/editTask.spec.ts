@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test'
-import { loginTestUser } from 'utils/auth0Setup'
 
 test('Edit task', async ({ page }) => {
-  await loginTestUser(page)
+  await page.goto('http://localhost:5174/')
   const newCategoryTitle = 'Category for Editing'
   const newTaskTitle = 'New Task'
   const updatedTaskTitle = 'Updated Task Title'
@@ -342,7 +341,7 @@ test('Edit task', async ({ page }) => {
     await page.getByRole('button', { name: 'close' }).click()
   })
 
-  await test.step('delete task', async () => {
+  await test.step('delete task and category', async () => {
     await expect(updatedTask).toBeVisible()
     await updatedTask.click()
     await expect(taskEditInfoModal).toBeVisible()
@@ -356,5 +355,46 @@ test('Edit task', async ({ page }) => {
     await acceptDeletionButton.click()
 
     await expect(updatedTask).not.toBeVisible()
+
+    const userMenu = page.getByTestId('user-menu-trigger')
+    const userSettings = page.getByTestId('user-settings-button')
+    const categoriesManageButton = page.getByTestId('manage-categories')
+    const confirmationModal = page.getByRole('heading', { name: 'Please Confirm the Action' })
+    const categoriesModalHeader = page.getByTestId('categories-modal-header')
+    const saveChangesButton = page.getByTestId('save-changes')
+    const categoryDeleteButton = page.getByTestId('delete-category-button')
+    const categoryTitle = page.getByTestId('category-title')
+    const confirmDeletionButton = page.getByTestId('accept-button')
+
+    await expect(userMenu).toBeVisible()
+    await expect(categoriesButton).toBeVisible()
+
+    await userMenu.click()
+    await expect(userSettings).toBeVisible()
+    await userSettings.click()
+
+    await expect(categoriesManageButton).toBeVisible()
+    await categoriesManageButton.click()
+
+    await expect(categoriesModalHeader).toBeVisible()
+    await expect(categoriesModalHeader).toHaveText('Categories')
+    await expect(categoryTitle).toBeVisible()
+    await expect(categoryTitle).toHaveText(newCategoryTitle)
+    await expect(categoryDeleteButton).toBeVisible()
+
+    categoryDeleteButton.click()
+
+    await expect(confirmationModal).toBeVisible()
+    await expect(confirmDeletionButton).toBeVisible()
+
+    await confirmDeletionButton.click()
+
+    await expect(confirmationModal).not.toBeVisible()
+    await expect(categoriesModalHeader).not.toBeVisible()
+    await expect(saveChangesButton).toBeVisible()
+
+    await saveChangesButton.click()
+
+    await expect(categoriesButton).not.toBeVisible()
   })
 })

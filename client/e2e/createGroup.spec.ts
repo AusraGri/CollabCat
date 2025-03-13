@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test'
-import { loginTestUser } from 'utils/auth0Setup'
 
 test('Create new group, select group, delete group', async ({ page }) => {
-  await loginTestUser(page)
+  await page.goto('http://localhost:5174/')
   const newGroupTitle = 'New Group'
   const expectedUrlPart = `/${newGroupTitle.replace(' ', '')}/.*`
 

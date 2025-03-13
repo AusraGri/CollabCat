@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { loginTestUser } from 'utils/auth0Setup'
 
 test('Create tasks, delete tasks', async ({ page }) => {
-  await loginTestUser(page)
+
+  await page.goto('http://localhost:5174/')
 
   const taskTitle = page.getByTestId('task-title-input')
   const taskDescription = page.getByTestId('task-description-input')

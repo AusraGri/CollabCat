@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { loginTestUser } from 'utils/auth0Setup'
 
 test('Create new personal category, select category, delete category', async ({ page }) => {
-  await loginTestUser(page)
+ 
+  await page.goto('http://localhost:5174/')
   const newCategoryTitle = 'New Category'
 
   const tasksTab = page.getByTestId('Tasks-tab')
