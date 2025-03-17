@@ -89,8 +89,9 @@ const closeModal = () => {
 
 const costValidation = (value: any) => {
   const numberValue = Number(value)
+  const max = 1000000
 
-  return !isNaN(numberValue) && numberValue > 0 && Number.isInteger(numberValue)
+  return !isNaN(numberValue) && numberValue > 0 && Number.isInteger(numberValue) && numberValue <= max
 }
 
 const titleValidation = (value: any) => {
@@ -127,7 +128,7 @@ watch(
 <template>
   <FwbModal v-if="isShowModal" @close="closeModal" aria-labelledby="reward-modal-header">
     <template #header>
-      <h2 id="reward-modal-header" class="text-lg font-semibold" data-test="modal-header">
+      <h2 id="reward-modal-header" class="text-lg font-semibold" data-test="reward-modal-header">
         {{ headerText }}
       </h2>
     </template>
@@ -145,7 +146,7 @@ watch(
           >
             <template #validationMessage v-if="!isTitleValid">
               <span class="text-red-600" aria-live="assertive"
-                >Please enter a valid reward title</span
+                >Please enter a valid reward title: length 3 - 40 letters</span
               >
             </template>
           </FwbInput>
@@ -156,6 +157,7 @@ watch(
               label="Limit Reward Claims"
               v-model="isClaims"
               aria-label="Limit Reward Claims"
+              data-test="reward-claim-limit"
             />
           </div>
           <div v-if="isClaims" class="mb-3 flex-grow">
@@ -195,8 +197,8 @@ watch(
             data-test="reward-cost-input"
           >
             <template #validationMessage v-if="!isCostValid">
-              <span class="text-red-600" aria-live="assertive"
-                >Please enter a valid cost for the reward</span
+              <span class="text-red-600" aria-live="assertive" aria-label="Reward cost error message"
+                >Please enter a valid cost for the reward: 1 - 1000000</span
               >
             </template>
           </FwbInput>
@@ -218,7 +220,8 @@ watch(
           color="green"
           type="submit"
           aria-label="Submit reward creation"
-          data-test="submit-button"
+          data-test="submit-reward-button"
+          :disabled="reward.title.length < 3"
         >
           {{ buttonText }} Reward
         </FwbButton>

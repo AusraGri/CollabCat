@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test'
+import { stringToUrl } from '@/utils/helpers'
 
 test.use({ storageState: { cookies: [], origins: [] } })
 
 test('new user signup, user settings', async ({ page }) => {
-  const userEmail = 'someemail@email.com'
+  const userEmail = 'anyemail@email.com'
   const password = 'SOMEemail123$'
   const username = 'Test User'
 
@@ -37,7 +38,7 @@ test('new user signup, user settings', async ({ page }) => {
     await expect(avatar).toBeVisible()
     await expect(menuTrigger).toBeVisible()
 
-    await expect(page).toHaveURL(`/${userEmail}/calendar`)
+    await expect(page).toHaveURL(`/${stringToUrl(userEmail)}/calendar`)
   })
 
   await test.step('Change username', async () => {

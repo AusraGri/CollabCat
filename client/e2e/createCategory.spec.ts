@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test'
 
 test('Create new personal category, select category, delete category', async ({ page }) => {
- 
   await page.goto('http://localhost:5174/')
   const newCategoryTitle = 'New Category'
 
@@ -66,7 +65,6 @@ test('Create new personal category, select category, delete category', async ({ 
   })
 
   await test.step('unselect personal category', async () => {
-
     await expect(categoriesButton).toBeVisible()
 
     await expect(categoriesButton).toContainText(newCategoryTitle)

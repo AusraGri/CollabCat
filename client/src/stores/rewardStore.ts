@@ -71,7 +71,7 @@ export const useRewardStore = defineStore('reward', {
           this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
       } catch (error) {
         setErrorMessage({messageKey: 'update', message: 'reward'})
-        throw new Error('Failed to update reward')
+        throw new Error(`Failed to update reward: ${error}`)
       }
     },
     async deleteReward(rewardId: number) {

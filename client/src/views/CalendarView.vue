@@ -46,7 +46,6 @@ const sortedTasks = computed(() => {
   return sortedTasks
 })
 
-
 const isCheckboxEnabled = computed(() => {
   const today = new Date()
 
@@ -168,7 +167,9 @@ watch(
     </div>
     <div class="mx-auto flex max-w-screen-lg flex-col justify-between p-3 sm:flex-row">
       <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-fit">
-        <div class="w-full border-b-2 text-center">{{ formatDate(date) }}</div>
+        <div class="w-full border-b-2 text-center" aria-labelledby="task-list-date" data-test="task-list-date">
+          <p id="task-list-date">{{ formatDate(date) }}</p>
+        </div>
         <div v-if="tasks">
           <div v-for="task in sortedTasks" :key="task.id" :aria-live="'polite'">
             <TaskCard

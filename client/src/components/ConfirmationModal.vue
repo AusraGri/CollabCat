@@ -32,7 +32,7 @@ function confirmAction(confirmed: boolean) {
       </h1>
     </template>
     <template #body>
-      <p id="modal-description">
+      <p id="modal-description" aria-label="Confirm action" data-test="confirmation-question">
         Do you really want to <span class="text-red-600">{{ action }}</span>
         <span class="pl-1 text-base font-extrabold">{{ object }}</span> ?
       </p>

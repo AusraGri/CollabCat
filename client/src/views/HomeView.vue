@@ -8,6 +8,7 @@ import { useAuthStore, useInvitationStore } from '@/stores'
 import { useUserStore } from '@/stores/userProfile'
 import { useAuth0 } from '@auth0/auth0-vue'
 import logo from '@/assets/collabCat.png'
+import { stringToUrl } from '@/utils/helpers'
 import pic1 from '@/assets/001.webp'
 import pic2 from '@/assets/002.webp'
 import pic3 from '@/assets/003.webp'
@@ -59,7 +60,7 @@ const handleAuthRedirect = async () => {
     }
 
     if (userStore.user?.username) {
-      routeUsername = userStore.user?.username?.replace(' ', '')
+      routeUsername = stringToUrl(userStore.user?.username)
 
       router.push({ name: 'PersonalCalendar', params: { username: routeUsername } })
     }

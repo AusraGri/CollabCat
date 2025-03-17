@@ -179,6 +179,7 @@ watch(
           @update:model-value="updateTaskStatus"
           :aria-label="`${task.title} complete status`"
           data-test="task-status"
+          :aria-checked="check ? 'true' : 'false'"
         />
       </div>
       <div

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test('Create new group, select group, delete group', async ({ page }) => {
   await page.goto('http://localhost:5174/')
   const newGroupTitle = 'New Group'
-  const expectedUrlPart = `/${newGroupTitle.replace(' ', '')}/.*`
+  const expectedUrlPart = `/${newGroupTitle.replace(' ', '-')}/.*`
 
   const groupDropdownButton = page.getByTestId('group-dropdown-button')
   const noGroupsSelection = page.getByTestId('no-groups')

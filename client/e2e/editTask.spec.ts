@@ -223,9 +223,9 @@ test('Edit task', async ({ page }) => {
     await expect(saveTaskChangesButton).toBeVisible()
     await saveTaskChangesButton.click()
     await expect(updatedTask).toBeVisible()
-
+    const localDate = today.toLocaleDateString('en-CA');
     await expect(updatedTask.getByTestId('task-start-date')).toContainText(
-      today.toString().split('T')[0]
+      localDate
     )
     await expect(updatedTask.getByTestId('task-time')).toContainText(expectedHour)
   })
