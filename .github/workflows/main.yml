@@ -190,8 +190,9 @@ jobs:
           --build-arg SMTP_PASS=${{ secrets.SMTP_PASS }} \
           --build-arg TOKEN_KEY=${{ secrets.TOKEN_KEY }} \
           --build-arg CLIENT_ORIGIN_URL=${{ secrets.CLIENT_ORIGIN_URL}} \
-          -t $SERVER_IMAGE_TAG
-          -f ./server/Dockerfile .
+          -t $SERVER_IMAGE_TAG \
+          -f ./server/Dockerfile \
+          .
 
       # if you need to pass additional environment variables to the client
       # build, then you will need to pass them as a docker build argument:
@@ -208,8 +209,9 @@ jobs:
           --build-arg VITE_AUTH0_TEST_PASSWORD=${{ secrets.AUTH0_TEST_PASSWORD }} \
           --build-arg VITE_API_PATH=${{ vars.API_PATH }} \
           --build-arg VITE_API_SERVER_URL=${{ vars.API_SERVER_URL }} \
-          -t $CLIENT_IMAGE_TAG
-          -f ./client/Dockerfile .
+          -t $CLIENT_IMAGE_TAG \
+          -f ./client/Dockerfile \
+          .
 
       - name: Push server image
         run: >-
