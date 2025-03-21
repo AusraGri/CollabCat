@@ -60,7 +60,6 @@ const resetPatternChanges = () => {
     v-if="isShowRecurrence"
     tabindex="-1"
     role="dialog"
-    data-test="recurrence-modal"
     aria-labelledby="recurrence-modal-title"
     aria-describedby="recurrence-modal-description"
   >
@@ -68,7 +67,7 @@ const resetPatternChanges = () => {
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       @click.self.stop="closeRecurrenceModal"
     >
-      <div class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
+      <div class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg" data-test="recurrence-change-modal">
         <header class="flex items-center justify-between">
           <h2 class="text-xl font-semibold" id="recurrence-modal-title" aria-live="assertive">
             Edit Recurrence

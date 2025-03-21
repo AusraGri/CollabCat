@@ -169,25 +169,37 @@ watch(
         'border-grey-700 m-1 flex h-fit w-full space-x-1 rounded rounded-s-2xl border-2 p-2 shadow-md',
         isCompletedTask ? 'bg-gray-400' : 'bg-green-400',
       ]"
-      aria-label="task item"
+      :aria-label="`${task.title}`"
+      :data-test="`${task.title.replace(' ', '-')}`"
     >
       <div v-if="isCheckbox" class="self-center">
         <FwbCheckbox
           v-model="check"
           :disabled="!isCheckboxEnabled || !isAdmin"
           @update:model-value="updateTaskStatus"
+          :aria-label="`${task.title} complete status`"
+          data-test="task-status"
+          :aria-checked="check ? 'true' : 'false'"
         />
       </div>
       <div
         @click="toggleTaskInfo"
         class="flex min-w-60 cursor-pointer flex-col items-stretch rounded-l-md bg-slate-50"
-        aria-label="task-info"
+        aria-label="`${task.title} information`"
       >
         <div class="flex w-full justify-between rounded-t p-1">
-          <div class="p-1">{{ task.title }}</div>
+          <div
+            class="p-1"
+            :aria-label="`${task.title} title`"
+            data-test="task-title"
+          >
+            {{ task.title }}
+          </div>
         </div>
         <div
           v-if="task.startDate && isShowDates"
+          :aria-label="`${task.title} dates`"
+          data-test="task-dates"
           :class="[
             'flex',
             'w-full',
@@ -199,53 +211,69 @@ watch(
             { ' rounded-bl': !task.recurrence && !task.categoryId && !task.groupId },
           ]"
         >
-          <div v-if="task.startDate" class="text-sm" aria-label="task-dates">
-            <span>{{ formatDateToLocal(task.startDate) }}</span>
-            <span v-if="task.endDate"> --> {{ formatDateToLocal(task.endDate) }}</span>
+          <div v-if="task.startDate" class="text-sm">
+            <span :aria-label="`${task.title} start date`" data-test="task-start-date">{{ formatDateToLocal(task.startDate) }}</span>
+            <span v-if="task.endDate" :aria-label="`${task.title} end date`" data-test="task-end-date"> --> {{ formatDateToLocal(task.endDate) }}</span>
           </div>
         </div>
 
         <div
           v-if="task.recurrence && isShowRecurrence"
           class="bg-orange-200 p-1 text-center text-sm"
+          :aria-label="`${task.title} recurrence`"
+          data-test="task-recurrence"
         >
           <RecurrenceCard :recurrence="task.recurrence" />
         </div>
         <div
           v-if="taskCategory"
           class="flex items-center space-x-2 pl-1 text-sm"
-          aria-label="category"
+          :aria-label="`${task.title} category`"
+          data-test="task-category"
         >
           <Squares2X2Icon class="h-5 w-5 text-blue-500" />
-          <span>{{ taskCategory?.title }}</span>
+          <p>{{ taskCategory?.title }}</p>
         </div>
         <div
           v-if="taskGroup && isGroupInfo"
           class="flex items-center space-x-2 pl-1 text-sm"
-          aria-label="group"
+          :aria-label="`${task.title} group`"
+          data-test="task-group"
         >
           <UsersIcon class="h-5 w-5 text-blue-500" />
-          <span>{{ taskGroup.name }}</span>
+          <p>{{ taskGroup.name }}</p>
         </div>
       </div>
       <div aria-label="task options" class="min-w-14">
         <div class="flex h-full w-fit min-w-10 flex-col justify-between">
-          <div v-if="task.points" class="min-w-10" aria-label="points">
+          <div
+            v-if="task.points"
+            class="min-w-10"
+            :aria-label="`${task.title} points`"
+            data-test="task-points"
+          >
             <FwbBadge size="sm" type="yellow" class="w-fit min-w-10 rounded-e-full p-0">
               <StarIcon class="h-3 pr-1" />
               {{ task.points }}</FwbBadge
             >
           </div>
-          <div v-if="assignedUserProfile" class="flex w-full justify-center">
+          <div
+            v-if="assignedUserProfile"
+            class="flex w-full justify-center"
+            :aria-label="`${task.title} assigned user`"
+            data-test="task-assigned-user"
+          >
             <UserBasicProfile :user="assignedUserProfile" />
           </div>
           <div
             v-if="task.startTime && task.startDate"
             class="mt-1 flex items-center space-x-1 text-sm"
+            :aria-label="`${task.title} time`"
+            data-test="task-time"
           >
             <ClockIcon class="h-5 w-5 text-gray-50" />
-            <span class="text-xs tracking-wider">
-              {{ timeToLocalTime(task.startTime, task.startDate) }}</span
+            <p class="text-xs tracking-wider">
+              {{ timeToLocalTime(task.startTime, task.startDate) }}</p
             >
           </div>
         </div>

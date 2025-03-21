@@ -73,7 +73,8 @@ export const updateRewardSchema = z.object({
     .array(idSchema)
     .optional()
     .describe('For making reward available for picked users only'),
-  title: z.string().min(3).max(100).optional(),
+  title: z.string().trim().min(3).max(100).optional(),
+  createdByUserId: idSchema.optional(),
 })
 export const rewardsKeysAll = Object.keys(
   rewardsSchema.shape

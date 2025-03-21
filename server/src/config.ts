@@ -2,6 +2,8 @@
 import 'dotenv-flow/config'
 import { z } from 'zod'
 
+process.env.DOTENV_CONFIG_PATH = '/server' 
+
 const { env } = process
 
 if (!env.NODE_ENV) env.NODE_ENV = 'development'

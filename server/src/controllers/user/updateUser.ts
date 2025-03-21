@@ -12,7 +12,7 @@ export default authenticatedProcedure
   )
   .input(
     z.object({
-      username: z.string().trim().min(1).max(15),
+      username: z.string().trim().min(1).max(20),
     })
   )
   .mutation(async ({ input: userData, ctx: { repos, authUser } }) => {

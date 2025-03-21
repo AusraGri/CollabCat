@@ -26,6 +26,7 @@ const categoryOptions = computed(() => {
       :options="categoryOptions"
       placeholder="Select Category"
       :aria-label="label || 'Select a category'"
+      data-test="category-selection"
     />
   </div>
 </template>

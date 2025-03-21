@@ -13,13 +13,13 @@ function clearError() {
 }
 </script>
 <template>
-  <FwbModal size="sm" position="center" v-if="errorMessage" @close="clearError">
+  <FwbModal size="sm" position="center" v-if="errorMessage" @close="clearError" role="alertdialog">
     <template #header>
       <ExclamationTriangleIcon class="h-10 text-red-700" />
     </template>
     <template #body>
       <div>
-        <p>{{ errorMessage }}</p>
+        <p aria-label="Error message">{{ errorMessage }}</p>
       </div>
     </template>
     <template #footer>

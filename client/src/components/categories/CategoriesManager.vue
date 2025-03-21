@@ -32,6 +32,7 @@ const deleteCategory = async (confirmed: boolean) => {
   const categoryId = categoryToDelete.value?.id
   if (confirmed && categoryId) {
     await categoryStore.deleteCategory(categoryId)
+    categories.filter((cat)=> cat.id !== categoryId)
   }
 
   isDeletionRequired.value = false
@@ -42,7 +43,7 @@ const deleteCategory = async (confirmed: boolean) => {
   <div v-if="categories">
     <FwbModal v-if="isShowCategories" @close="closeModal" data-test="categories-modal">
       <template #header>
-        <h2 class="text-lg font-semibold" data-test="modal-header">Categories</h2>
+        <h2 class="text-lg font-semibold" data-test="categories-modal-header">Categories</h2>
       </template>
       <template #body>
         <FwbListGroup v-for="category in categories" :key="category.id" class="w-full">
@@ -51,7 +52,7 @@ const deleteCategory = async (confirmed: boolean) => {
             hover
             data-test="category-item"
           >
-            <span data-test="category-title">{{ category.title }}</span>
+            <p data-test="category-title">{{ category.title }}</p>
             <FwbButton
               class="w-fit p-1 text-left"
               @click="confirmCategoryDeletion(category)"

@@ -36,8 +36,12 @@ async function changeName() {
     emit('close')
     return
   }
+  try {
+    userStore.updateUserName(username.value)
+  } catch {
+    return
+  }
 
-  userStore.updateUserName(username.value)
   username.value = user.username
   router.push({ params: { username: username.value.replace(' ', '') } })
 
@@ -140,6 +144,7 @@ watch(
             pill
             square
             aria-label="Manage your categories"
+            data-test="manage-categories"
           >
             Manage Your Categories
             <template #suffix>
@@ -160,6 +165,7 @@ watch(
               color="red"
               @click="isShowConfirmation = true"
               aria-label="Delete your account"
+              data-test="delete-account"
               >Delete account</FwbButton
             >
           </div>
@@ -168,7 +174,8 @@ watch(
               form="userSettingsForm"
               type="submit"
               color="green"
-              aria-label="Save changes"
+              aria-label="Save Changes"
+              data-test="save-changes"
             >
               Save Changes
             </FwbButton>

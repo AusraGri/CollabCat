@@ -1,20 +1,38 @@
 import type { Ref } from 'vue'
+import { z } from 'zod'
 
-export function stringToUrl(string: string) {
-  return string.replace(' ', '')
+export function stringToUrl(string: string): string {
+  return string
+    .trim()
+    .replace(/[^a-zA-Z0-9À-ž\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export function isEmailValid(email: string) {
+  const emailSchema = z.string().email()
+  const result = emailSchema.safeParse(email)
+
+  return result.success
 }
 
 export function timeToLocalTime(timeString: string, timestamptz: Date): string {
   const date = new Date(timestamptz)
-
   const [hours, minutes] = timeString.split(':').map(Number)
-  date.setHours(hours, minutes, 0, 0)
+
+  if (hours === 24) {
+    date.setHours(0, minutes, 0, 0)
+  } else {
+    date.setHours(hours, minutes, 0, 0)
+  }
 
   const options: Intl.DateTimeFormatOptions = {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZoneName: 'short',
+    hourCycle: 'h23',
+    timeZoneName: 'shortOffset',
   }
 
   const formatter = new Intl.DateTimeFormat(undefined, options)

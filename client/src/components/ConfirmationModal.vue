@@ -20,19 +20,19 @@ function confirmAction(confirmed: boolean) {
   <FwbModal
     v-if="isShowModal"
     persistent
-    role="dialog"
+    role="alertdialog"
     aria-labelledby="modal-title"
     aria-describedby="modal-description"
     data-test="confirmation-modal"
     @keydown.esc="confirmAction(false)"
   >
     <template #header>
-      <div id="modal-title" class="flex items-center text-lg text-black">
+      <h1 id="modal-title" class="flex items-center text-lg text-black">
         Please Confirm the Action
-      </div>
+      </h1>
     </template>
     <template #body>
-      <p id="modal-description">
+      <p id="modal-description" aria-label="Confirm action" data-test="confirmation-question">
         Do you really want to <span class="text-red-600">{{ action }}</span>
         <span class="pl-1 text-base font-extrabold">{{ object }}</span> ?
       </p>

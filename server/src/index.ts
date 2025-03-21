@@ -13,7 +13,3 @@ app.listen(config.port, () => {
   // eslint-disable-next-line no-console
   console.log(`🚀 Server is running at http://localhost:${config.port} using ${config.env} database`);
 });
-// app.listen(config.port, () => {
-//   // eslint-disable-next-line no-console
-//   console.log(`Server is running at http://localhost:${config.port}`)
-// })

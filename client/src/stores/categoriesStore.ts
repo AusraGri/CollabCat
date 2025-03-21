@@ -80,7 +80,9 @@ export const useCategoriesStore = defineStore('categories', {
 
         if (this.groupCategories) {
           this.groupCategories = this.groupCategories.filter((cat) => cat.id !== categoryId)
-        } else {
+        }
+
+        if (this.userCategories) {
           this.userCategories = this.userCategories.filter((cat) => cat.id !== categoryId)
         }
 

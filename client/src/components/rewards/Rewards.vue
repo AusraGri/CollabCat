@@ -77,7 +77,7 @@ const handleRewardChange = async ({
         <slot name="trigger"></slot>
       </template>
       <FwbListGroup class="w-fit">
-        <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover>
+        <FwbListGroupItem v-for="reward in rewards" :key="reward.id" hover :aria-label="`Reward: ${reward.title}`" data-test="reward-item">
           <RewardItem
             v-if="currentUser"
             :reward="reward"

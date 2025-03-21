@@ -52,6 +52,7 @@ export const sortTasks = (tasks: TaskData[]) => {
     if (a.startTime && b.startTime) {
       return a.startTime.localeCompare(b.startTime)
     }
+
     if (a.startTime && !b.startTime) return -1
     if (!a.startTime && b.startTime) return 1
 
@@ -70,10 +71,11 @@ export const sortTasksByCompleted = (tasks: TaskData[]) => {
   })
 }
 
-export const checkRecurrence = (rec: TaskData['recurrence'] ) => {
-  const isConvertToDaily = rec?.recurringType === 'weekly' && rec.separationCount === 0 && rec.dayOfWeek?.length === 7
+export const checkRecurrence = (rec: TaskData['recurrence']) => {
+  const isConvertToDaily =
+    rec?.recurringType === 'weekly' && rec.separationCount === 0 && rec.dayOfWeek?.length === 7
 
-  if(isConvertToDaily) return {...rec, recurringType: 'daily', separationCount: 0}
+  if (isConvertToDaily) return { ...rec, recurringType: 'daily', separationCount: 0 }
 
   return rec
 }

@@ -1,4 +1,3 @@
-import 'dotenv-flow/config'
 
 export const apiOrigin = (process.env.VITE_API_ORIGIN as string) || 'http://localhost:4000'
 export const apiPath = (process.env.VITE_API_PATH as string) || '/api/v1/trpc'

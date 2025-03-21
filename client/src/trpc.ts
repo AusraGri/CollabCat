@@ -15,14 +15,6 @@ export const trpc = createTRPCProxyClient<AppRouter>({
         const authStore = useAuthStore()
         const accessToken = authStore.authToken
 
-        // if (!accessToken) {
-        //   throw new Error('Unauthorized: No token found')
-        // }
-        //  Log the headers for debugging purposes
-        // console.log('Headers:', {
-        //   Authorization: `Bearer ${accessToken}`,
-        // })
-
         return {
           Authorization: `Bearer ${accessToken}`,
         }

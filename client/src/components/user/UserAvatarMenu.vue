@@ -59,7 +59,7 @@ onMounted(() => {
     <div>
       <FwbDropdown>
         <template #trigger>
-          <span
+          <div
             class="flex items-center hover:cursor-pointer"
             role="button"
             tabindex="0"
@@ -91,7 +91,7 @@ onMounted(() => {
                 />
               </div>
             </div>
-          </span>
+          </div>
         </template>
         <FwbListGroup>
           <FwbListGroupItem hover>
