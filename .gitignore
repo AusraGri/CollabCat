@@ -4,3 +4,5 @@ node_modules
 /.idea
 readmeOld.md
 docker-compose.yaml
+containers.json
+public-endpoint.json
