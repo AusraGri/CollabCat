@@ -177,6 +177,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Debug Docker context
+        run: |
+          pwd
+          ls -la
+          echo "SERVER_IMAGE_TAG is $SERVER_IMAGE_TAG"
+
       - name: Build server image
         run: >-
           docker build \
@@ -198,7 +204,7 @@ jobs:
       # build, then you will need to pass them as a docker build argument:
       # --build-arg VITE_MY_CUSTOM_VAR=${{vars.MY_CUSTOM_VAR}}
       - name: Build client image
-        run: >-
+        run: |
           docker build \
           --build-arg VITE_AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }} \
           --build-arg VITE_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }} \
@@ -214,7 +220,7 @@ jobs:
           .
 
       - name: Push server image
-        run: >-
+        run: |
           aws lightsail push-container-image
           --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
           --label $SERVER_IMAGE_TAG
