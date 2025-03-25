@@ -186,6 +186,7 @@ jobs:
       - name: Build server image
         run: >-
           docker build
+          -t $SERVER_IMAGE_TAG
           --build-arg AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
           --build-arg AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
           --build-arg AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}
@@ -196,7 +197,6 @@ jobs:
           --build-arg SMTP_PASS=${{ secrets.SMTP_PASS }}
           --build-arg TOKEN_KEY=${{ secrets.TOKEN_KEY }}
           --build-arg CLIENT_ORIGIN_URL=${{ secrets.CLIENT_ORIGIN_URL}}
-          -t $SERVER_IMAGE_TAG
           -f ./server/Dockerfile
           .
 
@@ -206,6 +206,7 @@ jobs:
       - name: Build client image
         run: >-
           docker build
+          -t $CLIENT_IMAGE_TAG
           --build-arg VITE_AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
           --build-arg VITE_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
           --build-arg VITE_AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}
@@ -215,7 +216,6 @@ jobs:
           --build-arg VITE_AUTH0_TEST_PASSWORD=${{ secrets.AUTH0_TEST_PASSWORD }}
           --build-arg VITE_API_PATH=${{ vars.API_PATH }}
           --build-arg VITE_API_SERVER_URL=${{ vars.API_SERVER_URL }}
-          -t $CLIENT_IMAGE_TAG
           -f ./client/Dockerfile
           .
 
