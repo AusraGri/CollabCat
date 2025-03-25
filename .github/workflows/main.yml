@@ -185,9 +185,19 @@ jobs:
 
       - name: Build server image
         run: >-
-          docker build \
-          -t $SERVER_IMAGE_TAG \
-          -f ./server/Dockerfile \
+          docker build
+          --build-arg AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
+          --build-arg AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
+          --build-arg AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}
+          --build-arg AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}
+          --build-arg SMTP_HOST=${{ secrets.SMTP_HOST }}
+          --build-arg SMTP_PORT=${{ secrets.SMTP_PORT }}
+          --build-arg SMTP_USER=${{ secrets.SMTP_USER }}
+          --build-arg SMTP_PASS=${{ secrets.SMTP_PASS }}
+          --build-arg TOKEN_KEY=${{ secrets.TOKEN_KEY }}
+          --build-arg CLIENT_ORIGIN_URL=${{ secrets.CLIENT_ORIGIN_URL}}
+          -t $SERVER_IMAGE_TAG
+          -f ./server/Dockerfile
           .
 
       # if you need to pass additional environment variables to the client
@@ -195,9 +205,18 @@ jobs:
       # --build-arg VITE_MY_CUSTOM_VAR=${{vars.MY_CUSTOM_VAR}}
       - name: Build client image
         run: >-
-          docker build \
-          -t $CLIENT_IMAGE_TAG \
-          -f ./client/Dockerfile \
+          docker build
+          --build-arg VITE_AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
+          --build-arg VITE_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
+          --build-arg VITE_AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}
+          --build-arg VITE_AUTH0_CALLBACK_URL=${{ secrets.AUTH0_CALLBACK_URL }}
+          --build-arg VITE_AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}
+          --build-arg VITE_AUTH0_TEST_EMAIL=${{ secrets.AUTH0_TEST_EMAIL }}
+          --build-arg VITE_AUTH0_TEST_PASSWORD=${{ secrets.AUTH0_TEST_PASSWORD }}
+          --build-arg VITE_API_PATH=${{ vars.API_PATH }}
+          --build-arg VITE_API_SERVER_URL=${{ vars.API_SERVER_URL }}
+          -t $CLIENT_IMAGE_TAG
+          -f ./client/Dockerfile
           .
 
       - name: Push server image
