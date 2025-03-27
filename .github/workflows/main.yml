@@ -196,19 +196,9 @@ jobs:
           ls -la ./server
 
       - name: Build server image
-        run: >
+        run: >-
           docker build
           -t $SERVER_IMAGE_TAG
-          --build-arg AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
-          --build-arg AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
-          --build-arg AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}
-          --build-arg AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}
-          --build-arg SMTP_HOST=${{ secrets.SMTP_HOST }}
-          --build-arg SMTP_PORT=${{ secrets.SMTP_PORT }}
-          --build-arg SMTP_USER=${{ secrets.SMTP_USER }}
-          --build-arg SMTP_PASS=${{ secrets.SMTP_PASS }}
-          --build-arg TOKEN_KEY=${{ secrets.TOKEN_KEY }}
-          --build-arg CLIENT_ORIGIN_URL=${{ secrets.CLIENT_ORIGIN_URL}}
           -f ./server/Dockerfile .
 
       # if you need to pass additional environment variables to the client
