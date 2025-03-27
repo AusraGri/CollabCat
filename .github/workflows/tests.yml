@@ -145,6 +145,14 @@ jobs:
       - name: Test client E2E
         run: npm run test:e2e -w=client
 
+      - name: Upload Playwright debug screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-debug
+          path: debug.png
+          retention-days: 7
+
       # Playwright generates a report of the E2E tests. We will
       # upload that report as an artifact so that we can download
       # it later from the GitHub Actions UI. This will help us
