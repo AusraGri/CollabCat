@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-debug
-          path: debug.png
+          path: client/debug.png
           retention-days: 7
 
       # Playwright generates a report of the E2E tests. We will
