@@ -6,7 +6,7 @@ WORKDIR /app
 # On the server build we could prune the client dependencies
 # and after the build stage we could install only the non-dev
 # dependencies, though we will keep this simple.
-COPY package*.json .
+COPY package*.json ./
 COPY client/package*.json client/
 COPY server/package*.json server/
 RUN npm ci
