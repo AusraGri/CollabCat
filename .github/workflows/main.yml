@@ -229,6 +229,10 @@ jobs:
       - name: Debug AWS Lightsail service name
         run: echo "AWS_LIGHTSAIL_SERVICE=${{ vars.AWS_LIGHTSAIL_SERVICE }}"
 
+      - name: Check AWS Lightsail connection
+        run: aws lightsail get-container-images --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
+
+
       - name: Push server image
         run: |
           aws lightsail push-container-image
