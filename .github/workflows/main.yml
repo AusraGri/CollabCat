@@ -185,6 +185,7 @@ jobs:
 
       - name: Build server image
         run: >
+        run: >
           docker build
           -t $SERVER_IMAGE_TAG
           --build-arg AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
