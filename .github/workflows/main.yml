@@ -11,6 +11,8 @@ jobs:
       # variables for our front-end tests, see client/src/config.ts
       VITE_API_ORIGIN: http://localhost:3000
       VITE_API_PATH: /api/v1/trpc
+      VITE_AUTH0_TEST_EMAIL: ${{ secrets.AUTH0_TEST_EMAIL }}
+      VITE_AUTH0_TEST_PASSWORD: ${{ secrets.AUTH0_TEST_PASSWORD }}
 
       # variables for our back-end tests, see server/src/config.ts
       TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5433/testdb

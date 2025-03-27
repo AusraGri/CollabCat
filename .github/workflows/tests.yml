@@ -18,6 +18,8 @@ jobs:
       TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5433/testdb
       DATABASE_URL: postgres://capstone:capstone@localhost:5434/devdb
       BASE_URL: http://localhost:3000
+      VITE_AUTH0_TEST_EMAIL: ${{ secrets.AUTH0_TEST_EMAIL }}
+      VITE_AUTH0_TEST_PASSWORD: ${{ secrets.AUTH0_TEST_PASSWORD }}
 
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
       SMTP_PORT: ${{ secrets.SMTP_PORT }}
