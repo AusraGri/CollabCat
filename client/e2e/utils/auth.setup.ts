@@ -19,14 +19,14 @@ setup('authenticate', async ({context}) => {
     }
 
     const browser = await chromium.launch({ headless: true })
-    // const page = await chromium.newPage()
+    // const page = await browser.newPage()
     const page = await context.newPage()
 
     
 
     await page.goto('http://localhost:5174/')
+    await page.screenshot({ path: 'debug1.png' });
     await page.getByTestId('login-button').click()
-    await page.getByLabel('Email address').waitFor({ state: 'visible', timeout: 50000 });
     await page.screenshot({ path: 'debug.png' });
     await page.getByLabel('Email address').fill(VITE_AUTH0_TEST_EMAIL)
     await page.getByLabel('Password').fill(VITE_AUTH0_TEST_PASSWORD)
