@@ -209,20 +209,34 @@ jobs:
           --build-arg VITE_API_SERVER_URL=${{ vars.API_SERVER_URL }}
           -f ./client/Dockerfile .
 
+      # - name: Push server image
+      #   run: |
+      #     aws lightsail push-container-image
+      #     --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
+      #     --label $SERVER_IMAGE_TAG
+      #     --image $SERVER_IMAGE_TAG
+      #     --output yaml
       - name: Push server image
         run: |
           aws lightsail push-container-image
           --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
-          --label $SERVER_IMAGE_TAG
-          --image $SERVER_IMAGE_TAG
+          --label ${{ env.SERVER_IMAGE_TAG }}
+          --image ${{ env.SERVER_IMAGE_TAG }}
           --output yaml
 
+      # - name: Push client image
+      #   run: >-
+      #     aws lightsail push-container-image
+      #     --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
+      #     --label $CLIENT_IMAGE_TAG
+      #     --image $CLIENT_IMAGE_TAG
+      #     --output yaml
       - name: Push client image
         run: >-
           aws lightsail push-container-image
           --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
-          --label $CLIENT_IMAGE_TAG
-          --image $CLIENT_IMAGE_TAG
+          --label ${{ env.CLIENT_IMAGE_TAG }}
+          --image ${{ env.CLIENT_IMAGE_TAG }}
           --output yaml
 
       - name: Get Lightsail image tag
