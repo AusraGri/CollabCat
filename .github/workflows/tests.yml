@@ -13,13 +13,13 @@ jobs:
       # variables for our front-end tests, see client/src/config.ts
       VITE_API_ORIGIN: http://localhost:3000
       VITE_API_PATH: /api/v1/trpc
+      VITE_AUTH0_TEST_EMAIL: ${{ secrets.AUTH0_TEST_EMAIL }}
+      VITE_AUTH0_TEST_PASSWORD: ${{ secrets.AUTH0_TEST_PASSWORD }}
 
       # variables for our back-end tests, see server/src/config.ts
       TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5433/testdb
       DATABASE_URL: postgres://capstone:capstone@localhost:5434/devdb
       BASE_URL: http://localhost:3000
-      VITE_AUTH0_TEST_EMAIL: ${{ secrets.AUTH0_TEST_EMAIL }}
-      VITE_AUTH0_TEST_PASSWORD: ${{ secrets.AUTH0_TEST_PASSWORD }}
 
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
       SMTP_PORT: ${{ secrets.SMTP_PORT }}
@@ -156,6 +156,14 @@ jobs:
         with:
           name: playwright-debug
           path: client/debug.png
+          retention-days: 7
+
+      - name: Upload Playwright debug screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-debug1
+          path: client/debug1.png
           retention-days: 7
 
       # Playwright generates a report of the E2E tests. We will
