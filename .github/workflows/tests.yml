@@ -124,11 +124,6 @@ jobs:
       # instead of running it in dev mode because there is some
       # differences between dev mode and production mode front
       # end code.
-      - name: Debug Check working directory
-        run: pwd
-
-      - name: Debug List files
-        run: ls -lah client/e2e/utils/
 
       - name: Build front end for E2E tests
         run: npm run build -w=client
@@ -149,13 +144,6 @@ jobs:
 
       - name: Test client E2E
         run: npm run test:e2e -w=client
-
-      - name: Upload Playwright Traces
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-traces
-          path: client/test-results/**/*.zip
 
       - name: Upload Playwright debug screenshot
         if: always()
