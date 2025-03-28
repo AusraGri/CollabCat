@@ -147,10 +147,8 @@ jobs:
           retry-delay: 5s
           url: ${{ env.VITE_API_ORIGIN }}/api/health
 
-      # - name: Test client E2E
-      #   run: npm run test:e2e -w=client
       - name: Test client E2E
-        run: npx playwright test --trace=on -w=client
+        run: npm run test:e2e -w=client
 
       - name: Upload Playwright Traces
         if: failure()
