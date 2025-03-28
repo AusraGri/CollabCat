@@ -16,7 +16,6 @@ jobs:
       VITE_AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
       VITE_AUTH0_CLIENT_ID: ${{ secrets.CLIENT_AUTH0_CLIENT_ID }}
       VITE_AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE}}
-      VITE_AUTH0_CLIENT_SECRET: ${{ secrets.CLIENT_AUTH0_CLIENT_SECRET }}
       VITE_AUTH0_CALLBACK_URL: ${{ secrets.AUTH0_CALLBACK_URL }}
 
       # variables for our back-end tests, see server/src/config.ts
@@ -31,7 +30,7 @@ jobs:
 
       AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
       AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
-      CLIENT_ORIGIN_URL: ${{ secrets.PROD_CLIENT_ORIGIN_URL }}
+      CLIENT_ORIGIN_URL: ${{ secrets.CLIENT_ORIGIN_URL }}
       AUTH0_CLIENT_ID: ${{ secrets.SERVER_AUTH0_CLIENT_ID }}
       AUTH0_CLIENT_SECRET: ${{ secrets.SERVER_AUTH0_CLIENT_SECRET }}
     services:
@@ -288,7 +287,7 @@ jobs:
                 "AUTH0_CLIENT_ID": "${{ secrets.SERVER_AUTH0_CLIENT_ID }}",
                 "AUTH0_CLIENT_SECRET": "${{ secrets.SERVER_AUTH0_CLIENT_SECRET }}",
                 "AUTH0_AUDIENCE": "${{ secrets.AUTH0_AUDIENCE }}",
-                "CLIENT_ORIGIN_URL": "${{ secrets.CLIENT_ORIGIN_URL }}",
+                "CLIENT_ORIGIN_URL": "${{ secrets.PROD_CLIENT_ORIGIN_URL }}",
                 "SMTP_HOST": "${{ secrets.SMTP_HOST }}",
                 "SMTP_PORT": "${{ secrets.SMTP_PORT }}",
                 "SMTP_USER": "${{ secrets.SMTP_USER }}",
