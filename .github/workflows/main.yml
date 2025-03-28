@@ -184,24 +184,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Debug Docker context
-        run: |
-          pwd
-          ls -la
-          echo "SERVER_IMAGE_TAG is $SERVER_IMAGE_TAG"
-
-          echo "Current directory:"
-          pwd
-
-          echo "Listing files at the root of the repo:"
-          ls -la
-
-          echo "Listing files in the server folder:"
-          ls -la ./server
-
-          echo "Dockerfile location check:"
-          ls -la ./server
-
       - name: Build server image
         run: >
           docker build
@@ -226,19 +208,6 @@ jobs:
           --build-arg VITE_API_PATH=${{ vars.API_PATH }}
           --build-arg VITE_API_SERVER_URL=${{ vars.API_SERVER_URL }}
           -f ./client/Dockerfile .
-
-      - name: Debug server image tag
-        run: echo "SERVER_IMAGE_TAG=$SERVER_IMAGE_TAG"
-
-      - name: Debug client image tag
-        run: echo "CLIENT_IMAGE_TAG=$CLIENT_IMAGE_TAG"
-
-      - name: Debug AWS Lightsail service name
-        run: echo "AWS_LIGHTSAIL_SERVICE=${{ vars.AWS_LIGHTSAIL_SERVICE }}"
-
-      - name: Check AWS Lightsail connection
-        run: aws lightsail get-container-images --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
-
 
       - name: Push server image
         run: |

@@ -20,7 +20,7 @@ jobs:
       VITE_AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE}}
       VITE_AUTH0_CLIENT_SECRET: ${{ secrets.CLIENT_AUTH0_CLIENT_SECRET }}
       VITE_AUTH0_CALLBACK_URL: ${{ secrets.AUTH0_CALLBACK_URL }}
-      
+
       # variables for our back-end tests, see server/src/config.ts
       TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5433/testdb
       DATABASE_URL: postgres://capstone:capstone@localhost:5434/devdb
@@ -149,22 +149,6 @@ jobs:
 
       - name: Test client E2E
         run: npm run test:e2e -w=client
-
-      - name: Upload Playwright debug screenshot
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-debug
-          path: client/debug.png
-          retention-days: 7
-
-      - name: Upload Playwright debug screenshot
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-debug1
-          path: client/debug1.png
-          retention-days: 7
 
       # Playwright generates a report of the E2E tests. We will
       # upload that report as an artifact so that we can download

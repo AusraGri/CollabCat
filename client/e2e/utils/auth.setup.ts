@@ -19,21 +19,16 @@ setup('authenticate', async ({context}) => {
     }
 
     const browser = await chromium.launch({ headless: true })
-    // const page = await browser.newPage()
     const page = await context.newPage()
 
 
     await page.goto('http://localhost:5174/')
     await page.getByTestId('login-button').click()
-    await page.screenshot({ path: 'debug.png' });
     await page.getByLabel('Email address').fill(VITE_AUTH0_TEST_EMAIL)
-    await page.screenshot({ path: 'debug1.png' });
     await page.getByLabel('Password').fill(VITE_AUTH0_TEST_PASSWORD)
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
     await page.waitForURL(`http://localhost:5174/${stringToUrl(VITE_AUTH0_TEST_EMAIL)}/calendar`, { timeout: 20000 })
-
     await expect(page).toHaveURL(/calendar/)
-    // await page.context().storageState({ path: authFile })
     await context.storageState({ path: authFile })
 
     await browser.close()
