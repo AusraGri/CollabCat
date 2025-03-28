@@ -13,6 +13,11 @@ jobs:
       VITE_API_PATH: /api/v1/trpc
       VITE_AUTH0_TEST_EMAIL: ${{ secrets.AUTH0_TEST_EMAIL }}
       VITE_AUTH0_TEST_PASSWORD: ${{ secrets.AUTH0_TEST_PASSWORD }}
+      VITE_AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+      VITE_AUTH0_CLIENT_ID: ${{ secrets.CLIENT_AUTH0_CLIENT_ID }}
+      VITE_AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE}}
+      VITE_AUTH0_CLIENT_SECRET: ${{ secrets.CLIENT_AUTH0_CLIENT_SECRET }}
+      VITE_AUTH0_CALLBACK_URL: ${{ secrets.AUTH0_CALLBACK_URL }}
 
       # variables for our back-end tests, see server/src/config.ts
       TEST_DATABASE_URL: postgres://capstone:capstone@localhost:5433/testdb
@@ -212,10 +217,10 @@ jobs:
           docker build
           -t $CLIENT_IMAGE_TAG
           --build-arg VITE_AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}
-          --build-arg VITE_AUTH0_CLIENT_ID=${{ secrets.CLIENT_AUTH0_CLIENT_ID }}
+          --build-arg VITE_AUTH0_CLIENT_ID=${{ secrets.PROD_AUTH0_CLIENT_ID }}
           --build-arg VITE_AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}
-          --build-arg VITE_AUTH0_CALLBACK_URL=${{ secrets.AUTH0_CALLBACK_URL }}
-          --build-arg VITE_AUTH0_CLIENT_SECRET=${{ secrets.CLIENT_AUTH0_CLIENT_SECRET }}
+          --build-arg VITE_AUTH0_CALLBACK_URL=${{ secrets.PROD_AUTH0_CALLBACK_URL }}
+          --build-arg VITE_AUTH0_CLIENT_SECRET=${{ secrets.PROD_AUTH0_CLIENT_SECRET }}
           --build-arg VITE_AUTH0_TEST_EMAIL=${{ secrets.AUTH0_TEST_EMAIL }}
           --build-arg VITE_AUTH0_TEST_PASSWORD=${{ secrets.AUTH0_TEST_PASSWORD }}
           --build-arg VITE_API_PATH=${{ vars.API_PATH }}
@@ -281,6 +286,7 @@ jobs:
                 "NODE_ENV": "production",
                 "PORT": "3000",
                 "DATABASE_URL": "${{ secrets.PROD_DATABASE_URL }}",
+                "TEST_DATABASE_URL": "${{ secrets.PROD_DATABASE_URL }}",
                 "TOKEN_KEY": "${{ secrets.PROD_TOKEN_KEY }}",
                 "AUTH0_DOMAIN": "${{ secrets.AUTH0_DOMAIN }}",
                 "AUTH0_CLIENT_ID": "${{ secrets.SERVER_AUTH0_CLIENT_ID }}",
