@@ -27,9 +27,9 @@ setup('authenticate', async ({context}) => {
     await page.getByTestId('login-button').click()
     await page.screenshot({ path: 'debug.png' });
     await page.getByLabel('Email address').fill(VITE_AUTH0_TEST_EMAIL)
-    await page.screenshot({ path: 'debug1.png' });
     await page.getByLabel('Password').fill(VITE_AUTH0_TEST_PASSWORD)
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
+    await page.screenshot({ path: 'debug1.png' });
     await page.waitForURL(`http://localhost:5174/${stringToUrl(VITE_AUTH0_TEST_EMAIL)}/calendar`, { timeout: 20000 })
 
     await expect(page).toHaveURL(/calendar/)
