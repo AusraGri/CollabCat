@@ -222,7 +222,7 @@ jobs:
         run: |
           echo "Testing AWS Lightsail permissions..."
           aws lightsail get-container-services --region ${{ env.AWS_REGION }} --output yaml
-          
+
       # - name: Push server image
       #   run: |
       #     aws lightsail push-container-image
@@ -231,7 +231,7 @@ jobs:
       #     --image $SERVER_IMAGE_TAG
       #     --output yaml
       - name: Push server image
-        run: |
+        run: >-
           aws lightsail push-container-image
           --service-name ${{ vars.AWS_LIGHTSAIL_SERVICE }}
           --label ${{ env.SERVER_IMAGE_TAG }}
