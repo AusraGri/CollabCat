@@ -209,6 +209,20 @@ jobs:
           --build-arg VITE_API_SERVER_URL=${{ vars.API_SERVER_URL }}
           -f ./client/Dockerfile .
 
+      - name: Debugging environment variables
+        run: |
+          echo "SERVER_IMAGE_TAG: ${{ env.SERVER_IMAGE_TAG }}"
+          echo "CLIENT_IMAGE_TAG: ${{ env.CLIENT_IMAGE_TAG }}"
+          echo "AWS_LIGHTSAIL_SERVICE: ${{ vars.AWS_LIGHTSAIL_SERVICE }}"
+          echo "aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+          echo "aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+          echo "Running aws lightsail push-container-image command..."
+
+      - name: Test AWS Lightsail Permissions
+        run: |
+          echo "Testing AWS Lightsail permissions..."
+          aws lightsail get-container-services --region ${{ env.AWS_REGION }} --output yaml
+          
       # - name: Push server image
       #   run: |
       #     aws lightsail push-container-image
