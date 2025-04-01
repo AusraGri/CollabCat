@@ -6,11 +6,13 @@ import {
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import { createOpenApiExpressMiddleware } from 'trpc-openapi'
+import { sql } from 'kysely'
 import type { Database } from './database'
 import { appRouter } from './controllers'
 import type { Context } from './trpc'
 import config from './config'
 import { openApiDocument } from './trpc/openApi'
+import logger from './utils/logger'
 
 export default function createApp(db: Database) {
   const app = express()
@@ -25,8 +27,19 @@ export default function createApp(db: Database) {
 
   app.use(express.json())
 
-  app.use('/api/health', (_, res) => {
-    res.status(200).send('OK')
+  // app.use('/api/health', (_, res) => {
+  //   res.status(200).send('OK')
+  // })
+
+  app.use('/api/health', async (_, res) => {
+    try {
+      await sql`SELECT 1 FROM pg_stat_database LIMIT 1`.execute(db)
+
+      res.status(200).json({ status: 'OK', database: 'connected' })
+    } catch (error) {
+      logger.error('❌ Database health check failed!', { error })
+      res.status(500).json({ status: 'ERROR', database: 'disconnected' })
+    }
   })
 
   app.use(

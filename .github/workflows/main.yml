@@ -165,8 +165,7 @@ jobs:
           -f ./server/Dockerfile .
 
       - name: Build client image
-
-        run: >
+        run: >-
           docker build
           -t $CLIENT_IMAGE_TAG
           --build-arg VITE_AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}

@@ -6,6 +6,7 @@ import { defineConfig, loadEnv } from 'vite'
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
   test: {
+    setupFiles: "./vitest.setup.ts",
     environment: 'node',
     globals: true,
     coverage: {

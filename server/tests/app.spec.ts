@@ -9,9 +9,16 @@ afterAll(() => {
   database.destroy()
 })
 
-it('can launch the app', async () => {
-  await supertest(app).get('/api/health').expect(200, 'OK')
-})
+it('should return status 200 and a healthy database', async () => {
+  const response = await supertest(app).get('/api/health');
+
+  expect(response.status).toBe(200);
+
+  expect(response.body).toEqual({
+    status: 'OK',
+    database: 'connected',
+  });
+});
 
 it('should check TRPC health', async () => {
   const response = await supertest(app)

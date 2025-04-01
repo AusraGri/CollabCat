@@ -14,6 +14,10 @@ export const requestContext = (
         sub: 'sub',
       },
     },
+    headers: {
+      'x-forwarded-for': '127.0.0.1',
+    },
+    url: '/some/api/endpoint',
     header: () => undefined,
     get: () => undefined,
   } as any,

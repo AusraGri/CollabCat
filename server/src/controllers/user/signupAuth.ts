@@ -7,6 +7,7 @@ import { userSchema } from '@server/entities/user'
 import { verifyAuth0Token } from '@server/auth0/verifyAuth0Token'
 import z from 'zod'
 import config from '@server/config'
+import logger from '@server/utils/logger'
 
 export default publicProcedure
   .use(
@@ -48,6 +49,7 @@ export default publicProcedure
       )
 
       if (!userFromAuth0.sub) {
+        logger.warn('Unauthorized user signup request: Invalid Auth0 token')
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: 'Invalid Auth0 token',
