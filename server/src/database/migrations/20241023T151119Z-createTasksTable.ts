@@ -32,25 +32,37 @@ export async function up(db: Kysely<any>) {
   await db.schema
     .createIndex('idx_tasks_created_by_user')
     .on('tasks')
-    .columns(['created_by_user_id'])
+    .column('created_by_user_id')
     .execute()
 
   await db.schema
     .createIndex('idx_tasks_assigned_user')
     .on('tasks')
-    .columns(['assigned_user_id'])
+    .column('assigned_user_id')
     .execute()
 
   await db.schema
     .createIndex('idx_tasks_group')
     .on('tasks')
-    .columns(['group_id'])
+    .column('group_id')
+    .execute()
+
+    await db.schema
+    .createIndex('idx_tasks_end_date')
+    .on('tasks')
+    .column('end_date')
     .execute()
 
   await db.schema
-    .createIndex('idx_tasks_id')
+    .createIndex('idx_tasks_is_recurring')
     .on('tasks')
-    .columns(['id'])
+    .column('is_recurring')
+    .execute()
+
+    await db.schema
+    .createIndex('idx_tasks_start_date')
+    .on('tasks')
+    .column('start_date')
     .execute()
 }
 export async function down(db: Kysely<any>) {
