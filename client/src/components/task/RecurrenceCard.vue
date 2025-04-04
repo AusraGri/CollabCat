@@ -38,15 +38,21 @@ function separation(count: number) {
 }
 </script>
 <template>
-  <div class="text-sm" aria-label="Task recurrence pattern info" data-test="task-recurrence-pattern-info">
+  <div
+    class="text-sm"
+    aria-label="Task recurrence pattern info"
+    data-test="task-recurrence-pattern-info"
+  >
     <div v-if="isDaily">
       <div :aria-label="separationLabel" data-test="task-repeat-daily">{{ separationLabel }}</div>
     </div>
-    <div
-      v-if="isWeekly"
-      class="flex flex-col space-y-1  sm:items-center sm:space-x-3 sm:space-y-0"
-    >
-      <div v-if="recurrence.dayOfWeek" class="flex space-x-1" aria-label="Task repeats on:" data-test="task-days-of-week">
+    <div v-if="isWeekly" class="flex flex-col space-y-1 sm:items-center sm:space-x-3 sm:space-y-0">
+      <div
+        v-if="recurrence.dayOfWeek"
+        class="flex space-x-1"
+        aria-label="Task repeats on:"
+        data-test="task-days-of-week"
+      >
         <div
           v-for="day in weekdays"
           :key="day"

@@ -70,7 +70,7 @@ export const useRewardStore = defineStore('reward', {
         this.rewards =
           this.rewards?.map((r) => (r.id === updatedReward.id ? updatedReward : r)) || null
       } catch (error) {
-        setErrorMessage({messageKey: 'update', message: 'reward'})
+        setErrorMessage({ messageKey: 'update', message: 'reward' })
         throw new Error(`Failed to update reward: ${error}`)
       }
     },
@@ -79,7 +79,7 @@ export const useRewardStore = defineStore('reward', {
         await trpc.rewards.deleteReward.mutate({ rewardId })
         this.rewards = this.rewards?.filter((r) => r.id !== rewardId) || null
       } catch (error) {
-        setErrorMessage({messageKey: 'delete', message: 'reward'})
+        setErrorMessage({ messageKey: 'delete', message: 'reward' })
         throw new Error('Failed to delete reward')
       }
     },
@@ -93,7 +93,7 @@ export const useRewardStore = defineStore('reward', {
 
         this.rewards = this.rewards ? [...this.rewards, reward] : [reward]
       } catch (error) {
-        setErrorMessage({messageKey: 'create', message: 'reward'})
+        setErrorMessage({ messageKey: 'create', message: 'reward' })
         throw new Error('Failed to create new reward')
       }
     },

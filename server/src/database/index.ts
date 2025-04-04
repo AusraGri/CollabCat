@@ -29,8 +29,8 @@ export function createDatabase(options: pg.PoolConfig): Kysely<DB> {
         error: err.message,
         stack: err.stack,
       },
-      "Database pool error detected!"
-    );
+      'Database pool error detected!'
+    )
   })
 
   return new Kysely<DB>({

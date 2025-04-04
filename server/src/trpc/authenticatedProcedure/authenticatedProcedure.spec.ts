@@ -19,7 +19,7 @@ vi.mock('jsonwebtoken', () => ({
       return { user: { id: 2, email: 'valid@email.com' } }
     },
   },
-})) 
+}))
 
 const repos = {
   userRepository: {

@@ -6,7 +6,6 @@ import { TRPCError } from '@trpc/server'
 import z from 'zod'
 import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
-
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
   .use(errorLoggingMiddleware)

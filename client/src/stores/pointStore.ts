@@ -48,7 +48,7 @@ export const usePointsStore = defineStore('points', {
         this.isEnabled = true
         this.pointsData = points
       } catch (error) {
-        setErrorMessage({message: 'Failed to enable user points. Please try again'})
+        setErrorMessage({ message: 'Failed to enable user points. Please try again' })
         throw new Error('Failed to enable user points')
       }
     },
@@ -62,7 +62,7 @@ export const usePointsStore = defineStore('points', {
         this.isEnabled = false
         this.pointsData = null
       } catch (error) {
-        setErrorMessage({message: 'Failed to disable user points. Please try again'})
+        setErrorMessage({ message: 'Failed to disable user points. Please try again' })
         throw new Error('Failed to disable user points')
       }
     },

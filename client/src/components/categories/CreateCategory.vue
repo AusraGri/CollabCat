@@ -47,7 +47,7 @@ async function confirmAction(confirmed: boolean) {
     return
   }
 
-  const isCategory = isCategoryTitle({ title: title.value, groupId: groupId})
+  const isCategory = isCategoryTitle({ title: title.value, groupId: groupId })
 
   if (isCategory) {
     closeModal()

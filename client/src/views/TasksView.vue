@@ -56,7 +56,7 @@ const selectedCategoryName = computed(() => {
   return selectedCategoryTitle || 'Categories'
 })
 
-const selectedCategoryLabel = computed(()=> {
+const selectedCategoryLabel = computed(() => {
   const selectedCategoryTitle = selectedCategory.value?.title || undefined
 
   return selectedCategoryTitle || 'None'
@@ -271,7 +271,7 @@ watch(
           <div class="rounded-t-xl border-2 border-b-0 border-blue-500">
             <button
               type="button"
-              class="flex px-3 pt-1 text-sm whitespace-nowrap pb-1"
+              class="flex whitespace-nowrap px-3 pb-1 pt-1 text-sm"
               :aria-label="`Select category. Selected category: ${selectedCategoryLabel}`"
               data-test="select-category"
             >

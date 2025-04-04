@@ -21,7 +21,7 @@ const error = ref()
 const groupInfo = ref<GroupsPublic>()
 const groupOwner = ref<UserPublic>()
 
-const signupUser = async()=> {
+const signupUser = async () => {
   signup('/invite')
 }
 
@@ -93,7 +93,7 @@ onMounted(async () => {
       await invitationStore.deleteInvitation()
     }
 
-    if(isAuth && userStore.user){
+    if (isAuth && userStore.user) {
       await addUserToGroup()
       await invitationStore.deleteInvitation()
     }

@@ -24,23 +24,18 @@ await insertAll(db, 'userGroups', [
   fakeUserGroup({ groupId: groupOne.id, userId: userOne.id }),
   fakeUserGroup({ groupId: groupTwo.id, userId: userOne.id }),
 ])
-const [
-  categoryOne,
-  categoryTwo,
-  categoryThree,
-  categoryFour,
-  defaultCategory,
-] = await insertAll(db, 'categories', [
-  fakeCategory({ groupId: groupOne.id, createdByUserId: null }),
-  fakeCategory({ createdByUserId: userOne.id, groupId: null }),
-  fakeCategory({ createdByUserId: userOne.id, groupId: groupTwo.id }),
-  fakeCategory({ createdByUserId: userTwo.id, groupId: groupOne.id }),
-  fakeCategory({
-    isDefault: true,
-    createdByUserId: null,
-    groupId: null
-  }),
-]) 
+const [categoryOne, categoryTwo, categoryThree, categoryFour, defaultCategory] =
+  await insertAll(db, 'categories', [
+    fakeCategory({ groupId: groupOne.id, createdByUserId: null }),
+    fakeCategory({ createdByUserId: userOne.id, groupId: null }),
+    fakeCategory({ createdByUserId: userOne.id, groupId: groupTwo.id }),
+    fakeCategory({ createdByUserId: userTwo.id, groupId: groupOne.id }),
+    fakeCategory({
+      isDefault: true,
+      createdByUserId: null,
+      groupId: null,
+    }),
+  ])
 
 describe('create category', () => {
   it('should create new category', async () => {
@@ -131,7 +126,9 @@ describe('get categories data', () => {
 
     // Then
     expect(result).toBeTruthy()
-    expect(result).toEqual(expect.arrayContaining([categoryTwo, defaultCategory]))
+    expect(result).toEqual(
+      expect.arrayContaining([categoryTwo, defaultCategory])
+    )
   })
 
   it('should return only default categories if no personal user or group created categories found', async () => {

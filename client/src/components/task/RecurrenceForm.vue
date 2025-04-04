@@ -217,7 +217,11 @@ onMounted(() => {
         </FwbDropdown>
       </div>
     </div>
-    <div class="flex flex-col" aria-label="Recurrence separation count" data-test="recurrence-separation">
+    <div
+      class="flex flex-col"
+      aria-label="Recurrence separation count"
+      data-test="recurrence-separation"
+    >
       <FwbInput
         v-model="everyXCount"
         type="number"

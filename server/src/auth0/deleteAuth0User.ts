@@ -16,7 +16,6 @@ export const deleteAuth0User = async (auth0UserId: string) => {
     if (!response.ok) {
       throw new Error(`Failed to delete user: ${response.statusText}`)
     }
-
   } catch (error) {
     throw new Error('Failed to delete Auth0 user')
   }

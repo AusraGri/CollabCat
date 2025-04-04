@@ -5,7 +5,6 @@ import { groupsSchema } from '@server/entities/groups'
 import z from 'zod'
 import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
-
 export default authenticatedProcedure
   .use(provideRepos({ groupsRepository }))
   .use(errorLoggingMiddleware)

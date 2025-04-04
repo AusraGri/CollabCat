@@ -22,7 +22,7 @@ export default authenticatedProcedure
       summary: 'Get assigned user info by task id',
       example: {
         request: {
-          taskId: 1
+          taskId: 1,
         },
       },
     },

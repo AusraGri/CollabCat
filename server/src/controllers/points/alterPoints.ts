@@ -19,12 +19,13 @@ export default authenticatedProcedure
       protect: true,
       contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       summary: 'Change user points value',
-      description: 'Authenticated procedure to alter user points (add, subtract, equal) ',
+      description:
+        'Authenticated procedure to alter user points (add, subtract, equal) ',
       example: {
         request: {
           groupId: 1,
           points: 20,
-          action: '+'
+          action: '+',
         },
       },
     },

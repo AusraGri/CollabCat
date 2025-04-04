@@ -49,7 +49,7 @@ export function categoriesRepository(db: Database) {
           'categories.groupId',
           'categories.id',
           'categories.title',
-          'categories.isDefault'
+          'categories.isDefault',
         ])
         .where(({ eb, or, and, not }) =>
           and([

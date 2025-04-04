@@ -174,7 +174,9 @@ const stopEditingDate = () => {
 }
 
 const checkIfTaskTitleExists = (title: string) => {
-  const taskTitle = tasksStore.tasks.find((task)=> task.title.toLowerCase() === title.toLowerCase())
+  const taskTitle = tasksStore.tasks.find(
+    (task) => task.title.toLowerCase() === title.toLowerCase()
+  )
 
   return !!taskTitle
 }
@@ -183,7 +185,7 @@ const validateTitleAndSave = () => {
   const title = editableTask.value.title.trim()
 
   const isTitleExists = checkIfTaskTitleExists(title)
-  if(task.title !== title && isTitleExists){
+  if (task.title !== title && isTitleExists) {
     errorMessage.value = 'Title already exists'
     return
   }
@@ -295,7 +297,10 @@ const saveChanges = () => {
       </div>
     </template>
     <template #body>
-      <div class="text-md flex w-full flex-col justify-between space-y-3 divide-y"  data-test="task-edit-info">
+      <div
+        class="text-md flex w-full flex-col justify-between space-y-3 divide-y"
+        data-test="task-edit-info"
+      >
         <div
           @click="isEditingCategory = true"
           class="flex cursor-pointer items-center space-x-3"
@@ -304,19 +309,22 @@ const saveChanges = () => {
           data-test="edit-category"
         >
           <Squares2X2Icon class="w-7 text-black" />
-          <label for="categorySelect" class="text-sm font-bold"> Category:</label>
+          <label id="category-selection" class="text-sm font-bold"> Category:</label>
           <CategorySelect
             id="categorySelect"
+            aria-labelledby="category-selection"
             v-if="categories && isEditingCategory"
             :categories="categories"
             v-model:selected-category="selectedCategory"
             aria-label="Select a category"
             data-test="select-category"
           />
-          <p v-else aria-label="Task category" data-test="task-category" class="text-sm">{{ categoryLabel }}</p>
+          <p v-else aria-label="Task category" data-test="task-category" class="text-sm">
+            {{ categoryLabel }}
+          </p>
         </div>
         <div
-        v-if="groupMembers?.length"
+          v-if="groupMembers?.length"
           class="flex w-full items-center justify-between space-x-3 pt-3"
           @click="isEditingAssignment = true"
           role="button"
@@ -348,7 +356,8 @@ const saveChanges = () => {
             @click="startEditingPoints"
             class="flex cursor-pointer items-center space-x-3"
             role="button"
-            aria-label="Edit task points" data-test="task-points-edit"
+            aria-label="Edit task points"
+            data-test="task-points-edit"
           >
             <StarIcon class="w-7" />
             <p class="text-sm font-bold">{{ pointsLabel }}</p>
@@ -385,10 +394,19 @@ const saveChanges = () => {
               <CalendarDaysIcon class="w-7" />
             </div>
             <div class="flex flex-nowrap p-1 text-sm">
-              <div v-if="editableTask.startDate" aria-label="Task Start Date" data-test="task-start-date">
+              <div
+                v-if="editableTask.startDate"
+                aria-label="Task Start Date"
+                data-test="task-start-date"
+              >
                 {{ formatDateToLocal(editableTask.startDate) }}
               </div>
-              <div v-if="editableTask.endDate" aria-label="Task End Date" data-test="task-end-date" class=" whitespace-nowrap inline-flex">
+              <div
+                v-if="editableTask.endDate"
+                aria-label="Task End Date"
+                data-test="task-end-date"
+                class="inline-flex whitespace-nowrap"
+              >
                 <span class="ml-2 mr-2">--></span>
                 <p>{{ formatDateToLocal(editableTask.endDate) }}</p>
               </div>
@@ -453,7 +471,14 @@ const saveChanges = () => {
               <InformationCircleIcon class="w-7" />
               <p class="cursor-pointer text-sm font-bold">{{ descriptionLabel }}</p>
             </div>
-            <p v-if="!isEditingDescription" class="text-sm" aria-label="Task description" data-test="task-description">{{ editableTask.description }}</p>
+            <p
+              v-if="!isEditingDescription"
+              class="text-sm"
+              aria-label="Task description"
+              data-test="task-description"
+            >
+              {{ editableTask.description }}
+            </p>
             <div v-if="isEditingDescription">
               <textarea
                 v-model="editableTask.description"

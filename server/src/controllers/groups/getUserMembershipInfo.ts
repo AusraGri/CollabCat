@@ -7,7 +7,6 @@ import z from 'zod'
 import type { GroupMember } from '@server/entities/groups'
 import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
-
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
   .use(errorLoggingMiddleware)
@@ -22,7 +21,7 @@ export default groupAuthProcedure
       example: {
         request: {
           groupId: 1,
-          userId: 1
+          userId: 1,
         },
       },
     },

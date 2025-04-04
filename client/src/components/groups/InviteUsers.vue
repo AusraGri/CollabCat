@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { FwbButton, FwbModal, FwbInput } from 'flowbite-vue'
-import { isEmailValid } from '@/utils/helpers';
+import { isEmailValid } from '@/utils/helpers'
 
 const { isShowModal } = defineProps<{
   isShowModal: boolean
@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 const email = ref('')
 
-const isInviteEmailValid = computed(()=> {
+const isInviteEmailValid = computed(() => {
   return !isEmailValid(email.value)
 })
 

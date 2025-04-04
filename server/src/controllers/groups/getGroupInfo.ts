@@ -4,7 +4,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { idSchema } from '@server/entities/shared'
 import z from 'zod'
 import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
-import { groupPublicSchema} from '@server/entities/groups'
+import { groupPublicSchema } from '@server/entities/groups'
 
 export default publicProcedure
   .use(provideRepos({ groupsRepository }))
@@ -19,7 +19,7 @@ export default publicProcedure
       summary: 'Get group public info, by group id',
       example: {
         request: {
-          groupId: 1
+          groupId: 1,
         },
       },
     },

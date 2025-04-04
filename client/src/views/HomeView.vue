@@ -70,11 +70,11 @@ const handleAuthRedirect = async () => {
 }
 
 onMounted(async () => {
-    if (isAuthenticated.value) {
-      await handleAuthRedirect()
-    } else {
-      console.log('User not authenticated. Waiting for login...')
-    }
+  if (isAuthenticated.value) {
+    await handleAuthRedirect()
+  } else {
+    console.log('User not authenticated. Waiting for login...')
+  }
 })
 
 watch(

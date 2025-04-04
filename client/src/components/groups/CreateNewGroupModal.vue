@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FwbModal, FwbButton, FwbInput, FwbAlert } from 'flowbite-vue'
-import { useUserGroupsStore } from '@/stores';
+import { useUserGroupsStore } from '@/stores'
 import { ref } from 'vue'
 
 const { isShowModal } = defineProps<{
@@ -17,20 +17,19 @@ const errorMessage = ref('')
 
 const name = ref<string>('')
 
-const isGroupName = (name: string)=> {
+const isGroupName = (name: string) => {
   const userGroups = userGroupStore.userGroups || []
   return userGroups.some((group) => group.name.toLowerCase() === name.toLowerCase())
-
 }
 
 function confirmAction(confirmed: boolean) {
   if (confirmed) {
-   const isName = isGroupName(name.value)
+    const isName = isGroupName(name.value)
 
-   if(isName){
-    errorMessage.value = 'This group name already exist in your groups'
-    return
-   }
+    if (isName) {
+      errorMessage.value = 'This group name already exist in your groups'
+      return
+    }
     emit('create:group', name.value)
   }
 

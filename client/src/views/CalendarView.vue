@@ -140,34 +140,42 @@ watch(
         v-if="isGroupTasks"
         class="flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm"
       >
-        <label for="tasks-for-group-select" class="text-sm">Show Tasks for:</label>
         <FwbSelect
+          label="Show Tasks for:"
           id="tasks-for-group-select"
           v-model="tasksFor"
           :options="memberOptions"
           class="whitespace-nowrap"
           aria-label="Select member for tasks"
           data-test="select-member"
+          size="sm"
         />
       </div>
       <div
         v-if="!isGroupTasks"
         class="flex min-w-20 items-center space-x-2 whitespace-nowrap text-sm"
       >
-        <label for="tasks-for-select" class="text-sm">Show Tasks for:</label>
         <FwbSelect
+          label="Show Tasks for:"
           id="tasks-for-select"
           v-model="tasksFor"
           :options="personalOptions"
           class="whitespace-nowrap"
           aria-label="Select personal tasks"
           data-test="select-personal"
+          size="sm"
         />
       </div>
     </div>
-    <div class="mx-auto flex max-w-screen-lg flex-col justify-between p-3 sm:flex-row">
-      <div class="mr-7 mt-5 flex grow flex-col sm:mt-0 sm:max-w-fit">
-        <div class="w-full border-b-2 text-center" aria-labelledby="task-list-date" data-test="task-list-date">
+    <div
+      class="mx-auto flex w-full max-w-screen-lg flex-col items-center p-3 sm:flex-row sm:items-start"
+    >
+      <div class="mr-7 mt-5 flex grow flex-col sm:mt-0">
+        <div
+          class="w-full border-b-2 text-center"
+          aria-labelledby="task-list-date"
+          data-test="task-list-date"
+        >
           <p id="task-list-date">{{ formatDate(date) }}</p>
         </div>
         <div v-if="tasks">
@@ -192,7 +200,7 @@ watch(
           No tasks for this day
         </div>
       </div>
-      <div class="order-first mx-auto max-w-fit sm:order-last">
+      <div class="order-first max-w-fit sm:order-last">
         <VueDatePicker
           v-model="date"
           :six-weeks="true"

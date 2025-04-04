@@ -32,7 +32,7 @@ const deleteCategory = async (confirmed: boolean) => {
   const categoryId = categoryToDelete.value?.id
   if (confirmed && categoryId) {
     await categoryStore.deleteCategory(categoryId)
-    categories.filter((cat)=> cat.id !== categoryId)
+    categories.filter((cat) => cat.id !== categoryId)
   }
 
   isDeletionRequired.value = false

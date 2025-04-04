@@ -4,7 +4,7 @@ import { FwbButton, FwbCheckbox } from 'flowbite-vue'
 import RecurrenceForm from './RecurrenceForm.vue'
 import { type RecurrencePattern, type TaskData } from '@server/shared/types'
 import { areObjectsEqual } from '@/utils/helpers'
-import { checkRecurrence } from '../../utils/tasks';
+import { checkRecurrence } from '../../utils/tasks'
 
 const { isShowRecurrence, isRecurring, pickDates } = defineProps<{
   isShowRecurrence: boolean
@@ -67,7 +67,10 @@ const resetPatternChanges = () => {
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       @click.self.stop="closeRecurrenceModal"
     >
-      <div class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg" data-test="recurrence-change-modal">
+      <div
+        class="m-3 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg"
+        data-test="recurrence-change-modal"
+      >
         <header class="flex items-center justify-between">
           <h2 class="text-xl font-semibold" id="recurrence-modal-title" aria-live="assertive">
             Edit Recurrence

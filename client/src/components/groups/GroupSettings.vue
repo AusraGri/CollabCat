@@ -25,7 +25,7 @@ const isPointsEnabled = ref(pointStore.isPointsEnabled)
 const isShowConfirmation = ref(false)
 const isManageCategories = ref(false)
 const isAdmin = computed(() => userGroupStore.isAdmin)
-const groupName = computed(()=> userGroupStore.activeGroup?.name)
+const groupName = computed(() => userGroupStore.activeGroup?.name)
 const categories = computed(() => {
   const groupCategories = categoryStory.groupCategories || []
 
@@ -97,13 +97,21 @@ watch(
   <div>
     <FwbModal v-if="isShowModal" @close="closeModal" aria-labelledby="group-settings-modal">
       <template #header>
-        <h2 class="text-lg font-semibold" id="group-settings-modal" data-test="group-settings-title">
-          Manage {{ groupName}}
+        <h2
+          class="text-lg font-semibold"
+          id="group-settings-modal"
+          data-test="group-settings-title"
+        >
+          Manage {{ groupName }}
         </h2>
       </template>
       <template #body>
         <div class="w-fit">
-          <FwbCheckbox v-model="isPointsEnabled" label="My Group Task Points" :aria-label="`${groupName} points checkbox`" />
+          <FwbCheckbox
+            v-model="isPointsEnabled"
+            label="My Group Task Points"
+            :aria-label="`${groupName} points checkbox`"
+          />
         </div>
         <div v-if="categories.length" class="mt-5">
           <FwbButton

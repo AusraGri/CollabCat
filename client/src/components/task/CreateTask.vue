@@ -46,7 +46,9 @@ const endDate = ref<Date | string>()
 const points = ref<string>('')
 
 const checkIfTaskTitleExists = (title: string) => {
-  const taskTitle = tasksStore.tasks.find((task)=> task.title.toLowerCase() === title.toLowerCase())
+  const taskTitle = tasksStore.tasks.find(
+    (task) => task.title.toLowerCase() === title.toLowerCase()
+  )
 
   return !!taskTitle
 }
@@ -81,7 +83,7 @@ const taskForm = ref({
 })
 
 function closeModal() {
-  errorMessage.value =''
+  errorMessage.value = ''
   taskForm.value.isRecurring = false
   resetForm()
   emit('close')
@@ -100,13 +102,13 @@ const validateNewTaskData = (taskData: NewTaskData) => {
 
   const titleExists = checkIfTaskTitleExists(task.title)
 
-  if(titleExists) throw new Error('Task title already exists. Please choose different')
+  if (titleExists) throw new Error('Task title already exists. Please choose different')
 
   return true
 }
 
 async function confirmAction(confirmed: boolean) {
-  errorMessage.value =''
+  errorMessage.value = ''
 
   if (!confirmed) {
     resetForm()
@@ -120,16 +122,15 @@ async function confirmAction(confirmed: boolean) {
     task: taskData.value,
     recurrence: recurrence || undefined,
   }
-   try {
-     const isValidTaskData = validateNewTaskData(newTaskData)
-     if (!isValidTaskData) return
-   } catch (error) {
-    if(error instanceof Error){
+  try {
+    const isValidTaskData = validateNewTaskData(newTaskData)
+    if (!isValidTaskData) return
+  } catch (error) {
+    if (error instanceof Error) {
       errorMessage.value = error.message
       return
     }
-   }
-
+  }
 
   const newTask = await tasksStore.createTask(newTaskData)
   resetForm()
@@ -163,7 +164,7 @@ useKeyboardAction(
 )
 </script>
 <template>
-  <FwbModal v-if="isShowModal" @close="closeModal" >
+  <FwbModal v-if="isShowModal" @close="closeModal">
     <template #header>
       <div class="inline-flex space-x-3">
         <div class="flex items-center text-lg" data-test="new-task-modal-title">New Task</div>
@@ -225,10 +226,10 @@ useKeyboardAction(
         <!-- Date and Time Input -->
         <div v-if="!taskForm.isRecurring" class="flex flex-col">
           <div class="flex items-center whitespace-nowrap">
-            <label for="dueDate" class="mr-2 w-20 text-sm">Task Date</label>
+            <label id="dueDate" class="mr-2 w-20 text-sm">Task Date</label>
             <VueDatePicker
               v-model="startDate"
-              id="dueDate"
+              aria-labelledby="dueDate"
               name="Task Date"
               placeholder="Pick task date"
               :format="format"

@@ -17,7 +17,7 @@ export default authenticatedProcedure
       summary: 'Create new Group',
       example: {
         request: {
-          name: 'New Group'
+          name: 'New Group',
         },
       },
     },

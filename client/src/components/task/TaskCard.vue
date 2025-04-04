@@ -166,7 +166,7 @@ watch(
   <div>
     <div
       :class="[
-        'border-grey-700 m-1 flex h-fit w-full space-x-1 rounded rounded-s-2xl border-2 p-2 shadow-md',
+        'border-grey-700 m-1 flex h-fit w-fit space-x-1 rounded rounded-s-2xl border-2 p-2 shadow-md',
         isCompletedTask ? 'bg-gray-400' : 'bg-green-400',
       ]"
       :aria-label="`${task.title}`"
@@ -188,11 +188,7 @@ watch(
         aria-label="`${task.title} information`"
       >
         <div class="flex w-full justify-between rounded-t p-1">
-          <div
-            class="p-1"
-            :aria-label="`${task.title} title`"
-            data-test="task-title"
-          >
+          <div class="p-1" :aria-label="`${task.title} title`" data-test="task-title">
             {{ task.title }}
           </div>
         </div>
@@ -212,8 +208,16 @@ watch(
           ]"
         >
           <div v-if="task.startDate" class="text-sm">
-            <span :aria-label="`${task.title} start date`" data-test="task-start-date">{{ formatDateToLocal(task.startDate) }}</span>
-            <span v-if="task.endDate" :aria-label="`${task.title} end date`" data-test="task-end-date"> --> {{ formatDateToLocal(task.endDate) }}</span>
+            <span :aria-label="`${task.title} start date`" data-test="task-start-date">{{
+              formatDateToLocal(task.startDate)
+            }}</span>
+            <span
+              v-if="task.endDate"
+              :aria-label="`${task.title} end date`"
+              data-test="task-end-date"
+            >
+              --> {{ formatDateToLocal(task.endDate) }}</span
+            >
           </div>
         </div>
 
@@ -273,8 +277,8 @@ watch(
           >
             <ClockIcon class="h-5 w-5 text-gray-50" />
             <p class="text-xs tracking-wider">
-              {{ timeToLocalTime(task.startTime, task.startDate) }}</p
-            >
+              {{ timeToLocalTime(task.startTime, task.startDate) }}
+            </p>
           </div>
         </div>
       </div>

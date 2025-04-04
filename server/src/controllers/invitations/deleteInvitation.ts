@@ -18,7 +18,7 @@ export default authenticatedProcedure
       summary: 'Delete invitation, by invitation token',
       example: {
         request: {
-          invitationToken: 'someInvitationToken'
+          invitationToken: 'someInvitationToken',
         },
       },
     },

@@ -24,7 +24,9 @@ const getInvitationData = async (invitationToken: string) => {
   try {
     return await trpc.invitations.getInvitationData.query({ invitationToken })
   } catch (error) {
-    setErrorMessage({message: 'Ooops! Something went wrong while trying to get the invitation data'})
+    setErrorMessage({
+      message: 'Ooops! Something went wrong while trying to get the invitation data',
+    })
   }
 }
 
@@ -35,7 +37,7 @@ onMounted(async () => {
 const confirmInvitation = async (value: boolean) => {
   if (value) {
     await invitationStore.acceptInvitation(invitation)
-  } else if (!value){
+  } else if (!value) {
     await invitationStore.declineInvitation(invitation)
   }
   await userGroupStore.fetchUserGroups()

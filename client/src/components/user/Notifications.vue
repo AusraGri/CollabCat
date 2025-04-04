@@ -29,7 +29,7 @@ const { hasNotifications = false } = defineProps<{
       >
         Notifications
       </div>
-      <div role="region" aria-live="polite" data-test="notification-list" class=" w-full" >
+      <div role="region" aria-live="polite" data-test="notification-list" class="w-full">
         <slot name="notifications" :active="hasNotifications"> </slot>
         <FwbListGroup>
           <FwbListGroupItem v-if="!hasNotifications" data-test="no-notifications">

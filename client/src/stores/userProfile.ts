@@ -35,9 +35,9 @@ export const useUserStore = defineStore('user', {
 
     async updateUserName(newName: string) {
       if (!this.user) return
-        await this.saveUserChanges(newName)
+      await this.saveUserChanges(newName)
 
-        this.user.username = newName
+      this.user.username = newName
     },
 
     async deleteUser() {

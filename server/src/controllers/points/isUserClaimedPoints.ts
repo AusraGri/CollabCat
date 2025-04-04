@@ -19,7 +19,7 @@ export default authenticatedProcedure
       example: {
         request: {
           taskId: 1,
-          taskInstanceDate: '2024-12-12'
+          taskInstanceDate: '2024-12-12',
         },
       },
     },
@@ -28,7 +28,7 @@ export default authenticatedProcedure
     z
       .object({
         taskId: idSchema,
-        taskInstanceDate: dateSchema.describe('date the task is scheduled')
+        taskInstanceDate: dateSchema.describe('date the task is scheduled'),
       })
       .strict()
   )
@@ -38,7 +38,6 @@ export default authenticatedProcedure
       input: { taskId, taskInstanceDate },
       ctx: { authUser, repos },
     }) => {
-
       const queryOptions = {
         taskId,
         taskInstanceDate,

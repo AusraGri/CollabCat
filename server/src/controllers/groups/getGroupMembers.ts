@@ -18,7 +18,7 @@ export default groupAuthProcedure
       summary: 'Get group members of the group',
       example: {
         request: {
-          groupId: 1
+          groupId: 1,
         },
       },
     },

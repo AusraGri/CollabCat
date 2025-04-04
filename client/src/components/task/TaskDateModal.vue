@@ -171,11 +171,12 @@ watch(
         <div id="dateModalDescription" class="mt-4 space-y-3">
           <div class="flex space-x-3">
             <div>
-              <label for="startDate" class="block text-sm font-medium">Start Date</label>
+              <label id="start-date-label" class="block text-sm font-medium">Start Date</label>
               <VueDatePicker
                 v-model="startDate"
                 id="startDate"
                 name="Task Date"
+                aria-labelledby="start-date-label"
                 placeholder="Pick task date"
                 :format="formatDate"
                 :max-date="endDate"
@@ -186,11 +187,12 @@ watch(
               ></VueDatePicker>
             </div>
             <div v-if="isRecurring">
-              <label for="endDate" class="block text-sm font-medium">End Date</label>
+              <label id="end-date-label" class="block text-sm font-medium">End Date</label>
               <VueDatePicker
                 v-model="endDate"
                 id="endDate"
                 name="Task Date"
+                aria-labelledby="end-date-label"
                 placeholder="Pick task end date"
                 :format="formatDate"
                 :min-date="endDateMin"

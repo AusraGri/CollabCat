@@ -18,7 +18,7 @@ export default groupAuthProcedure
       summary: 'Delete group. Only group admin can delete',
       example: {
         request: {
-          groupId: 1
+          groupId: 1,
         },
       },
     },

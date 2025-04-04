@@ -20,7 +20,7 @@ export default authenticatedProcedure
       contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       example: {
         request: {
-          title: 'New Category'
+          title: 'New Category',
         },
       },
     },

@@ -23,7 +23,7 @@ export default publicProcedure
       summary: 'Get user info by user id. Public procedure.',
       example: {
         request: {
-          userId: 1
+          userId: 1,
         },
       },
     },

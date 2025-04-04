@@ -10,7 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const authFile = path.join(__dirname, 'auth.json')
 
-setup('authenticate', async ({context}) => {
+setup('authenticate', async ({ context }) => {
   try {
     const { VITE_AUTH0_TEST_EMAIL, VITE_AUTH0_TEST_PASSWORD } = process.env
 
@@ -21,13 +21,22 @@ setup('authenticate', async ({context}) => {
     const browser = await chromium.launch({ headless: true })
     const page = await context.newPage()
 
-
     await page.goto('http://localhost:5174/')
     await page.getByTestId('login-button').click()
     await page.getByLabel('Email address').fill(VITE_AUTH0_TEST_EMAIL)
     await page.getByLabel('Password').fill(VITE_AUTH0_TEST_PASSWORD)
     await page.getByRole('button', { name: 'Continue', exact: true }).click()
-    await page.waitForURL(`http://localhost:5174/${stringToUrl(VITE_AUTH0_TEST_EMAIL)}/calendar`, { timeout: 20000 })
+
+    const acceptButton = page.getByRole('button', { name: 'Accept' })
+    const isAcceptButton = await acceptButton.isVisible().catch(() => false)
+
+    if (isAcceptButton) {
+      await acceptButton.click()
+    }
+
+    await page.waitForURL(`http://localhost:5174/${stringToUrl(VITE_AUTH0_TEST_EMAIL)}/calendar`, {
+      timeout: 20000,
+    })
     await expect(page).toHaveURL(/calendar/)
     await context.storageState({ path: authFile })
 

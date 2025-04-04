@@ -15,7 +15,8 @@ export default authenticatedProcedure
       method: 'GET',
       path: '/tasks/due',
       tags: ['tasks'],
-      summary: 'Get tasks for the given date, both personal and where user is assigned for the task in user groups',
+      summary:
+        'Get tasks for the given date, both personal and where user is assigned for the task in user groups',
       protect: true,
       example: {
         request: {

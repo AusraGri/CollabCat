@@ -19,7 +19,7 @@ export default authenticatedProcedure
       summary: 'Add user to the group (needs to be authenticated first)',
       example: {
         request: {
-          groupId: 345
+          groupId: 345,
         },
       },
     },

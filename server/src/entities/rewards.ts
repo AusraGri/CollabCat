@@ -74,7 +74,9 @@ export const updateRewardSchema = z.object({
     .optional()
     .describe('For making reward available for picked users only'),
   title: z.string().trim().min(3).max(100).optional(),
-  createdByUserId: idSchema.optional().describe("This value at the moment is not allowed to change."),
+  createdByUserId: idSchema
+    .optional()
+    .describe('This value at the moment is not allowed to change.'),
 })
 export const rewardsKeysAll = Object.keys(
   rewardsSchema.shape

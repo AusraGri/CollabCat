@@ -1,6 +1,6 @@
 import logger from '@server/utils/logger'
 import { TRPCError } from '@trpc/server'
-import { middleware} from '../trpc/index'
+import { middleware } from '../trpc/index'
 
 export const errorLoggingMiddleware = middleware(
   async ({ ctx, path, type, next }) => {

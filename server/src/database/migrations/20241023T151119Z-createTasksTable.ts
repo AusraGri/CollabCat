@@ -47,7 +47,7 @@ export async function up(db: Kysely<any>) {
     .column('group_id')
     .execute()
 
-    await db.schema
+  await db.schema
     .createIndex('idx_tasks_end_date')
     .on('tasks')
     .column('end_date')
@@ -59,7 +59,7 @@ export async function up(db: Kysely<any>) {
     .column('is_recurring')
     .execute()
 
-    await db.schema
+  await db.schema
     .createIndex('idx_tasks_start_date')
     .on('tasks')
     .column('start_date')

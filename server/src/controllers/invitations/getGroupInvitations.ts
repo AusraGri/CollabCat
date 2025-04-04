@@ -8,7 +8,6 @@ import {
 } from '@server/entities/invitations'
 import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
-
 export default authenticatedProcedure
   .use(provideRepos({ invitationsRepository }))
   .use(errorLoggingMiddleware)

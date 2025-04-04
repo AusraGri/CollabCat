@@ -91,7 +91,9 @@ const costValidation = (value: any) => {
   const numberValue = Number(value)
   const max = 1000000
 
-  return !isNaN(numberValue) && numberValue > 0 && Number.isInteger(numberValue) && numberValue <= max
+  return (
+    !isNaN(numberValue) && numberValue > 0 && Number.isInteger(numberValue) && numberValue <= max
+  )
 }
 
 const titleValidation = (value: any) => {
@@ -197,7 +199,10 @@ watch(
             data-test="reward-cost-input"
           >
             <template #validationMessage v-if="!isCostValid">
-              <span class="text-red-600" aria-live="assertive" aria-label="Reward cost error message"
+              <span
+                class="text-red-600"
+                aria-live="assertive"
+                aria-label="Reward cost error message"
                 >Please enter a valid cost for the reward: 1 - 1000000</span
               >
             </template>

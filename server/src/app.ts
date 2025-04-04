@@ -49,7 +49,6 @@ export default function createApp(db: Database) {
     })
   )
 
-
   app.use(
     '/api',
     createOpenApiExpressMiddleware({

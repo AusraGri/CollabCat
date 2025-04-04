@@ -15,7 +15,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="h-full w-full">
     <div
       :class="[
         'flex',

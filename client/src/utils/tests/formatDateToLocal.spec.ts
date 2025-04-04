@@ -18,7 +18,7 @@ describe('formatDateToLocal', () => {
   })
 
   it('should handle edge case with a leap year date', () => {
-    const date = new Date('2024-02-29T00:00:00Z') 
+    const date = new Date('2024-02-29T00:00:00Z')
     expect(formatDateToLocal(date)).toBe('2024-02-29')
   })
 

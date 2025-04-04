@@ -6,7 +6,6 @@ import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddlewa
 import z from 'zod'
 import { authenticatedProcedure } from '../../trpc/authenticatedProcedure/index'
 
-
 export default authenticatedProcedure
   .use(provideRepos({ pointsRepository }))
   .use(errorLoggingMiddleware)
@@ -21,7 +20,7 @@ export default authenticatedProcedure
       example: {
         request: {
           taskId: 1,
-          taskInstanceDate: '2024-12-12'
+          taskInstanceDate: '2024-12-12',
         },
       },
     },

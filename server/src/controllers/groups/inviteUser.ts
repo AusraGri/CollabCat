@@ -12,7 +12,6 @@ import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddlewa
 import { userRepository } from '@server/repositories/userRepository'
 import { invitationsRepository } from '../../repositories/invitationRepository'
 
-
 const { expiresIn, tokenKey } = config.auth
 export default groupAuthProcedure
   .use(
@@ -29,11 +28,11 @@ export default groupAuthProcedure
       contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       description:
         'First you need to create group to be able to invite the user',
-        example: {
-          request: {
-            email: 'some@email.com',
-          },
+      example: {
+        request: {
+          email: 'some@email.com',
         },
+      },
     },
   })
   .input(

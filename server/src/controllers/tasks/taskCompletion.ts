@@ -20,7 +20,7 @@ export default authenticatedProcedure
         request: {
           id: 1,
           instanceDate: '2024-11-11',
-          isCompleted: true
+          isCompleted: true,
         },
       },
     },
@@ -67,7 +67,6 @@ export default authenticatedProcedure
 
       isTaskCompleted = isCompleted
     }
-
 
     return {
       success: true,

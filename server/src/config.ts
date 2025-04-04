@@ -2,7 +2,7 @@
 import 'dotenv-flow/config'
 import { z } from 'zod'
 
-process.env.DOTENV_CONFIG_PATH = '/server' 
+process.env.DOTENV_CONFIG_PATH = '/server'
 
 const { env } = process
 
@@ -74,7 +74,7 @@ const config = schema.parse({
     clientOriginUrl: env.CLIENT_ORIGIN_URL,
     clientId: env.AUTH0_CLIENT_ID,
     clientSecret: env.AUTH0_CLIENT_SECRET,
-    domain: env.AUTH0_DOMAIN
+    domain: env.AUTH0_DOMAIN,
   },
   database: {
     connectionString: env.DATABASE_URL,
