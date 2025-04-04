@@ -20,8 +20,7 @@ it('should get group info by group id', async () => {
   // ACT
   const result = await getGroupInfo({ groupId: group.id })
 
-  expect(Array.isArray(result)).toBe(true)
-  expect(result).toContainEqual(group)
+  expect(result).toStrictEqual(group)
   expect(repo.groupsRepository.getGroup).toBeCalledWith({ id: group.id })
 })
 

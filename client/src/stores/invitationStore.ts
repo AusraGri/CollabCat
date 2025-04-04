@@ -69,8 +69,8 @@ export const useInvitationStore = defineStore('invitations', {
 
         if (!groupId) throw new Error('Missing group id')
 
-        const [group] = await trpc.groups.getGroupInfo.query({ groupId })
-        this.groupData = group
+        const group = await trpc.groups.getGroupInfo.query({ groupId })
+        this.groupData = group || null
 
         return group
       } catch (error) {

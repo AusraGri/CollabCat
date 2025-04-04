@@ -29,8 +29,9 @@ export default publicProcedure
       groupId: idSchema,
     })
   )
-  .output(z.array(groupPublicSchema).or(z.undefined()))
+  .output(groupPublicSchema.or(z.undefined()))
   .query(async ({ input: { groupId }, ctx: { repos } }) => {
     const group = await repos.groupsRepository.getGroup({ id: groupId })
-    return group || undefined
+
+    return group ? group[0] : undefined
   })
