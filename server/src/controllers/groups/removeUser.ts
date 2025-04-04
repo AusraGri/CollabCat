@@ -4,18 +4,28 @@ import provideRepos from '@server/trpc/provideRepos'
 import { idSchema } from '@server/entities/shared'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
+
 
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'DELETE',
-      path: '/group/remove-user',
+      path: '/group/removeUser',
       tags: ['group'],
       protect: true,
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       summary: 'Remove user from group',
       description:
         'This will remove user from the group, but first you need to have users in your group',
+      example: {
+        request: {
+          groupId: 1,
+          userId: 1,
+        },
+      },
     },
   })
   .input(

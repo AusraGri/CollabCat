@@ -3,6 +3,7 @@ import { userRepository } from '@server/repositories/userRepository'
 import z from 'zod'
 import { idSchema } from '@server/entities/shared'
 import { userPublicSchema } from '@server/entities/user'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 import { authenticatedProcedure } from '../../trpc/authenticatedProcedure/index'
 
 export default authenticatedProcedure
@@ -11,6 +12,21 @@ export default authenticatedProcedure
       userRepository,
     })
   )
+  .use(errorLoggingMiddleware)
+  .meta({
+    openapi: {
+      method: 'GET',
+      path: '/user/assignedInfo',
+      tags: ['user'],
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Get assigned user info by task id',
+      example: {
+        request: {
+          taskId: 1
+        },
+      },
+    },
+  })
   .input(
     z.object({
       taskId: idSchema,

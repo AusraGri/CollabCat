@@ -5,16 +5,24 @@ import { idSchema, messageOutputSchema } from '@server/entities/shared'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import { userRepository } from '@server/repositories/userRepository'
 import z from 'zod'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ rewardsRepository, userRepository, groupsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'DELETE',
       path: '/rewards/delete',
       tags: ['rewards'],
-      summary: 'Delete reward',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Delete reward by reward id',
       protect: true,
+      example: {
+        request: {
+          rewardId: 1,
+        },
+      },
     },
   })
   .input(

@@ -12,7 +12,13 @@ export default authenticatedProcedure
       path: '/categories/delete',
       tags: ['category'],
       protect: true,
-      summary: 'Delete Category',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Delete category by category id',
+      example: {
+        request: {
+          categoryId: 123,
+        },
+      },
     },
   })
   .input(

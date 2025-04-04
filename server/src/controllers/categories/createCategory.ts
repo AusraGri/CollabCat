@@ -5,9 +5,11 @@ import {
   insertCategorySchema,
   publicCategorySchema,
 } from '@server/entities/categories'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ categoriesRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'POST',
@@ -15,6 +17,12 @@ export default authenticatedProcedure
       tags: ['category'],
       protect: true,
       summary: 'Create new Category',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      example: {
+        request: {
+          title: 'New Category'
+        },
+      },
     },
   })
   .input(insertCategorySchema)

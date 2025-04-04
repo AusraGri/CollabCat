@@ -5,17 +5,28 @@ import {
 import provideRepos from '@server/trpc/provideRepos'
 import { alterPointsSchema, pointsSchemaOutput } from '@server/entities/points'
 import { TRPCError } from '@trpc/server'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 import { authenticatedProcedure } from '../../trpc/authenticatedProcedure/index'
 
 export default authenticatedProcedure
   .use(provideRepos({ pointsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'PATCH',
       path: '/points/alter',
       tags: ['points'],
+      protect: true,
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       summary: 'Change user points value',
-      description: 'Authenticated procedure to alter user points',
+      description: 'Authenticated procedure to alter user points (add, subtract, equal) ',
+      example: {
+        request: {
+          groupId: 1,
+          points: 20,
+          action: '+'
+        },
+      },
     },
   })
   .input(alterPointsSchema)

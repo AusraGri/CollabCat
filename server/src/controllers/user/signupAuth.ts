@@ -8,6 +8,7 @@ import { verifyAuth0Token } from '@server/auth0/verifyAuth0Token'
 import z from 'zod'
 import config from '@server/config'
 import logger from '@server/utils/logger'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default publicProcedure
   .use(
@@ -15,11 +16,13 @@ export default publicProcedure
       userRepository,
     })
   )
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'POST',
       path: '/user/auth',
       tags: ['user'],
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       summary: 'Signup user',
       example: {
         request: {

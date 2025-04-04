@@ -4,9 +4,11 @@ import provideRepos from '@server/trpc/provideRepos'
 import { taskCompletionSchema } from '@server/entities/tasks'
 import { TRPCError } from '@trpc/server'
 import { messageOutputSchema } from '@server/entities/shared'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'POST',
@@ -14,6 +16,13 @@ export default authenticatedProcedure
       tags: ['tasks'],
       summary: 'Alter task completion: done/undone',
       protect: true,
+      example: {
+        request: {
+          id: 1,
+          instanceDate: '2024-11-11',
+          isCompleted: true
+        },
+      },
     },
   })
   .input(taskCompletionSchema)

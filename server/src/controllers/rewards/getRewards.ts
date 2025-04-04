@@ -6,16 +6,24 @@ import { idSchema } from '@server/entities/shared'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import { userRepository } from '@server/repositories/userRepository'
 import z from 'zod'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ rewardsRepository, userRepository, groupsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'GET',
       path: '/rewards/get',
       tags: ['rewards'],
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       summary: 'Get rewards by userID or groupID',
       protect: true,
+      example: {
+        request: {
+          groupId: 1,
+        },
+      },
     },
   })
   .input(

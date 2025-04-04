@@ -5,15 +5,17 @@ import { dateSchema } from '@server/entities/shared'
 import isTaskDue from '@server/utils/isTaskDue'
 import { taskDataSchema } from '@server/entities/tasks'
 import z from 'zod'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'GET',
-      path: '/tasks/dailyPersonal',
+      path: '/tasks/duePersonal',
       tags: ['tasks'],
-      summary: 'Get tasks for the given date',
+      summary: 'Get tasks for the given date (personal)',
       protect: true,
       example: {
         request: {

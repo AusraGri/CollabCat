@@ -5,19 +5,6 @@ import logger from './utils/logger'
 
 const databaseUrl =
   config.env === 'test' ? config.testDatabase : config.database
-
-// const database = createDatabase(databaseUrl)
-// const app = createApp(database)
-
-// app.listen(config.port, () => {
-//   logger.info(
-//     {
-//       port: config.port,
-//       environment: config.env,
-//     },
-//     `🚀 Server is running at http://localhost:${config.port} using ${config.env} database`
-//   )
-// })
 try {
   const database = createDatabase(databaseUrl)
   const app = createApp(database)

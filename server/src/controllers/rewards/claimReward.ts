@@ -6,16 +6,25 @@ import { pointsRepository } from '@server/repositories/pointsRepository'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
 import { rewardClaimsSchema } from '@server/entities/rewards'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ rewardsRepository, pointsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'POST',
       path: '/rewards/claim',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       tags: ['rewards'],
-      summary: 'Claim reward',
+      summary: 'Claim reward: personal or group',
       protect: true,
+      example: {
+        request: {
+          rewardId: 1,
+          groupId: 2,
+        },
+      },
     },
   })
   .input(

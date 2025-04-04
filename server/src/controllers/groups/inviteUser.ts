@@ -8,23 +8,32 @@ import jsonwebtoken from 'jsonwebtoken'
 import config from '@server/config'
 import { prepareInvitationTokenPayload } from '@server/trpc/tokenPayload'
 import { invitationSchema } from '@server/entities/invitations'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 import { userRepository } from '@server/repositories/userRepository'
 import { invitationsRepository } from '../../repositories/invitationRepository'
+
 
 const { expiresIn, tokenKey } = config.auth
 export default groupAuthProcedure
   .use(
     provideRepos({ groupsRepository, invitationsRepository, userRepository })
   )
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'POST',
-      path: '/group/invite-user',
+      path: '/group/inviteUser',
       tags: ['group'],
       protect: true,
       summary: 'Invite user to the group',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       description:
         'First you need to create group to be able to invite the user',
+        example: {
+          request: {
+            email: 'some@email.com',
+          },
+        },
     },
   })
   .input(

@@ -3,15 +3,17 @@ import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { idSchema, messageOutputSchema } from '@server/entities/shared'
 import { z } from 'zod'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'DELETE',
       path: '/tasks/delete',
       tags: ['tasks'],
-      summary: 'Delete task',
+      summary: 'Delete task by task id',
       protect: true,
     },
   })

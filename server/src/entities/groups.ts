@@ -11,6 +11,8 @@ export const groupsSchema = z.object({
   name: z.string().trim().min(3).max(50),
 })
 
+export const groupPublicSchema = groupsSchema.omit({createdAt: true, })
+
 export const userGroupsSchema = z.object({
   groupId: idSchema,
   userId: idSchema,

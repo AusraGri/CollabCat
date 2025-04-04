@@ -2,9 +2,11 @@ import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/inde
 import { tasksRepository } from '@server/repositories/tasksRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { getTasksSchema, taskDataSchema } from '@server/entities/tasks'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'GET',

@@ -13,10 +13,9 @@ export const categoriesSchema = z.object({
 
 export const publicCategorySchema = categoriesSchema.omit({isDefault: true})
 
-export const insertCategorySchema = categoriesSchema.omit({
-  id: true,
-  createdByUserId: true,
-  isDefault: true,
+export const insertCategorySchema = z.object({
+  title: z.string().trim().min(3).max(50),
+  groupId: idSchema.nullable().optional(),
 })
 export const categoriesKeysAll = Object.keys(
   categoriesSchema.shape

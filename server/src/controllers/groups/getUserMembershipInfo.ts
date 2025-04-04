@@ -5,9 +5,28 @@ import { idSchema } from '@server/entities/shared'
 import { memberSchema } from '@server/entities/groups'
 import z from 'zod'
 import type { GroupMember } from '@server/entities/groups'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
+
 
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
+  .use(errorLoggingMiddleware)
+  .meta({
+    openapi: {
+      method: 'GET',
+      path: '/group/membership',
+      tags: ['group'],
+      protect: true,
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Get group membership info of the user',
+      example: {
+        request: {
+          groupId: 1,
+          userId: 1
+        },
+      },
+    },
+  })
   .input(
     z.object({
       userId: idSchema.optional(),

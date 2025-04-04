@@ -4,16 +4,24 @@ import { idSchema } from '@server/entities/shared'
 import { userGroupsSchema } from '@server/entities/groups'
 import z from 'zod'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ groupsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'POST',
-      path: '/group/add',
+      path: '/group/addUser',
       tags: ['group'],
       protect: true,
-      summary: 'add user to the group',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Add user to the group (needs to be authenticated first)',
+      example: {
+        request: {
+          groupId: 345
+        },
+      },
     },
   })
   .input(

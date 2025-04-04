@@ -4,10 +4,11 @@ import provideRepos from '@server/trpc/provideRepos'
 import { recurringPatternSchemaInput } from '@server/entities/recurrence'
 import { inputTaskSchema, taskDataSchema } from '@server/entities/tasks'
 import z from 'zod'
-// import { setDateToUTCmidnight } from '../utility/helpers'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ tasksRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'POST',

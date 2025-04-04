@@ -5,6 +5,7 @@ import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
 import { authenticatedProcedure } from '@server/trpc/authenticatedProcedure/index'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 import {
   type InvitationData,
   invitationDataSchema,
@@ -14,6 +15,22 @@ export default authenticatedProcedure
   .use(
     provideRepos({ invitationsRepository, groupsRepository, userRepository })
   )
+  .use(errorLoggingMiddleware)
+  .meta({
+    openapi: {
+      method: 'GET',
+      path: '/invitations/info',
+      tags: ['invitations'],
+      protect: true,
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Get invitation data by invitation token',
+      example: {
+        request: {
+          invitationToken: 'someInvitationToken',
+        },
+      },
+    },
+  })
   .input(
     z.object({
       invitationToken: z.string(),

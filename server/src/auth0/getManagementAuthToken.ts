@@ -14,7 +14,6 @@ export const getAuth0Token = async () => {
         grant_type: "client_credentials",
       }),
     });
-
     if (!response.ok) {
       throw new Error(`Failed to get token: ${response.statusText}`);
     }

@@ -127,15 +127,15 @@ export const taskUpdateOptional = taskSchema
 export const taskUpdateSchema = z.object({
   id: idSchema.describe('Task id to update'),
   task: taskUpdateOptional.describe('Task updated data to save/change'),
-  recurrence: recurringPatternSchemaInput.optional(),
+  recurrence: recurringPatternSchemaInput.optional().describe('if task is recurring, recurrence pattern is required'),
 })
 
 export const taskCompletionSchema = z.object({
   id: idSchema.describe('Task id'),
-  instanceDate: dateSchema.describe('Task instance date'),
+  instanceDate: dateSchema.describe('Task instance date (when it is scheduled)'),
   isCompleted: z
     .boolean()
-    .describe('If you want to mark as completed - true, opposite - false'),
+    .describe('If you want to mark task as completed - true, not completed - false'),
 })
 
 export const getTasksSchema = z

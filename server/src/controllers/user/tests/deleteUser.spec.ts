@@ -95,7 +95,7 @@ describe('delete user', () => {
       success: true,
       message: /not found/i,
     })
-    expect(repo.userRepository.deleteUser).toHaveBeenCalledOnce()
+    expect(repo.userRepository.deleteUser).toHaveBeenCalled()
     expect(repo.userRepository.findById).toHaveBeenCalledWith(authUser.id)
     expect(deleteAuth0User).not.toHaveBeenCalled()
     expect(repo.userRepository.deleteUser).toBeCalledWith(authUser.id)

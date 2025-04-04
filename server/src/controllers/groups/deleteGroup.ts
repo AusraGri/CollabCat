@@ -3,16 +3,24 @@ import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { TRPCError } from '@trpc/server'
 import z from 'zod'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default groupAuthProcedure
   .use(provideRepos({ groupsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'DELETE',
       path: '/group/remove',
       tags: ['group'],
       protect: true,
-      summary: 'Delete group',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Delete group. Only group admin can delete',
+      example: {
+        request: {
+          groupId: 1
+        },
+      },
     },
   })
   .input(z.object({}))

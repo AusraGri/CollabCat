@@ -6,9 +6,22 @@ import {
   type PublicInvitation,
   invitationSchema,
 } from '@server/entities/invitations'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
+
 
 export default authenticatedProcedure
   .use(provideRepos({ invitationsRepository }))
+  .use(errorLoggingMiddleware)
+  .meta({
+    openapi: {
+      method: 'GET',
+      path: '/invitations/get',
+      tags: ['invitations'],
+      protect: true,
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Get user invitations to join the group',
+    },
+  })
   .input(z.void())
   .output(z.array(invitationSchema))
   .query(async ({ ctx: { authUser, repos } }) => {

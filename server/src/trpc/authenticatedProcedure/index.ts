@@ -1,7 +1,7 @@
 import config from '@server/config'
 import { TRPCError } from '@trpc/server'
 import { userRepository } from '@server/repositories/userRepository'
-import { auth0Procedure } from '@server/middlewares/trpcAuthMiddleware'
+import { auth0Procedure } from '@server/trpc/auth0Procedure'
 import logger from '@server/utils/logger'
 import provideRepos from '../provideRepos'
 

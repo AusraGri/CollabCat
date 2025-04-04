@@ -18,6 +18,7 @@ data/database*
 
 coverage
 .env
+.env.test
 test.ts
 test.spec.ts
 TO-DO.md

@@ -27,14 +27,9 @@ export default function createApp(db: Database) {
 
   app.use(express.json())
 
-  // app.use('/api/health', (_, res) => {
-  //   res.status(200).send('OK')
-  // })
-
   app.use('/api/health', async (_, res) => {
     try {
-      await sql`SELECT 1 FROM pg_stat_database LIMIT 1`.execute(db)
-
+      await sql`SELECT 1`.execute(db)
       res.status(200).json({ status: 'OK', database: 'connected' })
     } catch (error) {
       logger.error('❌ Database health check failed!', { error })
@@ -50,10 +45,10 @@ export default function createApp(db: Database) {
         req,
         res,
       }),
-
       router: appRouter,
     })
   )
+
 
   app.use(
     '/api',
@@ -67,8 +62,19 @@ export default function createApp(db: Database) {
     })
   )
 
-  app.use('/', swaggerUi.serve)
-  app.get('/', swaggerUi.setup(openApiDocument))
+  app.use('/docs', swaggerUi.serve)
+  app.get(
+    '/docs',
+    swaggerUi.setup(openApiDocument, {
+      swaggerOptions: {
+        oauth2RedirectUrl: 'http://localhost:3000/docs/oauth2-redirect.html',
+        oauth: {
+          clientId: config.auth0.clientId,
+          scopes: 'openid profile email',
+        },
+      },
+    })
+  )
 
   return app
 }

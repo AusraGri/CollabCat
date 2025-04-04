@@ -3,6 +3,8 @@ import provideRepos from '@server/trpc/provideRepos'
 import { userRepository } from '@server/repositories/userRepository'
 import z from 'zod'
 import { TRPCError } from '@trpc/server'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
+import { userPublicSchema } from '@server/entities/user'
 
 export default authenticatedProcedure
   .use(
@@ -10,11 +12,27 @@ export default authenticatedProcedure
       userRepository,
     })
   )
+  .use(errorLoggingMiddleware)
+  .meta({
+    openapi: {
+      method: 'PATCH',
+      path: '/user/update',
+      tags: ['user'],
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Update user username',
+      example: {
+        request: {
+          username: 'new username',
+        },
+      },
+    },
+  })
   .input(
     z.object({
-      username: z.string().trim().min(1).max(20),
+      username: z.string().trim().min(1).max(30),
     })
   )
+  .output(userPublicSchema)
   .mutation(async ({ input: userData, ctx: { repos, authUser } }) => {
     const user = await repos.userRepository.findById(authUser.id)
 

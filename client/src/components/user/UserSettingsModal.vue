@@ -37,15 +37,14 @@ async function changeName() {
     return
   }
   try {
-    userStore.updateUserName(username.value)
+    await userStore.updateUserName(username.value)
   } catch {
     return
+  } finally {
+    username.value = user.username
+    emit('close')
   }
-
-  username.value = user.username
   router.push({ params: { username: username.value.replace(' ', '') } })
-
-  emit('close')
 }
 
 const handleDeletion = async (value: boolean) => {

@@ -7,16 +7,28 @@ import {
 } from '@server/entities/rewards'
 import { groupsRepository } from '@server/repositories/groupsRepository'
 import { userRepository } from '@server/repositories/userRepository'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default authenticatedProcedure
   .use(provideRepos({ rewardsRepository, userRepository, groupsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'PATCH',
       path: '/rewards/update',
       tags: ['rewards'],
-      summary: 'Update reward',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Update reward data',
       protect: true,
+      example: {
+        request: {
+          id: 2,
+          groupId: 1,
+          cost: 24,
+          title: 'updated title',
+          amount: 56,
+        },
+      },
     },
   })
   .input(updateRewardSchema.strict())

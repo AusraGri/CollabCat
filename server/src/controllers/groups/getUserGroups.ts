@@ -3,9 +3,12 @@ import { groupsRepository } from '@server/repositories/groupsRepository'
 import provideRepos from '@server/trpc/provideRepos'
 import { groupsSchema } from '@server/entities/groups'
 import z from 'zod'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
+
 
 export default authenticatedProcedure
   .use(provideRepos({ groupsRepository }))
+  .use(errorLoggingMiddleware)
   .meta({
     openapi: {
       method: 'GET',
@@ -13,6 +16,7 @@ export default authenticatedProcedure
       tags: ['group'],
       protect: true,
       summary: 'Get groups of the user',
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
       description: 'This will retrieve all groups that user created',
     },
   })

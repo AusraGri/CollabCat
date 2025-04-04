@@ -4,6 +4,7 @@ import { userRepository } from '@server/repositories/userRepository'
 import z from 'zod'
 import { idSchema } from '@server/entities/shared'
 import { userPublicSchema } from '@server/entities/user'
+import { errorLoggingMiddleware } from '@server/middlewares/errorLoggingMiddleware'
 
 export default publicProcedure
   .use(
@@ -11,6 +12,22 @@ export default publicProcedure
       userRepository,
     })
   )
+  .use(errorLoggingMiddleware)
+  .meta({
+    openapi: {
+      method: 'GET',
+      path: '/user/get',
+      tags: ['user'],
+      protect: false,
+      contentTypes: ['application/x-www-form-urlencoded', 'application/json'],
+      summary: 'Get user info by user id. Public procedure.',
+      example: {
+        request: {
+          userId: 1
+        },
+      },
+    },
+  })
   .input(
     z.object({
       userId: idSchema,

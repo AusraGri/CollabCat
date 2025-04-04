@@ -14,13 +14,14 @@ const repos = (group?: any) => ({
 it('should get group info by group id', async () => {
   // ARRANGE
   const group = fakeGroup({ id: randomId() })
-  const repo = repos(group)
+  const repo = repos([group])
   const { getGroupInfo } = createCaller(repoContext(repo))
 
   // ACT
   const result = await getGroupInfo({ groupId: group.id })
 
-  expect(result).toBe(group)
+  expect(Array.isArray(result)).toBe(true)
+  expect(result).toContainEqual(group)
   expect(repo.groupsRepository.getGroup).toBeCalledWith({ id: group.id })
 })
 
