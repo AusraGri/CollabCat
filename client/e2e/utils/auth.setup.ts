@@ -5,7 +5,7 @@ import { stringToUrl } from '@/utils/helpers'
 import { config } from 'dotenv'
 
 config()
-// @ts-ignore  - need to fix it somehow :O -
+// @ts-ignore  - need to fix it somehow :O~
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const authFile = path.join(__dirname, 'auth.json')

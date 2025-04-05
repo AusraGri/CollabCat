@@ -4,7 +4,7 @@ import { Kysely, sql } from 'kysely'
 import type { RepositoriesKeys, Repositories } from '@server/repositories'
 
 interface SequenceResult {
-  sequence: string | null // `sequence` can be null if not found
+  sequence: string | null
 }
 
 /**
@@ -47,11 +47,9 @@ export const createTestDatabase = () => createDatabase(config.testDatabase)
  * for accurate test results
  */
 export async function cleanDatabase(db: Kysely<any>) {
-  // Disable foreign key constraints temporarily
   await sql`SET session_replication_role = replica`.execute(db)
 
   try {
-    // Fetch all table names excluding migration-related tables (like 'kysely_migration')
     const result = await db
       .selectFrom('pg_tables')
       .select('tablename')
@@ -61,7 +59,6 @@ export async function cleanDatabase(db: Kysely<any>) {
 
     const tableNames = result.map((row) => row.tablename)
 
-    // Delete all data from each table instead of truncating
     await Promise.all(
       tableNames.map(async (table) => {
         const query = `DELETE FROM "public"."${table}"`
@@ -69,11 +66,9 @@ export async function cleanDatabase(db: Kysely<any>) {
       })
     )
 
-    // Step 3: Check if the "id" column has an associated sequence and reset it
     await Promise.all(
       tableNames.map(async (table) => {
         try {
-          // Check if there is a sequence associated with the "id" column
           const sequenceQuery = sql.raw(`
           SELECT pg_get_serial_sequence('"public"."${table}"', 'id') AS sequence
           FROM information_schema.columns
@@ -87,19 +82,15 @@ export async function cleanDatabase(db: Kysely<any>) {
             rows: SequenceResult[]
           }
 
-          // Ensure proper typing for the result
           const sequenceRow: SequenceResult | undefined =
             sequenceNameResult.rows[0]
 
-          // Check if the result is empty or doesn't have the expected sequence field
           if (!sequenceRow || !sequenceRow.sequence) {
             return
           }
 
-          // Extract the sequence name safely
           const sequenceName = sequenceRow.sequence
 
-          // Reset the sequence to 1
           const resetSequenceQuery = `SELECT setval('${sequenceName}', 1, false)`
           await sql`${sql.raw(resetSequenceQuery)}`.execute(db)
         } catch (error) {
@@ -109,7 +100,6 @@ export async function cleanDatabase(db: Kysely<any>) {
       })
     )
   } finally {
-    // Re-enable foreign key constraints
     await sql`SET session_replication_role = DEFAULT`.execute(db)
   }
 }

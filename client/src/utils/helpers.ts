@@ -1,6 +1,21 @@
 import type { Ref } from 'vue'
 import { z } from 'zod'
 
+/**
+ * Converts a string into a URL-friendly slug.
+ *
+ * This function:
+ * - Trims whitespace from the start and end
+ * - Removes non-alphanumeric characters (except accented characters and spaces)
+ * - Replaces spaces with hyphens
+ * - Collapses multiple hyphens into one
+ * - Removes leading and trailing hyphens
+ *
+ * Useful for creating slugs or readable URL paths from titles or labels.
+ *
+ * @param {string} string - The input string to convert.
+ * @returns {string} - The cleaned, URL-safe slug string.
+ */
 export function stringToUrl(string: string): string {
   return string
     .trim()
@@ -17,6 +32,21 @@ export function isEmailValid(email: string) {
   return result.success
 }
 
+/**
+ * Converts a time string (e.g. "13:30" or "24:00") to a local time string
+ * based on a given timestamp with time zone (`timestamptz`).
+ *
+ * Useful when you want to apply a plain time (like from a form or task)
+ * onto a specific date, and then format it using the local timezone offset.
+ *
+ * Notes:
+ * - If `timeString` is `"24:00"`, it will be treated as `"00:00"` of the *next* day (but set to 00:00 on the same date here).
+ * - Uses 24-hour format and includes the short timezone offset (like `+03:00`).
+ *
+ * @param {string} timeString - The time string in `"HH:mm"` format (24-hour).
+ * @param {Date} timestamptz - The base date with timezone info to apply the time to.
+ * @returns {string} - The formatted local time string (e.g. `"13:30"`).
+ */
 export function timeToLocalTime(timeString: string, timestamptz: Date): string {
   const date = new Date(timestamptz)
   const [hours, minutes] = timeString.split(':').map(Number)
@@ -70,6 +100,24 @@ export const formatDateToLongString = (date: Date) => {
   return `${year} ${month} ${day}, ${weekday}`
 }
 
+/**
+ * Performs a deep equality check between two values.
+ *
+ * Handles:
+ * - Primitive values (compared with `===`)
+ * - Nested objects and arrays
+ * - `Date` objects (compared by their ISO string representation)
+ *
+ * Returns `false` if:
+ * - Types are different
+ * - Object keys mismatch in length or values are not deeply equal
+ *
+ * Note: This does not handle special cases like circular references or special objects (Map, Set, etc.)
+ *
+ * @param {*} obj1 - First value to compare.
+ * @param {*} obj2 - Second value to compare.
+ * @returns {boolean} - `true` if values are deeply equal, `false` otherwise.
+ */
 export function areObjectsEqual(obj1: any, obj2: any): boolean {
   if (typeof obj1 !== typeof obj2) return false
 

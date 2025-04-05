@@ -22,7 +22,6 @@ export const clearTables = async <
   db: Kysely<T>,
   tableNames: N[]
 ): Promise<void> => {
-  // if SQLite, just delete all records
   if (db.getExecutor().adapter instanceof SqliteAdapter) {
     await Promise.all(
       tableNames.map((tableName) =>
@@ -33,7 +32,6 @@ export const clearTables = async <
     return
   }
 
-  // assume PostgreSQL, truncate all tables
   const tableNamesSql = sql.join(tableNames.map(sql.table), sql.raw(', '))
 
   await sql`TRUNCATE TABLE ${tableNamesSql} CASCADE;`.execute(db)

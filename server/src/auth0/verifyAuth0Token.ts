@@ -9,6 +9,22 @@ export interface Auth0TokenPayload {
   picture?: string
 }
 
+/**
+ * Verifies an Auth0-issued JWT access token using the JSON Web Key Set (JWKS).
+ *
+ * This function:
+ * - Decodes the token header to extract the `kid` (Key ID)
+ * - Fetches the public signing key from the Auth0 JWKS endpoint
+ * - Verifies the token's signature and claims using RS256 algorithm
+ *
+ * If the token is expired or invalid, it throws specific error messages.
+ *
+ * @param {string} token - The JWT access token to verify.
+ * @param {string} audience - The expected audience (`aud`) claim (usually your API identifier).
+ * @param {string} issuer - The Auth0 domain (e.g. `your-tenant.auth0.com`) used to validate the `iss` claim.
+ * @returns {Promise<Auth0TokenPayload>} - The decoded token payload if verification succeeds.
+ * @throws {Error} - Throws if the token is invalid, expired, or verification fails.
+ */
 export async function verifyAuth0Token(
   token: string,
   audience: string,

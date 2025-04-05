@@ -3,6 +3,19 @@ import logger from '@server/utils/logger'
 import { middleware, publicProcedure } from '../trpc/index'
 import { validateAccessToken } from './auth0Middleware'
 
+/**
+ * Middleware for validating an access token in the request headers.
+ *
+ * This middleware:
+ * - Validates the JWT access token if it's not in a test environment.
+ * - Logs errors if the token validation fails and includes request details such as the IP address, user agent, and error message.
+ * - If the token validation succeeds, it calls the next middleware or procedure handler.
+ *
+ * @param {object} ctx - The context of the request, which includes the request (`req`) and response (`res`) objects.
+ * @param {Function} next - The function that invokes the next middleware or handler in the chain.
+ * @returns {Promise} - Resolves when the token validation is successful and the next middleware is called.
+ * @throws {Error} - Throws an error if the token is invalid or if the request/response objects are missing from the context.
+ */
 export const validateAccessTokenMiddleware = middleware(
   async ({ ctx, next }) => {
     const { req, res } = ctx

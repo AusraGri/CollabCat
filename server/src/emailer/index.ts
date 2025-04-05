@@ -10,10 +10,23 @@ export function getMailTransporter(): Transporter {
   return nodemailer.createTransport(config.emailService)
 }
 
+/**
+ * Sends an email invitation to a user with a link to join a group.
+ *
+ * This function:
+ * - Creates an invitation URL using the provided token
+ * - Sends the email via the given transporter (e.g., using Nodemailer)
+ * - Includes a personalized message with a link to the invite page
+ *
+ * @param {Transporter} transporter - The email transporter used to send the email (e.g., Nodemailer transporter).
+ * @param {EmailData} emailData - The data for the invitation email, including the recipient's email and invite token.
+ * @returns {Promise<any>} - A Promise that resolves when the email is sent successfully.
+ * @throws {Error} - Throws an error if the invitation email fails to send.
+ */
 export async function sentInvitationMail(
   transporter: Transporter,
   emailData: EmailData
-) {
+): Promise<any> {
   const inviteLink = `${config.auth0.clientOriginUrl}/invite?token=${emailData.inviteToken}`
   const info = {
     from: '"CollabCat App" <invitations@myapp.email>',
