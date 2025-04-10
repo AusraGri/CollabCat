@@ -119,8 +119,6 @@ const redirectToHomePage = () => {
 }
 </script>
 <template>
-  <div>{{ isAuth }}</div>
-  <div>{{ invitationStore.invitationToken }}</div>
   <div class="rounded-lg bg-white p-6 shadow-md">
     <div>
       <!-- Invitation Block: Only visible if not authenticated -->
