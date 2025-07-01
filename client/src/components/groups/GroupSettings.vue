@@ -80,9 +80,9 @@ const processConfirmation = async (confirm: boolean) => {
     await userGroupStore.removeUserFromGroup()
   }
   userGroupStore.activeGroup = null
-  userGroupStore.fetchUserGroups()
+  await userGroupStore.fetchUserGroups()
   emit('close')
-  router.push({ name: 'Profile' })
+  await router.push({ name: 'Profile' })
 }
 
 watch(

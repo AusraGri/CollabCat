@@ -213,15 +213,7 @@ watch(
       </form>
     </template>
     <template #footer>
-      <div class="flex justify-between">
-        <FwbButton
-          @click="confirmAction(false)"
-          color="alternative"
-          aria-label="Decline reward creation"
-          data-test="decline-button"
-        >
-          Decline
-        </FwbButton>
+      <div class="flex justify-end">
         <FwbButton
           @click="confirmAction(true)"
           color="green"

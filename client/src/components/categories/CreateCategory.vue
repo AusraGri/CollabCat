@@ -98,10 +98,7 @@ useKeyboardAction(
       </div>
     </template>
     <template #footer>
-      <div class="flex justify-between">
-        <FwbButton @click="confirmAction(false)" color="alternative" data-test="decline-button">
-          Decline
-        </FwbButton>
+      <div class="flex justify-end">
         <FwbButton
           @click="confirmAction(true)"
           type="submit"
@@ -109,7 +106,7 @@ useKeyboardAction(
           :disabled="title.length < 3"
           data-test="accept-button"
         >
-          I accept
+          Create
         </FwbButton>
       </div>
     </template>

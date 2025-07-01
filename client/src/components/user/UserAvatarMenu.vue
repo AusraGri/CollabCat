@@ -29,11 +29,11 @@ const openUserSettings = () => {
   isShowSettings.value = !isShowSettings.value
 }
 
-function logoutUser() {
+async function logoutUser() {
   logout()
   authStore.logout()
   userStore.clearUser()
-  router.push({ name: 'Home' })
+  await router.push({ name: 'Home' })
 }
 
 const handleDeletion = async (value: boolean) => {

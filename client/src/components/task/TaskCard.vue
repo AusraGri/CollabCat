@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch, type PropType } from 'vue'
-import { FwbBadge, FwbCheckbox } from 'flowbite-vue'
 import { UsersIcon, Squares2X2Icon, ClockIcon, StarIcon } from '@heroicons/vue/24/outline'
 import {
   type TaskData,
@@ -15,6 +14,7 @@ import { toggle } from '@/utils/helpers'
 import { timeToLocalTime, formatDateToLocal } from '@/utils/helpers'
 import { useTasksStore, useUserStore, useUserGroupsStore } from '@/stores'
 import { checkRecurrence } from '@/utils/tasks'
+import CheckboxPaw from '../CheckboxPaw.vue'
 
 const emit = defineEmits<{
   (event: 'task:updated', value: TaskData): void
@@ -166,17 +166,17 @@ watch(
   <div>
     <div
       :class="[
-        'border-grey-700 m-1 flex h-fit w-fit space-x-1 rounded rounded-s-2xl border-2 p-2 shadow-md',
+        'border-grey-700 m-1 flex h-fit w-fit space-x-1 rounded-xl border-2 p-2 shadow-md',
         isCompletedTask ? 'bg-gray-400' : 'bg-green-400',
       ]"
       :aria-label="`${task.title}`"
       :data-test="`${task.title.replace(' ', '-')}`"
     >
-      <div v-if="isCheckbox" class="self-center">
-        <FwbCheckbox
-          v-model="check"
-          :disabled="!isCheckboxEnabled || !isAdmin"
-          @update:model-value="updateTaskStatus"
+      <div v-if="isCheckbox" class="self-center mr-1">
+        <CheckboxPaw
+          @update:checked="updateTaskStatus"
+          :is-checked="check"
+          :is-disabled="!isCheckboxEnabled || !isAdmin"
           :aria-label="`${task.title} complete status`"
           data-test="task-status"
           :aria-checked="check ? 'true' : 'false'"
@@ -203,7 +203,7 @@ watch(
             'items-middle',
             ,
             'p-1',
-            { 'justify-between bg-orange-300': isShowDates },
+            { 'justify-between border-2': isShowDates },
             { ' rounded-bl': !task.recurrence && !task.categoryId && !task.groupId },
           ]"
         >
@@ -223,7 +223,7 @@ watch(
 
         <div
           v-if="task.recurrence && isShowRecurrence"
-          class="bg-orange-200 p-1 text-center text-sm"
+          class="p-1 text-center text-sm"
           :aria-label="`${task.title} recurrence`"
           data-test="task-recurrence"
         >
@@ -256,10 +256,10 @@ watch(
             :aria-label="`${task.title} points`"
             data-test="task-points"
           >
-            <FwbBadge size="sm" type="yellow" class="w-fit min-w-10 rounded-e-full p-0">
-              <StarIcon class="h-3 pr-1" />
-              {{ task.points }}</FwbBadge
-            >
+            <div class="flex w-fit min-w-10 rounded-e-full p-0 text-sm">
+              <StarIcon class="h-5 pr-1 text-yellow-300" />
+              {{ task.points }}
+            </div>
           </div>
           <div
             v-if="assignedUserProfile"

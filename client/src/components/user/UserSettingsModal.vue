@@ -44,7 +44,7 @@ async function changeName() {
     username.value = user.username
     emit('close')
   }
-  router.push({ params: { username: username.value.replace(' ', '') } })
+  await router.push({ params: { username: username.value.replace(' ', '') } })
 }
 
 const handleDeletion = async (value: boolean) => {
@@ -54,16 +54,16 @@ const handleDeletion = async (value: boolean) => {
   isShowConfirmation.value = false
 }
 
-function logoutUser() {
+async function logoutUser() {
   logout()
   authStore.logout()
   userStore.clearUser()
-  router.push({ name: 'Home' })
+  await router.push({ name: 'Home' })
 }
 
 async function deleteAccount() {
   await userStore.deleteUser()
-  logoutUser()
+  await logoutUser()
 }
 
 const closeModal = () => {
