@@ -48,7 +48,7 @@ const handleAuthRedirect = async () => {
 
     const idToken = await getAccessTokenSilently()
 
-    authStore.setAuthToken(idToken)
+   await authStore.setAuthToken(idToken)
     let routeUsername: string
     const newUser = await getUserData()
     const signedUser = await trpc.user.signupAuth.mutate(newUser)

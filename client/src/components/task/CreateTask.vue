@@ -110,7 +110,7 @@ const validateNewTaskData = (taskData: NewTaskData) => {
 async function confirmAction(confirmed: boolean) {
   errorMessage.value = ''
 
-  if (!confirmed) {
+  if (!confirmed && isShowModal) {
     resetForm()
     emit('close')
     return

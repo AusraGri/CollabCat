@@ -54,9 +54,9 @@ const handlePointChange = async () => {
     if (!groupId) throw new Error('Missing data for points managing')
 
     if (isPointsEnabled.value) {
-      pointStore.enablePoints(groupId)
+      await pointStore.enablePoints(groupId)
     } else {
-      pointStore.disablePoints()
+      await pointStore.disablePoints()
     }
   } catch (error) {
     setErrorMessage({ message: 'Failed to change user points status' })

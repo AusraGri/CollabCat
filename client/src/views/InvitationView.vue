@@ -43,7 +43,7 @@ async function validateInvitation() {
   } catch (err) {
     error.value = `Error occurred: ${err}`
     isTokenValid.value = false
-    invitationStore.deleteInvitation()
+    await invitationStore.deleteInvitation()
   } finally {
     loading.value = false
   }

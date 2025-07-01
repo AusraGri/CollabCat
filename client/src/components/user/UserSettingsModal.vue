@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { useUserStore, usePointsStore, useCategoriesStore } from '@/stores'
+import { useUserStore, usePointsStore, useCategoriesStore, type UserStore } from '@/stores'
 import { useAuthStore } from '@/stores/authStore'
 import { useAuthService } from '@/services/auth0'
 import { useRouter } from 'vue-router'
@@ -21,7 +21,7 @@ const emit = defineEmits<{
 
 const { logout } = useAuthService()
 const authStore = useAuthStore()
-const userStore = useUserStore()
+const userStore: UserStore = useUserStore()
 const pointStore = usePointsStore()
 const categoryStore = useCategoriesStore()
 const username = ref()

@@ -41,7 +41,7 @@ const isCategoryTitle = (params: { title: string; groupId?: number }) => {
 }
 
 async function confirmAction(confirmed: boolean) {
-  if (!confirmed) {
+  if (!confirmed && isShowModal || !isShowModal) {
     closeModal()
 
     return

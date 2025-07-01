@@ -41,6 +41,8 @@ const reward = ref({
 function confirmAction(confirmed: boolean) {
   if (!confirmed) {
     emit('close')
+    resetReactiveValues()
+    return
   }
   if (!costValidation(reward.value.cost) || !titleValidation(reward.value.title)) {
     isCostValid.value = costValidation(reward.value.cost)
