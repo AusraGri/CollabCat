@@ -15,7 +15,6 @@ test('Edit task', async ({ page }) => {
   const categoriesButton = page.getByTestId('select-category')
   const categoryTitleInput = page.getByTestId('category-title-input')
   const addCategoryButton = page.getByTestId('accept-button')
-  const declineCategoryButton = page.getByTestId('decline-button')
   await tasksTab.click()
 
   const task = page.getByTestId(newTaskTitle.replace(' ', '-'))
@@ -56,7 +55,6 @@ test('Edit task', async ({ page }) => {
 
       await expect(categoryTitleInput).toBeVisible()
       await expect(addCategoryButton).toBeDisabled()
-      await expect(declineCategoryButton).toBeVisible()
 
       const placeholderText = await categoryTitleInput.getAttribute('placeholder')
       expect(placeholderText).toBe('enter category title')

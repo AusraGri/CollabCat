@@ -12,7 +12,7 @@ test('Create tasks, delete tasks', async ({ page }) => {
   const taskPointsCheckbox = page.getByTestId('task-points-checkbox')
   const taskPoints = page.getByTestId('points-input')
   const addTaskButton = page.getByTestId('add-task-button')
-  const declineButton = page.getByTestId('decline-button')
+  const closeButton = page.getByRole('button', { name: 'close' })
   const taskTimeCheckbox = page.getByTestId('task-time-checkbox')
   const startDate = page.getByTestId('start-date-picker')
   const endDate = page.getByTestId('end-date-picker')
@@ -45,7 +45,7 @@ test('Create tasks, delete tasks', async ({ page }) => {
     await expect(taskPointsCheckbox).toBeVisible()
     await expect(taskPoints).not.toBeVisible()
     await expect(addTaskButton).toBeVisible()
-    await expect(declineButton).toBeVisible()
+    await expect(closeButton).toBeVisible()
     await expect(addTaskButton).toBeDisabled()
     await expect(startDate).not.toBeVisible()
     await expect(endDate).not.toBeVisible()
@@ -108,7 +108,7 @@ test('Create tasks, delete tasks', async ({ page }) => {
     await expect(taskPointsCheckbox).toBeVisible()
     await expect(taskPoints).not.toBeVisible()
     await expect(addTaskButton).toBeVisible()
-    await expect(declineButton).toBeVisible()
+    await expect(closeButton).toBeVisible()
     await expect(addTaskButton).toBeDisabled()
     await expect(taskTimeCheckbox).not.toBeVisible()
     await expect(addTaskButton).toBeDisabled()
@@ -207,7 +207,7 @@ test('Create tasks, delete tasks', async ({ page }) => {
     await expect(taskRecurrenceCheckbox).toBeVisible()
     await expect(taskTitle).toBeVisible()
     await expect(addTaskButton).toBeDisabled()
-    await expect(declineButton).toBeVisible()
+    await expect(closeButton).toBeVisible()
 
     await taskTitle.click()
     await taskTitle.fill(newTaskTitle)
@@ -218,7 +218,7 @@ test('Create tasks, delete tasks', async ({ page }) => {
 
     await expect(alert).toBeVisible()
 
-    await declineButton.click()
+    await closeButton.click()
 
     await expect(newTaskModalTitle).not.toBeVisible()
   })

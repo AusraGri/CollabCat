@@ -10,7 +10,6 @@ test('Create new personal category, select category, delete category', async ({ 
   const categoriesButton = page.getByTestId('select-category')
   const categoryTitleInput = page.getByTestId('category-title-input')
   const addCategoryButton = page.getByTestId('accept-button')
-  const declineCategoryButton = page.getByTestId('decline-button')
   const categorySelectButton = page.getByTestId('select-category-button')
 
   await test.step('create personal category', async () => {
@@ -26,7 +25,6 @@ test('Create new personal category, select category, delete category', async ({ 
 
     await expect(categoryTitleInput).toBeVisible()
     await expect(addCategoryButton).toBeDisabled()
-    await expect(declineCategoryButton).toBeVisible()
 
     const placeholderText = await categoryTitleInput.getAttribute('placeholder')
     expect(placeholderText).toBe('enter category title')

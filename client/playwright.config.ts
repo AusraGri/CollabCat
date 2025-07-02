@@ -53,6 +53,11 @@ const config: PlaywrightTestConfig = {
     {
       name: 'setup',
       testMatch: /.*\.setup\.ts/, // Only runs files matching "*.setup.ts"
+      teardown: 'cleanup',
+    },
+    {
+      name: 'cleanup',
+      testMatch: /.*\.teardown\.ts/,
     },
 
     // ✅ Chromium project - Uses saved session from auth.json

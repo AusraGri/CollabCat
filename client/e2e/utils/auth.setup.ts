@@ -22,7 +22,7 @@ setup('authenticate', async ({ context }) => {
     const page = await context.newPage()
 
     await page.goto('http://localhost:5174/')
-    await page.getByTestId('login-button').click()
+    await page.getByTestId('signup-button').click()
     await page.getByLabel('Email address').fill(VITE_AUTH0_TEST_EMAIL)
     await page.getByLabel('Password').fill(VITE_AUTH0_TEST_PASSWORD)
     await page.getByRole('button', { name: 'Continue', exact: true }).click()

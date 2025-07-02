@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits, defineProps, useId } from 'vue'
+import { ref, useId, watch } from 'vue'
 
 const props = defineProps<{
   isChecked?: boolean
@@ -19,6 +19,10 @@ function onChange(event: Event) {
   checked.value = target.checked
   emit('update:checked', checked.value)
 }
+
+watch(() => props.isChecked, (newVal) => {
+  checked.value = newVal ?? false
+})
 </script>
 
 <template>

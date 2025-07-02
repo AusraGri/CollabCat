@@ -11,7 +11,7 @@ test('User calendar, mark tasks as done', async ({ page }) => {
   const todayButton = page.getByTestId('today-button')
   const taskListDate = page.getByTestId('task-list-date')
   const task = page.getByTestId(newTaskTitle.replace(' ', '-'))
-  const taskCheckbox = task.getByTestId('task-status').locator('input')
+  const taskCheckbox = task.getByTestId('task-status')
 
   await test.step('user can see the calendar and pick dates', async () => {
     await expect(calendarTab).toBeVisible()
@@ -59,12 +59,12 @@ test('User calendar, mark tasks as done', async ({ page }) => {
     await expect(task).toBeVisible()
 
     await expect(taskCheckbox).toBeVisible()
-    await expect(taskCheckbox).not.toBeChecked()
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'false')
     await expect(datePicker).toBeVisible()
-    await taskCheckbox.check()
-    await expect(taskCheckbox).toBeChecked()
+    await taskCheckbox.click()
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'true')
     await page.reload()
-    await expect(taskCheckbox).toBeChecked()
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'true')
   })
 
   await test.step('task should be visible in the calendar and allow to check it in the past dates', async () => {
@@ -78,7 +78,7 @@ test('User calendar, mark tasks as done', async ({ page }) => {
     await expect(task).toBeVisible()
 
     await expect(taskCheckbox).toBeVisible()
-    await expect(taskCheckbox).toBeChecked()
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'true')
 
     await expect(datePicker).toBeVisible()
 
@@ -87,9 +87,9 @@ test('User calendar, mark tasks as done', async ({ page }) => {
     await expect(taskListDate).toContainText(`${formatDateToLongString(currentDate)}`)
     await expect(task).toBeVisible()
     await expect(taskCheckbox).toBeVisible()
-    await taskCheckbox.check()
-    await expect(taskCheckbox).toBeChecked()
-
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'false')
+    await taskCheckbox.click();
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'true')
     await todayButton.click()
   })
   await test.step('task should be visible in the calendar and not allow to check it in the future dates', async () => {
@@ -104,7 +104,7 @@ test('User calendar, mark tasks as done', async ({ page }) => {
     await expect(task).toBeVisible()
 
     await expect(taskCheckbox).toBeVisible()
-    await expect(taskCheckbox).toBeChecked()
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'true')
 
     await expect(datePicker).toBeVisible()
     await nextMonthButton.click()
@@ -124,11 +124,11 @@ test('User calendar, mark tasks as done', async ({ page }) => {
     await expect(task).toBeVisible()
 
     await expect(taskCheckbox).toBeVisible()
-    await expect(taskCheckbox).toBeChecked()
-    await taskCheckbox.uncheck()
-    await expect(taskCheckbox).not.toBeChecked()
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'true')
+    await taskCheckbox.click();
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'false')
     await page.reload()
-    await expect(taskCheckbox).not.toBeChecked()
+    await expect(taskCheckbox).toHaveAttribute('aria-checked', 'false')
     await todayButton.click()
   })
 
